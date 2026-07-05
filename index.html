@@ -12,131 +12,106 @@
     --bg:#FFFFF8; --card:#FFFFFF; --inner:#FBFAF0; --ink:#222222; --ink2:#66665F;
     --muted:#9A988E; --border:#E7E3D6; --accent:#FCD41A; --accentDim:#EFC400;
     --paleY:#FFF7CE; --mutePill:#F5F3E9; --muteTx:#AEAC9F; --chipInk:#33332E;
+    --appbar:60px;
     --font:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic",sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--font);
     -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
-  body{min-height:100vh;}
   ::selection{background:var(--accent);color:var(--ink);}
   a{color:inherit;text-decoration:none;}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
   :focus-visible{outline:3px solid var(--accentDim);outline-offset:2px;border-radius:6px;}
 
-  /* ---------- top bar ---------- */
-  .topbar{display:flex;align-items:center;justify-content:space-between;
-    padding:20px 28px;max-width:1120px;margin:0 auto;}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.01em;}
-  .brand .dot{width:13px;height:13px;border-radius:50%;background:var(--accent);flex:none;}
-  .demo-tag{font-size:12px;font-weight:700;color:var(--ink);background:var(--accent);
-    padding:5px 11px;border-radius:999px;}
+  .appbar{height:var(--appbar);display:flex;align-items:center;justify-content:space-between;
+    padding:0 26px;border-bottom:1.5px solid var(--border);background:var(--card);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:none;}
+  .demo-tag{font-size:12px;font-weight:700;color:var(--ink);background:var(--accent);padding:5px 11px;border-radius:999px;}
 
-  /* ---------- explore ---------- */
-  .explore{max-width:820px;margin:0 auto;padding:0 24px 96px;}
-  .hero{padding:46px 0 8px;text-align:center;animation:rise .6s cubic-bezier(.2,.7,.2,1) both;}
-  .hero h1{font-size:clamp(26px,4vw,40px);font-weight:900;line-height:1.3;margin:0 0 6px;letter-spacing:.01em;}
-  .hero .hl{background:linear-gradient(transparent 58%, var(--accent) 58%, var(--accent) 92%, transparent 92%);
-    padding:0 2px;}
-  .hero p{color:var(--ink2);font-size:16px;font-weight:500;margin:10px 0 0;}
+  .tagzone{padding:22px 24px 40px;}
+  .searchzone{padding:20px 26px;border-bottom:1.5px solid var(--border);background:var(--bg);}
+  .resultzone{padding:20px 26px 40px;}
 
-  .searchwrap{position:relative;max-width:620px;margin:30px auto 0;}
-  .searchwrap svg{position:absolute;left:24px;top:50%;transform:translateY(-50%);color:var(--muted);}
-  #q{width:100%;height:66px;border:1.5px solid var(--border);background:var(--card);
-    border-radius:999px;padding:0 26px 0 58px;font-size:18px;font-weight:700;color:var(--ink);
-    font-family:inherit;transition:border-color .2s, box-shadow .2s;}
+  @media (min-width:921px){
+    body[data-view="explore"]{overflow:hidden;height:100vh;}
+    .workspace{display:grid;grid-template-columns:42% 58%;grid-template-rows:auto 1fr;
+      grid-template-areas:"tags search" "tags results";height:calc(100vh - var(--appbar));}
+    .tagzone{grid-area:tags;overflow-y:auto;border-right:1.5px solid var(--border);}
+    .searchzone{grid-area:search;}
+    .resultzone{grid-area:results;overflow-y:auto;}
+  }
+
+  .searchwrap{position:relative;max-width:640px;}
+  .searchwrap svg{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--muted);}
+  #q{width:100%;height:60px;border:1.5px solid var(--border);background:var(--card);border-radius:999px;
+    padding:0 52px 0 54px;font-size:17px;font-weight:700;color:var(--ink);font-family:inherit;transition:border-color .2s,box-shadow .2s;}
   #q::placeholder{color:var(--muted);font-weight:400;}
   #q:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px var(--paleY);}
+  .clearq{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;
+    background:var(--mutePill);color:var(--ink2);font-weight:700;font-size:15px;display:none;align-items:center;justify-content:center;}
+  .clearq.show{display:flex;}
+  .exrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;max-width:640px;}
+  .ex{font-size:13px;font-weight:500;color:var(--ink2);background:var(--card);border:1.5px solid var(--border);border-radius:999px;padding:7px 13px;}
+  .ex:hover{border-color:var(--ink);}
 
-  .seeds{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px auto 0;max-width:620px;}
-  .seed{font-size:14px;font-weight:500;color:var(--ink2);background:var(--card);
-    border:1.5px solid var(--border);border-radius:999px;padding:8px 15px;transition:border-color .2s,color .2s;}
-  .seed:hover{border-color:var(--ink);color:var(--ink);}
-
-  /* tag cloud */
-  .cloud{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:34px auto 0;max-width:760px;}
-  .tag{font-size:16px;font-weight:500;color:var(--chipInk);background:var(--card);
-    border:1.5px solid var(--border);border-radius:999px;padding:11px 16px;display:inline-flex;
-    align-items:center;gap:7px;transition:background .28s ease,color .28s ease,transform .28s ease,border-color .28s ease,opacity .28s ease;}
+  .tgroup{margin-bottom:22px;animation:fade .35s ease both;}
+  .gl{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:11px;display:flex;align-items:center;gap:8px;}
+  .gl .barmini{width:16px;height:4px;border-radius:2px;background:var(--accent);}
+  .gtags{display:flex;flex-wrap:wrap;gap:9px;}
+  .tag{font-size:15px;font-weight:500;color:var(--chipInk);background:var(--card);border:1.5px solid var(--border);
+    border-radius:999px;padding:10px 15px;display:inline-flex;align-items:center;gap:7px;
+    transition:background .2s,color .2s,border-color .2s,transform .12s;animation:pop .28s ease both;}
   .tag:hover{border-color:var(--ink);}
-  .tag .pdot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;}
-  .tag.hit{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:700;
-    transform:scale(1.05);font-size:17px;padding:12px 18px;}
+  .tag:active{transform:scale(.97);}
+  .tag .pdot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;}
+  .tag.hit{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:700;}
   .tag.hit .pdot{background:var(--ink);}
-  .tag.muted{background:var(--mutePill);border-color:transparent;color:var(--muteTx);transform:scale(.96);}
-  .tag.muted .pdot{background:var(--muteTx);}
+  .tag .x{color:var(--ink);opacity:.5;font-weight:700;margin-left:1px;}
+  .clearall{font-size:13px;font-weight:700;color:var(--ink2);background:var(--mutePill);border-radius:999px;padding:8px 13px;}
+  .clearall:hover{color:var(--ink);}
+  .selrow{display:flex;flex-wrap:wrap;gap:9px;align-items:center;}
 
-  .legend{display:flex;align-items:center;justify-content:center;gap:8px;margin:26px 0 0;
-    font-size:13px;color:var(--muted);}
-  .legend .pdot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
-
-  /* dynamic area */
-  #dyn{margin-top:34px;}
-  .hint{text-align:center;color:var(--ink2);font-size:15px;font-weight:500;}
-  .fade{animation:rise .45s cubic-bezier(.2,.7,.2,1) both;}
-
-  .clarify{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:22px 24px;margin:0 0 18px;}
-  .clarify .qrow{display:flex;align-items:center;gap:12px;margin:0 0 14px;}
-  .clarify .qmark{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--ink);
-    font-weight:700;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;}
-  .clarify .qtext{font-size:17px;font-weight:700;}
-  .clarify .opts{display:flex;flex-wrap:wrap;gap:9px;}
-  .opt{font-size:15px;font-weight:500;color:var(--chipInk);background:var(--card);
-    border:1.5px solid var(--border);border-radius:999px;padding:9px 15px;transition:background .2s,border-color .2s;}
-  .opt:hover{background:var(--paleY);border-color:var(--accentDim);}
-
-  .answer{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:26px 28px;margin:0 0 18px;}
-  .answer .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
-  .answer h2{font-size:24px;font-weight:900;margin:0;line-height:1.35;letter-spacing:.01em;}
-  .badge{display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:#fff;
-    font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;white-space:nowrap;flex:none;}
-  .badge .bd{width:8px;height:8px;border-radius:50%;background:var(--accent);}
-  .answer .src{color:var(--muted);font-size:14px;font-weight:500;margin:12px 0 0;}
-  .answer .sum{color:var(--ink2);font-size:16px;line-height:1.85;margin:14px 0 0;
-    border-top:1.5px solid var(--border);padding-top:16px;}
-  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--ink);
-    font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px;margin-top:18px;transition:transform .12s;}
+  .rhint{color:var(--ink2);font-size:15px;font-weight:500;line-height:1.7;padding:8px 0 4px;}
+  .rhint b{color:var(--ink);font-weight:700;}
+  .fade{animation:fade .3s ease both;}
+  .answer{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:22px 24px;margin:0 0 16px;animation:pop .3s ease both;}
+  .answer .top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .answer h2{font-size:22px;font-weight:900;margin:0;line-height:1.35;}
+  .badge{display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:#fff;font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:999px;white-space:nowrap;flex:none;}
+  .badge .bd{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  .answer .src{color:var(--muted);font-size:13.5px;font-weight:500;margin:11px 0 0;}
+  .answer .sum{color:var(--ink2);font-size:15px;line-height:1.8;margin:13px 0 0;border-top:1.5px solid var(--border);padding-top:14px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--ink);font-weight:700;font-size:14px;padding:12px 22px;border-radius:999px;margin-top:16px;transition:transform .12s;}
   .btn:hover{transform:translateY(-1px);}
-  .btn:active{transform:translateY(0);}
-  .trust{color:var(--muted);font-size:13px;line-height:1.7;margin:14px 0 0;}
-
-  .rlabel{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin:6px 0 12px;}
-  .card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:18px 20px;margin:0 0 12px;
-    transition:border-color .2s, transform .12s;cursor:pointer;}
+  .rlabel{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin:4px 0 11px;}
+  .card{background:var(--card);border:1.5px solid var(--border);border-radius:15px;padding:17px 19px;margin:0 0 11px;cursor:pointer;transition:border-color .2s,transform .12s;animation:pop .3s ease both;}
   .card:hover{border-color:var(--ink);}
   .card:active{transform:scale(.995);}
-  .card .ctop{display:flex;align-items:center;justify-content:space-between;gap:12px;}
-  .card h3{font-size:18px;font-weight:700;margin:0;}
-  .card .meta{color:var(--muted);font-size:13px;font-weight:500;margin:7px 0 0;}
-  .card .snip{color:var(--ink2);font-size:15px;line-height:1.7;margin:9px 0 0;}
-  .card .open{color:var(--ink);font-weight:700;font-size:14px;margin:11px 0 0;display:inline-block;}
+  .card h3{font-size:17px;font-weight:700;margin:0;}
+  .card .meta{color:var(--muted);font-size:12.5px;font-weight:500;margin:7px 0 0;}
+  .card .snip{color:var(--ink2);font-size:14.5px;line-height:1.65;margin:8px 0 0;}
+  .card .open{color:var(--ink);font-weight:700;font-size:13.5px;margin:10px 0 0;display:inline-block;}
   .card .open .arw{color:var(--accentDim);}
-  .empty{text-align:center;color:var(--ink2);font-size:15px;font-weight:500;padding:26px 0;}
+  .empty{color:var(--ink2);font-size:15px;font-weight:500;padding:24px 0;}
 
-  /* ---------- source page ---------- */
-  .srcnav{border-bottom:1.5px solid var(--border);background:var(--card);}
-  .srcnav .inner{max-width:1120px;margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;}
-  .navlinks{display:flex;align-items:center;gap:22px;font-size:15px;font-weight:500;color:var(--ink2);}
-  .navlinks .find{background:var(--accent);color:var(--ink);font-weight:700;padding:9px 15px;border-radius:999px;}
-  .srcbody{max-width:840px;margin:0 auto;padding:34px 28px 90px;}
+  .srcbody{max-width:840px;margin:0 auto;padding:30px 26px 90px;}
   .back{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:22px;display:inline-flex;gap:8px;align-items:center;}
   .back .arw{color:var(--accentDim);}
   .crumb{color:var(--muted);font-size:14px;margin:0 0 16px;}
   .tchips{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 20px;}
-  .tchip{font-size:15px;font-weight:500;color:var(--chipInk);background:var(--card);
-    border:1.5px solid var(--border);border-radius:999px;padding:9px 15px;}
-  .srcbody h1{font-size:clamp(26px,3.6vw,34px);font-weight:900;line-height:1.35;margin:0 0 20px;letter-spacing:.01em;}
+  .tchip{font-size:15px;font-weight:500;color:var(--chipInk);background:var(--card);border:1.5px solid var(--border);border-radius:999px;padding:9px 15px;}
+  .srcbody h1{font-size:clamp(26px,3.4vw,34px);font-weight:900;line-height:1.35;margin:0 0 20px;}
   .srcmeta{display:flex;align-items:center;gap:12px;margin:0 0 24px;}
-  .srcmeta .av{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--ink);
-    font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .srcmeta .av{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--ink);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;}
   .srcmeta .cm{font-weight:700;}
   .srcmeta .dt{color:var(--muted);font-size:15px;}
   .lead{color:var(--ink2);font-size:17px;line-height:1.9;margin:0 0 34px;}
   .sect{margin:0 0 16px;}
   .sect .bar{width:36px;height:5px;border-radius:3px;background:var(--accent);margin:0 0 12px;}
   .sect .en{font-size:13px;font-weight:700;color:var(--ink2);}
-  .sect .jp{font-size:22px;font-weight:900;margin:2px 0 0;letter-spacing:.01em;}
-  table.res{width:100%;border-collapse:collapse;border:1.5px solid var(--border);border-radius:14px;
-    overflow:hidden;margin:0 0 24px;}
+  .sect .jp{font-size:22px;font-weight:900;margin:2px 0 0;}
+  table.res{width:100%;border-collapse:collapse;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin:0 0 24px;}
   table.res th,table.res td{text-align:left;padding:15px 20px;font-size:16px;}
   table.res th{font-size:14px;font-weight:700;color:var(--ink2);border-bottom:1.5px solid var(--border);}
   table.res td{border-top:1px solid var(--border);}
@@ -145,292 +120,361 @@
   table.res .score{font-weight:700;width:110px;}
   .srclinks{display:flex;flex-wrap:wrap;gap:24px;margin:0 0 40px;font-weight:700;font-size:15px;}
   .srclinks a .arw{color:var(--accentDim);}
-  .listrow{display:flex;align-items:center;justify-content:space-between;background:var(--card);
-    border:1.5px solid var(--border);border-radius:14px;padding:18px 22px;margin:0 0 12px;font-weight:700;font-size:16px;}
+  .listrow{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px 22px;margin:0 0 12px;font-weight:700;font-size:16px;}
   .listrow .arw{color:var(--accentDim);}
   .ground{background:var(--paleY);border-radius:14px;padding:18px 22px;display:flex;gap:16px;align-items:flex-start;margin:14px 0 40px;}
-  .ground .ck{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;flex:none;
-    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+  .ground .ck{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
   .ground p{margin:0;font-size:15px;font-weight:500;line-height:1.7;}
   .srcfoot{border-top:1.5px solid var(--border);padding-top:26px;text-align:center;color:var(--muted);font-size:14px;}
+  .srctop{border-bottom:1.5px solid var(--border);background:var(--card);}
+  .srctop .in{max-width:1120px;margin:0 auto;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;}
+  .navlinks{display:flex;align-items:center;gap:20px;font-size:14px;font-weight:500;color:var(--ink2);}
+  .navlinks .find{background:var(--accent);color:var(--ink);font-weight:700;padding:8px 14px;border-radius:999px;}
 
-  .pagefoot{max-width:820px;margin:0 auto;padding:0 24px 40px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.8;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  @keyframes pop{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-  @media (max-width:640px){
-    .topbar{padding:16px 18px;}
-    .explore{padding:0 16px 72px;}
-    .hero{padding:30px 0 4px;}
-    #q{height:58px;font-size:16px;padding:0 20px 0 52px;}
-    .searchwrap svg{left:20px;}
-    .tag{font-size:15px;padding:10px 14px;}
-    .answer,.clarify{padding:20px;}
+  @media (max-width:920px){
+    .appbar{padding:0 18px;}
+    .workspace{display:block;}
+    .searchzone{position:sticky;top:0;z-index:5;}
+    .tagzone{border-top:1.5px solid var(--border);}
+    #q{height:56px;font-size:16px;}
     .answer h2{font-size:20px;}
     .srcbody{padding:24px 18px 72px;}
-    .navlinks{gap:14px;font-size:13px;}
+    .navlinks{gap:12px;font-size:12.5px;}
     table.res th,table.res td{padding:12px 12px;font-size:14px;}
-    table.res .venue{width:64px;}
+    table.res .venue{width:60px;}
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
-<body>
+<body data-view="explore">
 <div id="app"></div>
 
 <script>
 /* =====================================================================
-   探索エンジン（スタンドイン）
-   ここが「AIレイヤー」の差し込み口です。
-   本番では analyze() を、実データに対する RAG + LLM 呼び出しに置き換えます。
-   （クエリ理解 → 4軸へのマッピング → 出典つき再ランク → 要約／聞き返し）
-   いまはオフラインで動くよう、キーワード/軸の照合で近似しています。
+   探索エンジン（スタンドイン）— 本番は analyze()/buildCloud() を
+   実データの RAG + LLM に差し替え。表示は口語、照合は正規語に対応づけ。
    ===================================================================== */
 
-/* --- サンプルコンテンツ（実運用ではWordPress書き出しCSV等から生成） --- */
 const CONTENT = [
-  { id:'sanshu-result', title:'3種 県リーグ 第7節 結果', committee:'3種委員会', date:'2026.06.28',
-    axes:{target:['3種'],type:['試合結果']}, priority:false,
-    keywords:['3種','中学','試合','結果','リーグ','スコア','第7節'],
+  { id:'sanshu-result', title:'中学生（3種）県リーグ 第7節 結果', committee:'3種委員会', date:'2026.06.28',
+    axes:{target:['3種'],type:['試合結果']},
+    keywords:['3種','中学','中学生','試合','結果','リーグ','スコア','第7節'],
     snippet:'第7節を全会場ぶん掲載。上位2チームが勝ち点で並びました。',
     lead:'第7節は県内6会場で開催されました。上位2チームが勝ち点で並び、順位に変動があります。以下に各会場の結果を掲載します（記録は暫定値を含みます）。',
     results:[['松本','みなみ中FC － きた中FC','2 - 1'],['長野','ひがし中SC － にし中FC','3 - 0'],
              ['上田','しなの中 － あづみ中','1 - 1'],['飯田','てんりゅう中 － いな中','0 - 2'],
              ['諏訪','すわ中FC － おかや中','4 - 2']],
-    related:['次節（第8節）の対戦カード','3種 リーグ 順位表','3種委員会からのお知らせ一覧'] },
-  { id:'sanshu-schedule', title:'3種 大会日程・組み合わせ', committee:'3種委員会', date:'2026.06.20',
-    axes:{target:['3種'],type:['大会日程']}, priority:false,
-    keywords:['3種','中学','大会','日程','組み合わせ','トーナメント','会場'],
+    related:['次節（第8節）の対戦カード','中学生 リーグ 順位表','3種委員会からのお知らせ一覧'] },
+  { id:'sanshu-rank', title:'中学生（3種）リーグ 順位表', committee:'3種委員会', date:'2026.06.28',
+    axes:{target:['3種'],type:['順位表']}, keywords:['3種','中学','中学生','順位','順位表','リーグ'],
+    snippet:'県リーグの最新順位・勝ち点・得失点差の一覧です。' },
+  { id:'sanshu-schedule', title:'中学生（3種）大会日程・組み合わせ', committee:'3種委員会', date:'2026.06.20',
+    axes:{target:['3種'],type:['大会日程','組み合わせ']}, keywords:['3種','中学','中学生','大会','日程','組み合わせ','トーナメント'],
     snippet:'夏季大会のトーナメント表と、会場・キックオフ時刻の一覧です。' },
-  { id:'yonshu-schedule', title:'4種 大会日程', committee:'4種委員会', date:'2026.06.20',
-    axes:{target:['4種'],type:['大会日程']}, priority:false,
-    keywords:['4種','小学','ジュニア','大会','日程','スケジュール'],
+  { id:'sanshu-tresen', title:'中学生（3種）トレセン活動', committee:'技術委員会', date:'2026.06.18',
+    axes:{target:['3種'],purpose:['トレセン']}, keywords:['3種','中学','中学生','トレセン','選考','活動','選抜'],
+    snippet:'地区トレセンの選考結果と活動報告。技術委員会からの発信です。' },
+  { id:'yonshu-schedule', title:'小学生（4種）大会日程', committee:'4種委員会', date:'2026.06.20',
+    axes:{target:['4種'],type:['大会日程']}, keywords:['4種','小学','小学生','ジュニア','大会','日程','スケジュール'],
     snippet:'夏季大会の組み合わせと会場・キックオフ時刻の一覧です。' },
-  { id:'nishu-prince', title:'2種 プリンスリーグ', committee:'2種委員会', date:'2026.06.30',
-    axes:{target:['2種'],type:['試合結果','順位表']}, priority:false,
-    keywords:['2種','高校','ユース','プリンス','リーグ','試合','順位'],
+  { id:'yonshu-result', title:'小学生（4種）交流大会 結果', committee:'4種委員会', date:'2026.06.21',
+    axes:{target:['4種'],type:['試合結果']}, keywords:['4種','小学','小学生','試合','結果','交流'],
+    snippet:'交流大会の各ブロック結果をまとめて掲載しています。' },
+  { id:'nishu-prince', title:'高校生（2種）プリンスリーグ', committee:'2種委員会', date:'2026.06.30',
+    axes:{target:['2種'],type:['試合結果','順位表']}, keywords:['2種','高校','高校生','ユース','プリンス','リーグ','試合','順位'],
     snippet:'プリンスリーグ北信越 長野県勢の最新順位と次節案内。' },
-  { id:'isshu-tenno', title:'1種 天皇杯予選', committee:'1種委員会', date:'2026.05.18',
-    axes:{target:['1種'],type:['試合結果']}, priority:false,
-    keywords:['1種','社会人','天皇杯','予選','トップ','代表決定戦'],
+  { id:'isshu-tenno', title:'大人・社会人（1種）天皇杯予選', committee:'1種委員会', date:'2026.05.18',
+    axes:{target:['1種'],type:['試合結果']}, keywords:['1種','社会人','大人','天皇杯','予選','トップ','代表決定戦'],
     snippet:'天皇杯県予選のトーナメント表と代表決定戦の情報。' },
-  { id:'referee', title:'審判ライセンス更新', committee:'審判委員会', date:'2026.04.01',
-    axes:{purpose:['審判','ライセンス']}, priority:false,
-    keywords:['審判','ライセンス','更新','登録','レフェリー','資格','4級','3級'],
-    snippet:'4級・3級の新規登録と更新手続き、講習日程の案内です。' },
-  { id:'coach-c', title:'指導者 C級講習会', committee:'技術委員会', date:'2026.05.10',
-    axes:{purpose:['指導者','講習']}, priority:false,
-    keywords:['指導者','ライセンス','講習','C級','コーチ','養成'],
+  { id:'referee', title:'審判の資格をとる（登録・更新）', committee:'審判委員会', date:'2026.04.01',
+    axes:{purpose:['審判講習']}, keywords:['審判','ライセンス','資格','なりたい','とりたい','更新','登録','レフェリー','4級','3級'],
+    snippet:'4級・3級の新規登録と更新の手続き、講習日程の案内です。はじめての方はこちらから。' },
+  { id:'referee-schedule', title:'審判の講習・研修 日程', committee:'審判委員会', date:'2026.05.01',
+    axes:{purpose:['審判講習']}, keywords:['審判','講習','研修','日程'],
+    snippet:'各級の審判講習会・研修会の開催日程と申込先です。' },
+  { id:'coach-c', title:'指導者ライセンス（C級講習会）', committee:'技術委員会', date:'2026.05.10',
+    axes:{purpose:['指導者講習']}, keywords:['指導者','ライセンス','講習','C級','コーチ','養成','監督'],
     snippet:'C級コーチ養成講習会の募集要項と申込フォームへの導線。' },
-  { id:'girls', title:'女子 選手募集', committee:'女子委員会', date:'2026.06.05',
-    axes:{target:['女子'],purpose:['募集']}, priority:false,
-    keywords:['女子','選手','募集','はじめ','なでしこ','体験'],
-    snippet:'小中学生対象の女子体験会と所属チーム紹介の窓口です。' },
-  { id:'kids', title:'キッズ フェスティバル', committee:'キッズ委員会', date:'2026.06.22',
-    axes:{purpose:['イベント']}, priority:false,
-    keywords:['キッズ','幼児','園児','フェスティバル','U6','イベント'],
+  { id:'girls', title:'女子・女の子 選手募集／体験', committee:'女子委員会', date:'2026.06.05',
+    axes:{target:['女子'],purpose:['選手募集']}, keywords:['女子','女の子','選手','募集','はじめ','体験','入会','なでしこ','チーム'],
+    snippet:'小中学生対象の女子体験会と、チームの探し方・入会の窓口です。' },
+  { id:'startup', title:'はじめる・体験会のご案内', committee:'普及委員会', date:'2026.06.01',
+    axes:{purpose:['選手募集']}, keywords:['体験','はじめ','入会','募集','チーム','さがす','初心者','小学','中学','高校','大人','女子','キッズ','親子'],
+    snippet:'年代・カテゴリ別の体験会と、チームの探し方・入会の流れをまとめています。' },
+  { id:'teams', title:'加盟チーム一覧・登録', committee:'事務局', date:'2026.04.01',
+    axes:{admin:['お知らせ']}, keywords:['チーム','加盟','登録','一覧','入会','さがす','所属','近く'],
+    snippet:'県内の加盟チーム一覧と、新規加盟・登録の手続き案内です。' },
+  { id:'kids', title:'園児・キッズ フェスティバル', committee:'キッズ委員会', date:'2026.06.22',
+    axes:{target:['キッズ'],purpose:['選手募集']}, keywords:['キッズ','園児','幼児','フェスティバル','U6','イベント','体験','親子','未就学'],
     snippet:'未就学児〜低学年向けフェスティバルの開催案内です。' },
-  { id:'gk', title:'GKクリニック', committee:'技術委員会', date:'2026.06.12',
-    axes:{purpose:['講習']}, priority:false,
-    keywords:['GK','ゴールキーパー','クリニック','講習','トレーニング'],
+  { id:'gk', title:'GKクリニック（ゴールキーパー）', committee:'技術委員会', date:'2026.06.12',
+    axes:{purpose:['講習会']}, keywords:['GK','ゴールキーパー','キーパー','クリニック','講習','トレーニング'],
     snippet:'種別横断のGKクリニック開催案内。参加者を募集中。' },
-  { id:'senior', title:'シニア 交流大会', committee:'シニア委員会', date:'2026.05.28',
-    axes:{target:['シニア'],type:['大会日程']}, priority:false,
-    keywords:['シニア','交流','大会','O-40','O-50','エントリー'],
+  { id:'senior', title:'シニア（40歳〜）交流大会', committee:'シニア委員会', date:'2026.05.28',
+    axes:{target:['シニア'],type:['大会日程']}, keywords:['シニア','40','50','交流','大会','O-40','O-50','エントリー'],
     snippet:'O-40／O-50 交流大会のエントリー方法と会場情報。' },
   { id:'futsal', title:'フットサル 大会案内', committee:'フットサル委員会', date:'2026.06.15',
-    axes:{type:['大会日程']}, priority:false,
-    keywords:['フットサル','大会','案内','リーグ','選手権'],
+    axes:{target:['フットサル'],type:['大会日程']}, keywords:['フットサル','大会','案内','リーグ','選手権'],
     snippet:'県フットサルリーグと選手権予選の日程・要項をまとめています。' },
-  { id:'docs', title:'規約・様式ダウンロード', committee:'事務局', date:'2026.04.01',
-    axes:{source:['事務局']}, priority:false,
-    keywords:['規約','様式','ダウンロード','書式','申請','登録','ルール'],
+  { id:'award', title:'年間表彰・活動報告', committee:'協会事務局', date:'2026.03.31',
+    axes:{purpose:['表彰・報告']}, keywords:['表彰','活動報告','事業','年間','実績'],
+    snippet:'年間の表彰結果と各委員会の事業・活動報告のまとめです。' },
+  { id:'docs', title:'登録・様式ダウンロード（規約）', committee:'事務局', date:'2026.04.01',
+    axes:{admin:['規約・様式']}, keywords:['規約','様式','ダウンロード','書式','申請','登録','ルール','書類'],
     snippet:'各種申請書・規約・登録様式をまとめてダウンロードできます。' },
   { id:'gijutsu-news', title:'技術委員会からのお知らせ', committee:'技術委員会', date:'2026.06.18',
-    axes:{source:['技術委員会']}, priority:false,
-    keywords:['技術','委員会','お知らせ','トレセン','選抜','選考'],
+    axes:{admin:['お知らせ']}, keywords:['技術','委員会','お知らせ','トレセン','選抜','選考'],
     snippet:'トレセン選考・活動報告など技術委員会からのお知らせ。' },
-  { id:'heat', title:'熱中症対策ガイド', committee:'医学委員会', date:'2026.06.25',
-    axes:{purpose:['健康']}, priority:true,
-    keywords:['熱中症','対策','暑さ','WBGT','健康','医学','応急'],
+  { id:'heat', title:'熱中症のとき（対策ガイド）', committee:'医学委員会', date:'2026.06.25',
+    axes:{admin:['熱中症対策']}, priority:true, keywords:['熱中症','対策','暑さ','WBGT','健康','医学','応急','水分'],
     snippet:'WBGT指針に基づく活動可否の目安と、現場での応急対応。',
     lead:'夏季の活動における熱中症の予防と、現場での応急対応をまとめています。WBGT（暑さ指数）に基づく活動可否の目安を必ず確認してください。' },
-  { id:'cancel', title:'試合中止・順延情報', committee:'事務局', date:'2026.07.05',
-    axes:{type:['試合結果']}, priority:true,
-    keywords:['試合','中止','順延','天候','当日','中止情報'],
+  { id:'cancel', title:'試合が中止・順延か知りたい', committee:'事務局', date:'2026.07.05',
+    axes:{admin:['中止・順延'],type:['試合結果']}, priority:true, keywords:['試合','中止','順延','天候','当日','中止情報','雨'],
     snippet:'悪天候等による当日の中止・順延情報を随時更新します。' },
 ];
 
-/* --- 入口タグ（探索面に常設） --- */
-const TAGS = [
-  {label:'3種（中学）',kw:['3種','中学']},
-  {label:'4種（小学）',kw:['4種','小学']},
-  {label:'試合結果',kw:['試合','結果']},
-  {label:'大会日程',kw:['大会','日程']},
-  {label:'順位表',kw:['順位']},
-  {label:'審判ライセンス更新',kw:['審判','ライセンス','登録']},
-  {label:'指導者 C級講習会',kw:['指導者','講習','C級','コーチ']},
-  {label:'女子 選手募集',kw:['女子','募集']},
-  {label:'キッズ フェスティバル',kw:['キッズ','幼児','フェスティバル']},
-  {label:'GKクリニック',kw:['GK','ゴールキーパー']},
-  {label:'規約・様式ダウンロード',kw:['規約','様式','ダウンロード','申請']},
-  {label:'技術委員会からのお知らせ',kw:['技術','委員会','トレセン']},
-  {label:'熱中症対策ガイド',kw:['熱中症','暑さ','WBGT'],priority:true},
-  {label:'試合中止・順延情報',kw:['試合','中止','順延','天候'],priority:true},
+/* ---- タグ語彙（口語＋年代併記） ---- */
+const AGES=[
+  {l:'小学生（4種）',q:'小学生',f:'4種'},
+  {l:'中学生（3種）',q:'中学生',f:'3種'},
+  {l:'高校生（2種）',q:'高校生',f:'2種'},
+  {l:'大人・社会人（1種）',q:'社会人',f:'1種'},
+  {l:'シニア（40歳〜）',q:'シニア',f:'シニア'},
+  {l:'女子・女の子',q:'女子',f:'女子'},
+  {l:'フットサル',q:'フットサル',f:'フットサル'},
+  {l:'園児・キッズ',q:'キッズ',f:'キッズ'},
 ];
-const SEEDS = ['3種の次の試合','審判の登録方法','熱中症のとき','女子で始めたい'];
+const INTENTS=[
+  {l:'試合の結果が見たい',short:'試合の結果',q:'試合結果',core:'試合結果'},
+  {l:'次の試合はいつ？',short:'試合の日程',q:'大会日程',core:'大会日程'},
+  {l:'順位を知りたい',short:'順位表',q:'順位表',core:'順位表'},
+  {l:'大会の組み合わせ',short:'組み合わせ',q:'組み合わせ',core:'組み合わせ'},
+  {l:'チームをさがす',short:'チームさがし',q:'チーム さがす',core:'チーム'},
+  {l:'はじめたい・体験',short:'体験・入会',q:'体験 募集',core:'体験'},
+];
+const RESOURCES=[
+  {l:'審判の資格をとりたい',q:'審判 資格',core:'審判'},
+  {l:'指導者ライセンス',q:'指導者 ライセンス',core:'指導者'},
+  {l:'講習会・研修',q:'講習会',core:'講習会'},
+  {l:'GKクリニック',q:'GK クリニック',core:'GK'},
+];
+const ADMINX=[
+  {l:'登録・書類がほしい',q:'規約 様式',core:'規約'},
+  {l:'熱中症のとき',q:'熱中症',core:'熱中症',pri:1},
+  {l:'試合、中止かな？',q:'中止 順延',core:'中止',pri:1},
+  {l:'お知らせ',q:'お知らせ',core:'お知らせ'},
+];
+const DEEP={
+  '試合結果':[['最新節の結果','最新'],['地区別の結果','地区'],['大会の結果','大会']],
+  '大会日程':[['今週・直近の予定','今週'],['会場でさがす','会場'],['組み合わせを見る','組み合わせ']],
+  '順位表':[['上位を見る','上位'],['全チームの順位','全体']],
+  '組み合わせ':[['トーナメント表','表'],['ブロック分け','ブロック']],
+  'チーム':[['近くのチーム','近く'],['加盟チーム一覧','一覧'],['入会の流れ','入会']],
+  '体験':[['体験会の日程','日程'],['はじめての方へ','初心者'],['親子で参加','親子']],
+};
+const BROAD=['試合','大会','リーグ','結果','日程','中止'];
+const EXAMPLES=['小学生の試合結果','審判になりたい','女子ではじめたい','熱中症のとき'];
 
-const SEIBETSU = ['1種','2種','3種','4種','シニア','女子','フットサル','キッズ'];
-const SEIBETSU_ALIAS = {'中学':'3種','小学':'4種','高校':'2種','社会人':'1種'};
-const BROAD = ['試合','大会','リーグ','結果','日程','中止'];
+/* ---- クエリから年代・用事を検出（口語対応） ---- */
+function detect(q){
+  q=q||'';
+  let age=null;
+  for(const a of AGES){ if(q.includes(a.q)||q.includes(a.f)){ age=a; break; } }
+  let intent=null;
+  const im={
+    '試合結果':()=>q.includes('試合結果')||q.includes('試合')||q.includes('結果'),
+    '大会日程':()=>q.includes('大会日程')||q.includes('日程')||q.includes('スケジュール'),
+    '順位表':()=>q.includes('順位'),
+    '組み合わせ':()=>q.includes('組み合わせ')||q.includes('組合せ'),
+    'チーム':()=>q.includes('チーム')||q.includes('入会')||q.includes('加盟')||q.includes('さがす'),
+    '体験':()=>q.includes('体験')||q.includes('募集')||q.includes('はじめ'),
+  };
+  for(const it of INTENTS){ if(im[it.core] && im[it.core]()){ intent={kind:'intent',obj:it}; break; } }
+  if(!intent){ for(const r of RESOURCES){ if(q.includes(r.core)||(r.core==='審判'&&q.includes('審判'))||(r.core==='指導者'&&q.includes('指導者'))||(r.core==='講習会'&&q.includes('講習'))){ intent={kind:'res',obj:r}; break; } } }
+  if(!intent){ for(const ad of ADMINX){ if(q.includes(ad.core)||(ad.core==='規約'&&(q.includes('様式')||q.includes('書類')||q.includes('登録')))||(ad.core==='中止'&&q.includes('順延'))){ intent={kind:'admin',obj:ad}; break; } } }
+  return {age,intent};
+}
 
-/* ---- ここがエンジン本体（差し替え点） ---- */
+/* ---- 左カラム：口語タグの絞り込み／派生（最大3階層） ---- */
+function buildCloud(q){
+  q=(q||'').trim();
+  const {age,intent}=detect(q);
+  if(!age && !intent){
+    return { mode:'root', groups:[
+      {label:'だれの情報？（年代・カテゴリ）', tags:AGES.map(a=>tagObj(a.l,a.q))},
+      {label:'試合・大会のこと', tags:INTENTS.slice(0,4).map(i=>tagObj(i.l,i.q))},
+      {label:'はじめたい・入りたい', tags:INTENTS.slice(4).map(i=>tagObj(i.l,i.q))},
+      {label:'資格・講習', tags:RESOURCES.map(r=>tagObj(r.l,r.q))},
+      {label:'手続き・安全・お知らせ', tags:ADMINX.map(a=>tagObj(a.l,a.q,a.pri===1))},
+    ]};
+  }
+  const selected=[];
+  if(age) selected.push(tagObj(age.l,age.q));
+  if(intent) selected.push(tagObj(intent.obj.short||intent.obj.l, intent.obj.q, intent.obj.pri===1));
+  let narrow=[], branch=[];
+  if(age && !intent){
+    narrow = INTENTS.map(i=>tagObj(age.q+'の'+i.short, age.q+' '+i.q));
+    branch = AGES.filter(a=>a!==age).map(a=>tagObj(a.l,a.q));
+  } else if(intent && !age && intent.kind==='intent'){
+    narrow = AGES.map(a=>tagObj(a.q+'の'+intent.obj.short, a.q+' '+intent.obj.q));
+    branch = INTENTS.filter(i=>i!==intent.obj).map(i=>tagObj(i.l,i.q));
+  } else if(age && intent && intent.kind==='intent'){
+    const deep = DEEP[intent.obj.core] || [];
+    narrow = deep.map(d=>tagObj(age.q+'の'+d[0], age.q+' '+intent.obj.q+' '+d[1]));
+    branch = INTENTS.filter(i=>i!==intent.obj).slice(0,4).map(i=>tagObj(age.q+'の'+i.short, age.q+' '+i.q))
+      .concat(AGES.filter(a=>a!==age).slice(0,3).map(a=>tagObj(a.q+'の'+intent.obj.short, a.q+' '+intent.obj.q)));
+  } else if(intent && intent.kind==='res'){
+    const map={ '審判':['審判をはじめる','審判の講習日程','担当の割り当て'],
+      '指導者':['C級をとる','リフレッシュ研修','コーチを募集'],
+      '講習会':['審判の講習','指導者の講習','GKクリニック'],
+      'GK':['GKクリニック','GK体験会'] };
+    narrow=(map[intent.obj.core]||[]).map(l=>tagObj(l,l));
+    branch=RESOURCES.filter(r=>r!==intent.obj).map(r=>tagObj(r.l,r.q));
+  } else if(intent && intent.kind==='admin'){
+    narrow=ADMINX.filter(a=>a!==intent.obj).map(a=>tagObj(a.l,a.q,a.pri===1));
+    branch=AGES.slice(0,4).map(a=>tagObj(a.l,a.q));
+  } else {
+    branch=AGES.map(a=>tagObj(a.l,a.q));
+  }
+  return { mode:'focus', selected, narrow, branch };
+}
+function tagObj(label,q,priority){ return {label,q,priority:!!priority}; }
+
+/* ---- 右カラム：クエリ→結果（差し替え点） ---- */
 function analyze(qRaw){
-  const q = (qRaw||'').trim();
-  if(!q) return {q, results:[], answer:null, clarify:null};
-  const hasSeibetsu = SEIBETSU.some(s=>q.includes(s)) || Object.keys(SEIBETSU_ALIAS).some(a=>q.includes(a));
-  const scored = CONTENT.map(it=>{
+  const q=(qRaw||'').trim();
+  if(!q) return {q,results:[],answer:null,ambiguous:false};
+  const hasAge=!!detect(q).age;
+  const scored=CONTENT.map(it=>{
     let s=0;
     it.keywords.forEach(k=>{ if(q.includes(k)) s+=2; });
     if(q.includes(it.title)) s+=4;
     Object.values(it.axes).flat().forEach(v=>{ if(q.includes(v)) s+=1; });
-    if(it.priority && s>0) s+=0.5;
+    if(it.priority&&s>0) s+=0.5;
     return {it,s};
   }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
-
-  const ambiguous = BROAD.some(b=>q.includes(b)) && !hasSeibetsu && scored.length>2;
-  let clarify=null;
-  if(ambiguous){
-    clarify={ question:'どの種別のことですか？',
-      options:['1種（社会人）','2種（高校）','3種（中学）','4種（小学）','シニア','女子','フットサル'] };
-  }
+  const ambiguous = BROAD.some(b=>q.includes(b)) && !hasAge && scored.length>2;
   let answer=null;
   const top=scored[0];
-  if(top && !ambiguous && top.s>=4 && (scored.length<2 || top.s - scored[1].s >= 1.5 || top.s>=6)){
-    answer={ item:top.it, confidence: top.s>=6 ? '高' : '中' };
+  if(top && !ambiguous && top.s>=4 && (scored.length<2 || top.s-scored[1].s>=1.5 || top.s>=6)){
+    answer={item:top.it, confidence: top.s>=6?'高':'中'};
   }
-  return { q, results:scored.map(x=>x.it), answer, clarify };
-}
-
-/* --- タグの状態（hit / muted / default） --- */
-function tagState(tag, q){
-  if(!q) return 'default';
-  const hit = tag.kw.some(k=>q.includes(k)) || q.includes(tag.label.replace(/（.*?）/,''));
-  return hit ? 'hit' : 'muted';
+  return {q, results:scored.map(x=>x.it), answer, ambiguous};
 }
 
 /* ===================== 描画 ===================== */
-const app = document.getElementById('app');
-const state = { query:'', view:'explore', sourceId:null };
-const esc = s => (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const seibetsuCore = opt => opt.replace(/（.*?）/,'');
+const app=document.getElementById('app');
+const state={query:'',view:'explore',sourceId:null};
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){ document.body.setAttribute('data-view',state.view); state.view==='source'?renderSource(state.sourceId):renderExplore(); }
 
 function renderExplore(){
-  const a = analyze(state.query);
-  const tagsHtml = (() => {
-    const withState = TAGS.map(t=>({t, st:tagState(t, state.query)}));
-    withState.sort((x,y)=> (y.st==='hit') - (x.st==='hit'));
-    return withState.map(({t,st})=>
-      `<button class="tag ${st}" data-tag="${esc(t.label)}">${t.priority?'<span class="pdot"></span>':''}${esc(t.label)}</button>`
-    ).join('');
-  })();
-
-  app.innerHTML = `
-  <div class="topbar">
+  app.innerHTML=`
+  <div class="appbar">
     <div class="brand"><span class="dot"></span>長野県サッカー協会</div>
     <span class="demo-tag">サンプル / DEMO</span>
   </div>
-  <main class="explore">
-    <div class="hero">
-      <h1>あいまいな問いから、<br><span class="hl">ほしい情報へ。</span></h1>
-      <p>委員会の区分は気にせず、思いつくままに。使うほど、近づきます。</p>
-    </div>
-    <div class="searchwrap">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      <input id="q" type="text" autocomplete="off" placeholder="例）3種の次の試合、審判の登録…" value="${esc(state.query)}" aria-label="探したい情報を入力">
-    </div>
-    <div class="seeds">${SEEDS.map(s=>`<button class="seed" data-seed="${esc(s)}">${esc(s)}</button>`).join('')}</div>
-    <div class="cloud">${tagsHtml}</div>
-    <div class="legend"><span class="pdot"></span>＝ 優先して掲示したい情報</div>
-    <div id="dyn">${renderDynamic(a)}</div>
-  </main>
-  <footer class="pagefoot">
-    サンプルデータでの動作デモ｜長野県サッカー協会 サイトリニューアル<br>
-    本番のAI案内は、実データ（RAG）＋出典明示で行います。
-  </footer>`;
-
-  const input = document.getElementById('q');
-  // keep caret at end after re-render
-  const val = input.value; input.focus(); input.setSelectionRange(val.length, val.length);
+  <div class="workspace">
+    <section class="searchzone">
+      <div class="searchwrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="q" type="text" autocomplete="off" placeholder="ことばはそのままでOK。例）小学生の試合、審判になりたい…" value="${esc(state.query)}" aria-label="探したい情報を入力">
+        <button class="clearq" data-clear="1" aria-label="クリア">×</button>
+      </div>
+      <div class="exrow">${EXAMPLES.map(e=>`<button class="ex" data-q="${esc(e)}">${esc(e)}</button>`).join('')}</div>
+    </section>
+    <aside class="tagzone" id="tagzone"></aside>
+    <section class="resultzone" id="resultzone"></section>
+  </div>`;
+  updateTags(); updateResults(); toggleClear();
+  document.getElementById('q').focus();
 }
 
-function renderDynamic(a){
+function toggleClear(){ const c=document.querySelector('.clearq'); if(c) c.classList.toggle('show', !!state.query); }
+
+function renderTag(t){
+  return `<button class="tag ${t.selected?'hit':''}" data-q="${esc(t.q)}">${t.priority?'<span class="pdot"></span>':''}${esc(t.label)}${t.selected?'<span class="x">×</span>':''}</button>`;
+}
+function updateTags(){
+  const c=buildCloud(state.query); let html='';
+  if(c.mode==='root'){
+    html=c.groups.map(g=>`<div class="tgroup"><div class="gl"><span class="barmini"></span>${esc(g.label)}</div><div class="gtags">${g.tags.map(renderTag).join('')}</div></div>`).join('');
+  } else {
+    html+=`<div class="tgroup"><div class="gl"><span class="barmini"></span>いま探している<button class="clearall" data-clear="1" style="margin-left:auto">すべて解除</button></div><div class="gtags selrow">${c.selected.map(t=>renderTag(Object.assign({selected:true},t))).join('')}</div></div>`;
+    if(c.narrow.length) html+=`<div class="tgroup"><div class="gl"><span class="barmini"></span>さらに絞る</div><div class="gtags">${c.narrow.map(renderTag).join('')}</div></div>`;
+    if(c.branch.length) html+=`<div class="tgroup"><div class="gl"><span class="barmini"></span>ほかの選び方・関連</div><div class="gtags">${c.branch.map(renderTag).join('')}</div></div>`;
+  }
+  document.getElementById('tagzone').innerHTML=html;
+}
+
+function updateResults(){
+  const a=analyze(state.query); let html='';
   if(!a.q){
-    return `<p class="hint fade">曖昧な言葉でも大丈夫。入力するほど、関連する情報が前に出て、必要なときは種別を聞き返します。</p>`;
-  }
-  let html = '<div class="fade">';
-  if(a.clarify){
-    html += `<div class="clarify">
-      <div class="qrow"><div class="qmark">?</div><div class="qtext">${esc(a.clarify.question)}</div></div>
-      <div class="opts">${a.clarify.options.map(o=>`<button class="opt" data-opt="${esc(seibetsuCore(o))}">${esc(o)}</button>`).join('')}</div>
-    </div>`;
-  }
-  if(a.answer){
-    const it=a.answer.item;
-    html += `<div class="answer">
-      <div class="top"><h2>${esc(it.title)}</h2><span class="badge"><span class="bd"></span>確信度 ${a.answer.confidence}</span></div>
-      <div class="src">出典：${esc(it.committee)} ・ ${esc(it.date)} 更新</div>
-      <div class="sum">${esc(it.lead || it.snippet)}</div>
-      <button class="btn" data-open="${it.id}">この結果ページを開く</button>
-      <div class="trust">この案内は協会の掲載ページに基づいています。日程・結果は変更される場合があります。</div>
-    </div>`;
-  }
-  if(a.results.length){
-    const list = a.answer ? a.results.filter(r=>r.id!==a.answer.item.id) : a.results;
-    if(list.length){
-      html += `<div class="rlabel">${a.answer?'関連する情報':'見つかった情報'}</div>`;
-      html += list.slice(0,5).map(it=>`
-        <div class="card" data-open="${it.id}">
-          <div class="ctop"><h3>${esc(it.title)}</h3></div>
-          <div class="meta">出典：${esc(it.committee)} ・ ${esc(it.date)} 更新</div>
-          <div class="snip">${esc(it.snippet)}</div>
-          <span class="open">出典ページを開く <span class="arw">→</span></span>
-        </div>`).join('');
+    html=`<p class="rhint">左のタグ、または上の検索から。<b>使うほど、ここに情報が絞り込まれていきます。</b></p>`;
+  } else {
+    if(a.ambiguous){
+      html+=`<p class="rhint">「${esc(a.q)}」だけだと候補が多めです。<b>左の「だれの情報？」から年代を選ぶ</b>と、ぴったりに絞れます。</p>`;
     }
-  } else if(!a.clarify){
-    html += `<div class="empty">該当が見つかりませんでした。担当委員会の一覧からお探しいただけます。</div>`;
+    if(a.answer){
+      const it=a.answer.item;
+      html+=`<div class="answer">
+        <div class="top"><h2>${esc(it.title)}</h2><span class="badge"><span class="bd"></span>確信度 ${a.answer.confidence}</span></div>
+        <div class="src">出典：${esc(it.committee)} ・ ${esc(it.date)} 更新</div>
+        <div class="sum">${esc(it.lead||it.snippet)}</div>
+        <button class="btn" data-open="${it.id}">この結果ページを開く</button></div>`;
+    }
+    const list=a.answer?a.results.filter(r=>r.id!==a.answer.item.id):a.results;
+    if(list.length){
+      html+=`<div class="rlabel">${a.answer?'関連する情報':'見つかった情報 '+a.results.length+'件'}</div>`;
+      html+=list.slice(0,8).map(it=>`<div class="card" data-open="${it.id}">
+        <h3>${esc(it.title)}</h3>
+        <div class="meta">出典：${esc(it.committee)} ・ ${esc(it.date)} 更新</div>
+        <div class="snip">${esc(it.snippet)}</div>
+        <span class="open">出典ページを開く <span class="arw">→</span></span></div>`).join('');
+    } else if(!a.answer && !a.ambiguous){
+      html+=`<div class="empty">該当が見つかりませんでした。左のタグからお探しいただけます。</div>`;
+    }
   }
-  html += '</div>';
-  return html;
+  document.getElementById('resultzone').innerHTML=html;
+}
+
+function setQuery(q){
+  state.query=q;
+  const inp=document.getElementById('q'); if(inp) inp.value=q;
+  updateTags(); updateResults(); toggleClear();
+  if(inp){ inp.focus(); try{inp.setSelectionRange(q.length,q.length);}catch(e){} }
 }
 
 function renderSource(id){
-  const it = CONTENT.find(c=>c.id===id) || CONTENT[0];
-  const target = (it.axes.target||[])[0];
-  const type = (it.axes.type||[])[0] || (it.axes.purpose||[])[0] || '情報';
-  const chips = [];
-  if(target) chips.push('対象 · '+target);
-  chips.push('情報タイプ · '+type);
-  let bodyHtml = '';
+  const it=CONTENT.find(c=>c.id===id)||CONTENT[0];
+  const target=(it.axes.target||[])[0];
+  const type=(it.axes.type||[])[0]||(it.axes.purpose||[])[0]||(it.axes.admin||[])[0]||'情報';
+  const chips=[]; if(target) chips.push('対象 · '+target); chips.push('情報タイプ · '+type);
+  let body='';
   if(it.results){
-    bodyHtml += `<div class="sect"><div class="bar"></div><div class="en">RESULTS</div><div class="jp">第7節 結果</div></div>
-      <table class="res"><thead><tr><th>会場</th><th>対戦カード</th><th>スコア</th></tr></thead><tbody>
-      ${it.results.map(r=>`<tr><td class="venue">${esc(r[0])}</td><td>${esc(r[1])}</td><td class="score">${esc(r[2])}</td></tr>`).join('')}
-      </tbody></table>
-      <div class="srclinks"><a href="#">第7節 詳細（PDF）をダウンロード <span class="arw">↓</span></a><a href="#">大会の組み合わせ・日程を見る <span class="arw">→</span></a></div>`;
+    body+=`<div class="sect"><div class="bar"></div><div class="en">RESULTS</div><div class="jp">第7節 結果</div></div>
+    <table class="res"><thead><tr><th>会場</th><th>対戦カード</th><th>スコア</th></tr></thead><tbody>
+    ${it.results.map(r=>`<tr><td class="venue">${esc(r[0])}</td><td>${esc(r[1])}</td><td class="score">${esc(r[2])}</td></tr>`).join('')}
+    </tbody></table>
+    <div class="srclinks"><a href="#">第7節 詳細（PDF）をダウンロード <span class="arw">↓</span></a><a href="#">大会の組み合わせ・日程を見る <span class="arw">→</span></a></div>`;
   } else {
-    bodyHtml += `<div class="sect"><div class="bar"></div><div class="en">DETAIL</div><div class="jp">内容</div></div>
-      <p class="lead">${esc(it.lead || it.snippet)} 詳細と申込・様式は、担当委員会の掲載ページに記載しています。</p>
-      <div class="srclinks"><a href="#">関連する様式・PDFをダウンロード <span class="arw">↓</span></a></div>`;
+    body+=`<div class="sect"><div class="bar"></div><div class="en">DETAIL</div><div class="jp">内容</div></div>
+    <p class="lead">${esc(it.lead||it.snippet)} 詳細と申込・様式は、担当委員会の掲載ページに記載しています。</p>
+    <div class="srclinks"><a href="#">関連する様式・PDFをダウンロード <span class="arw">↓</span></a></div>`;
   }
   if(it.related){
-    bodyHtml += `<div class="sect"><div class="bar"></div><div class="en">RELATED</div><div class="jp">関連する情報</div></div>`;
-    bodyHtml += it.related.map(r=>`<div class="listrow"><span>${esc(r)}</span><span class="arw">→</span></div>`).join('');
+    body+=`<div class="sect"><div class="bar"></div><div class="en">RELATED</div><div class="jp">関連する情報</div></div>`;
+    body+=it.related.map(r=>`<div class="listrow"><span>${esc(r)}</span><span class="arw">→</span></div>`).join('');
   }
-
-  app.innerHTML = `
-  <div class="srcnav"><div class="inner">
+  app.innerHTML=`
+  <div class="srctop"><div class="in">
     <div class="brand"><span class="dot"></span>長野県サッカー協会</div>
-    <div class="navlinks"><span>ホーム</span><span>種別</span><span>大会・日程</span><span>審判</span><span>お知らせ</span><button class="find" data-home="1">サイト内を探す</button></div>
+    <div class="navlinks"><span>ホーム</span><span>年代</span><span>試合・大会</span><span>審判</span><span>お知らせ</span><button class="find" data-home="1">サイト内を探す</button></div>
   </div></div>
   <div class="srcbody">
     <button class="back" data-home="1"><span class="arw">←</span> 探索にもどる</button>
@@ -438,39 +482,24 @@ function renderSource(id){
     <div class="tchips">${chips.map(c=>`<span class="tchip">${esc(c)}</span>`).join('')}</div>
     <h1>${esc(it.title)}</h1>
     <div class="srcmeta"><div class="av">協</div><div><span class="cm">${esc(it.committee)}</span> <span class="dt">・ ${esc(it.date)} 更新</span></div></div>
-    <p class="lead">${esc(it.lead || it.snippet)}</p>
-    ${bodyHtml}
+    <p class="lead">${esc(it.lead||it.snippet)}</p>
+    ${body}
     <div class="ground"><div class="ck">✓</div><p>このページは長野県サッカー協会 ${esc(it.committee)} が掲載した情報です。探索面のAIは、このページを根拠として案内しています。</p></div>
     <div class="srcfoot">長野県サッカー協会 ｜ ${esc(it.committee)}　　© Nagano Football Association</div>
   </div>`;
   window.scrollTo(0,0);
 }
 
-/* ===================== ルーティング / イベント ===================== */
-function render(){ state.view==='source' ? renderSource(state.sourceId) : renderExplore(); }
-
-document.addEventListener('input', e=>{
-  if(e.target && e.target.id==='q'){ state.query = e.target.value; document.getElementById('dyn').innerHTML = renderDynamic(analyze(state.query)); refreshTags(); }
-});
-function refreshTags(){
-  // update classes in place so the yellow emphasis animates (no jumpy reorder while typing)
-  document.querySelectorAll('.tag').forEach(el=>{
-    const tag = TAGS.find(t=>t.label===el.getAttribute('data-tag'));
-    if(!tag) return;
-    const st = tagState(tag, state.query);
-    el.classList.remove('hit','muted');
-    if(st!=='default') el.classList.add(st);
-  });
-}
-document.addEventListener('click', e=>{
-  const t=e.target.closest('[data-tag]'); const s=e.target.closest('[data-seed]');
-  const o=e.target.closest('[data-opt]'); const open=e.target.closest('[data-open]');
+document.addEventListener('input',e=>{ if(e.target&&e.target.id==='q'){ state.query=e.target.value; updateTags(); updateResults(); toggleClear(); } });
+document.addEventListener('click',e=>{
+  const open=e.target.closest('[data-open]');
   const home=e.target.closest('[data-home]');
+  const clear=e.target.closest('[data-clear]');
+  const tagBtn=e.target.closest('[data-q]');
   if(open){ state.view='source'; state.sourceId=open.getAttribute('data-open'); render(); return; }
   if(home){ state.view='explore'; render(); return; }
-  if(t){ state.query = t.getAttribute('data-tag'); render(); return; }
-  if(s){ state.query = s.getAttribute('data-seed'); render(); return; }
-  if(o){ const core=o.getAttribute('data-opt'); state.query=(core+' '+state.query).trim(); render(); return; }
+  if(clear){ setQuery(''); return; }
+  if(tagBtn){ setQuery(tagBtn.getAttribute('data-q')); return; }
 });
 
 render();
