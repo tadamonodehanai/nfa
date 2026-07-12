@@ -131,14 +131,20 @@
     transform:rotate(45deg);}
   .bubble b{color:var(--ink);font-weight:500;}
   .bubble + .bubble{margin-top:10px;}
-  /* 吹き出し内の「関連のご案内」区画（主たる情報と明確に区別しつつ、同じ吹き出しに同居させる） */
-  .bsec{margin-top:16px;background:var(--bg);border-radius:6px;padding:14px 16px 12px;}
+  /* 吹き出し内の「関連のご案内」区画（主たる情報の最下部に、明確に区別して同居させる） */
+  .bsec{margin-top:16px;background:var(--accentPale);border-radius:6px;padding:14px 16px 12px;}
   .bsec .bh{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:500;color:var(--accent);letter-spacing:.1em;margin:0 0 2px;}
   .bsec .bh .barmini{width:14px;height:3px;border-radius:2px;background:var(--accent);}
   .bsec .brow{margin-top:9px;}
   .bsec .bk{display:block;font-size:12px;color:var(--ink2);margin:0 0 3px;}
   .bsec .itag{background:var(--card);}
   .bsec .itag:hover{background:var(--act2);color:#fff;}
+  /* 吹き出しの中に入る回答・結果カード（主たる情報。関連区画より先に表示する） */
+  .bubble .answer{background:var(--bg);margin:14px 0 12px;padding:24px 26px;}
+  .bubble .card{background:var(--bg);margin:0 0 10px;}
+  .bubble .card:hover{background:var(--soft);}
+  .bubble .card .openbtn{background:var(--card);}
+  .bubble .card:hover .openbtn,.bubble .card .openbtn:hover{background:var(--act2);color:#fff;}
   /* 文中に埋め込むタグ */
   .itag{display:inline-flex;align-items:center;height:28px;padding:0 11px;margin:2px 3px;border-radius:2px;
     background:var(--act3Bg);color:var(--act3);font-size:14px;line-height:1;vertical-align:middle;
@@ -453,7 +459,9 @@ function renderMenu(){
 }
 function tagHtml(t,big,n){
   const cnt = (typeof n==='number') ? `<span class="tn">（${n}件）</span>` : '';
-  return `<button class="tag ${t.selected?'hit':''} ${big?'big':''}" data-q="${esc(t.q)}"><span class="tl">${t.priority?'<span class="pdot"></span>':''}<span class="hash">#</span>${esc(t.label)}${cnt}${t.selected?'<span class="x">×</span>':''}</span></button>`;
+  /* 選択中タグ（×つき）はクリックで「解除」。未選択タグはクリックで「絞り込み」（チップの標準トグル動作） */
+  const act = t.selected ? `data-unpick="${esc(t.q)}" aria-label="${esc(t.label)}の条件を解除"` : `data-q="${esc(t.q)}"`;
+  return `<button class="tag ${t.selected?'hit':''} ${big?'big':''}" ${act}><span class="tl">${t.priority?'<span class="pdot"></span>':''}<span class="hash">#</span>${esc(t.label)}${cnt}${t.selected?'<span class="x">×</span>':''}</span></button>`;
 }
 
 /* ---------- ENTRY ---------- */
@@ -593,6 +601,13 @@ function rescueParts(t){
   const conds = t.conds || [];
   const inline = (arr, showCount) => arr.map(x=>
     `<button class="itag" data-swap="${esc(x.q)}"><span class="hash">#</span>${esc(x.label)}${showCount?`<span class="tn">（${x.n}件）</span>`:''}</button>`).join('');
+
+  /* -1) 条件をすべてはずしたとき：仕切り直しの案内 */
+  if(t.via==='drop' && !conds.length){
+    const starts = AGES.slice(0,4).map(a=>({label:a.l,q:a.q,n:analyze(a.q).results.length})).filter(x=>x.n>0);
+    return { main:`条件をすべてはずしました。あらためて、ことばでもタグからでもお探しください。`,
+      secs:[{k:'まずはここから', html:inline(starts,true)}] };
+  }
 
   /* 0) 言葉そのものが汲み取れなかったとき */
   if(t.unread){
@@ -743,7 +758,7 @@ function turnHtml(t,i){
     main = `候補がいくつかあります。<b>どなたの情報でしょう？</b>`;
     if(tagsInline) secs.push({k:'選ぶと絞り込めます', html:tagsInline});
   } else if(now){
-    main = `この条件だと、${now}件ありました。下にまとめています。`;
+    main = `この条件だと、${now}件が見つかりました。`;
   } else {
     const r = rescueParts(t);
     main = r.main; secs = r.secs;
@@ -771,9 +786,8 @@ function turnHtml(t,i){
   const secLab = (a.answer || (now && !a.ambiguous)) ? '関連のご案内' : '次の一歩';
   const secHtml = secs.length ? `<div class="bsec"><div class="bh"><span class="barmini"></span>${secLab}</div>${
     secs.map(s=>`<div class="brow"><span class="bk">${s.k}</span><span class="inlinetags">${s.html}</span></div>`).join('')}</div>` : '';
-  const bubble = `<div class="bubble">${main}${secHtml}</div>`;
 
-  /* 一覧（会話の下に自然に続く） */
+  /* 一覧（本文のすぐあと＝吹き出しの中の主たる情報として表示） */
   const list=a.answer?a.results.filter(r=>r.id!==a.answer.item.id):a.results;
   let cards='';
   if(list.length){
@@ -784,12 +798,13 @@ function turnHtml(t,i){
       <button class="openbtn" data-open="${it.id}">出典ページを開く →</button></div>`).join('');
   }
 
+  /* 1ターン＝1吹き出し：本文 → 回答 → 検索結果 → 最下部に関連のご案内 */
+  const bubble = `<div class="bubble">${main}${answerCard}${cards}${secHtml}</div>`;
+
   return `<div class="turn">
     ${you}
     <div class="nfa"><div class="av">N</div><div class="side">
       ${bubble}
-      ${answerCard}
-      ${cards}
     </div></div>
   </div>`;
 }
@@ -858,6 +873,17 @@ function dropCond(c){
   state.conds = conds;
   state.query = conds.join(' ');
   state.turns.push({ q:state.query, pick:c, via:'drop', conds:conds.slice(), res:analyze(state.query) });
+  renderCondBar(); renderSidebar(); renderThread();
+}
+/* 「いま探している」タグの解除：該当する条件を取り除いて再検索（チップの標準トグル動作） */
+function removeConds(q){
+  const ws=String(q).split(/\s+/).filter(Boolean);
+  const rm=state.conds.filter(c=>ws.some(w=>w===c||w.includes(c)||c.includes(w)));
+  if(!rm.length) return;
+  const conds=state.conds.filter(c=>!rm.includes(c));
+  state.conds=conds;
+  state.query=conds.join(' ');
+  state.turns.push({ q:state.query, pick:rm.join('」「'), via:'drop', conds:conds.slice(), res:analyze(state.query) });
   renderCondBar(); renderSidebar(); renderThread();
 }
 /* 出典ページの「関連する情報」：一意に決まればそのページへ、決まらなければ探索面で会話として続きを探す */
@@ -959,6 +985,7 @@ document.addEventListener('click',e=>{
   const dl=e.target.closest('[data-dl]');
   const rel=e.target.closest('[data-rel]');
   const ex=e.target.closest('[data-ex]');
+  const unpick=e.target.closest('[data-unpick]');
   const tag=e.target.closest('[data-q]');
   if(page){ closeMenu(); state.mode='page'; state.pageId=page.getAttribute('data-page'); render(); return; }
   if(open){ state.mode='source'; state.sourceId=open.getAttribute('data-open'); render(); return; }
@@ -970,6 +997,7 @@ document.addEventListener('click',e=>{
   if(dl){ toast('サンプルのため、PDFリンクは未接続です'); return; }
   if(rel){ openRelated(rel.getAttribute('data-rel'), rel.getAttribute('data-ctx')||''); return; }
   if(ex){ ask(ex.getAttribute('data-ex')); return; }
+  if(unpick){ removeConds(unpick.getAttribute('data-unpick')); return; }
   if(tag){
     const fanEl=tag.closest('.fan');
     if(fanEl) fanEl.classList.add('converge');
