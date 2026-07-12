@@ -131,6 +131,14 @@
     transform:rotate(45deg);}
   .bubble b{color:var(--ink);font-weight:500;}
   .bubble + .bubble{margin-top:10px;}
+  /* 吹き出し内の「関連のご案内」区画（主たる情報と明確に区別しつつ、同じ吹き出しに同居させる） */
+  .bsec{margin-top:16px;background:var(--bg);border-radius:6px;padding:14px 16px 12px;}
+  .bsec .bh{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:500;color:var(--accent);letter-spacing:.1em;margin:0 0 2px;}
+  .bsec .bh .barmini{width:14px;height:3px;border-radius:2px;background:var(--accent);}
+  .bsec .brow{margin-top:9px;}
+  .bsec .bk{display:block;font-size:12px;color:var(--ink2);margin:0 0 3px;}
+  .bsec .itag{background:var(--card);}
+  .bsec .itag:hover{background:var(--act2);color:#fff;}
   /* 文中に埋め込むタグ */
   .itag{display:inline-flex;align-items:center;height:28px;padding:0 11px;margin:2px 3px;border-radius:2px;
     background:var(--act3Bg);color:var(--act3);font-size:14px;line-height:1;vertical-align:middle;
@@ -221,7 +229,10 @@
   .card h3{font-size:16px;font-weight:500;margin:0;}
   .card .meta{color:var(--muted);font-size:12px;margin:9px 0 0;}
   .card .snip{color:var(--ink2);font-size:14px;line-height:1.85;margin:9px 0 0;}
-  .card .open{color:var(--act2);font-weight:500;font-size:13px;margin:13px 0 0;display:inline-block;}
+  .card .openbtn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--act2);
+    background:var(--act2Pale);border:1px solid var(--act2);border-radius:4px;padding:9px 14px;margin:14px 0 0;
+    transition:background .15s,color .15s;}
+  .card:hover .openbtn,.card .openbtn:hover{background:var(--act2);color:#fff;}
   .empty{color:var(--ink2);font-size:14px;padding:20px 0;}
 
   /* dock (GPT-like bottom input) */
@@ -271,15 +282,20 @@
   table.res .venue{color:var(--ink2);font-size:14px;width:120px;}
   table.res .score{font-weight:700;width:110px;color:var(--accent);}
   .srclinks{display:flex;flex-wrap:wrap;gap:28px;margin:0 0 48px;font-weight:500;font-size:14px;color:var(--act2);}
-  .srclinks a{border-bottom:1px solid var(--act2);padding-bottom:2px;}
-  .srclinks a:hover{color:var(--ctaText);border-bottom-color:var(--ctaText);}
-  .listrow{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:6px;padding:20px 24px;margin:0 0 12px;font-weight:500;font-size:15px;transition:background .15s;}
+  .srclinks .srclink{font-weight:500;font-size:14px;color:var(--act2);border-bottom:1px solid var(--act2);padding:0 0 2px;}
+  .srclinks .srclink:hover{color:var(--ctaText);border-bottom-color:var(--ctaText);}
+  .listrow{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:var(--card);border-radius:6px;padding:20px 24px;margin:0 0 12px;font-weight:500;font-size:15px;transition:background .15s;}
   .listrow:hover{background:var(--soft);}
   .listrow .arw{color:var(--act2);}
   .ground{background:var(--accentPale);border-radius:6px;padding:22px 26px;display:flex;gap:16px;align-items:flex-start;margin:20px 0 48px;}
   .ground .ck{width:24px;height:24px;border-radius:4px;background:var(--accent);color:#fff;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;}
   .ground p{margin:0;font-size:14px;line-height:1.9;}
   .srcfoot{border-top:1px solid var(--soft);padding-top:32px;text-align:center;color:var(--muted);font-size:12px;}
+
+  /* toast（サンプル未接続リンクの通知） */
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;
+    font-size:13px;padding:12px 20px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
   @keyframes pop{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
@@ -290,6 +306,7 @@
     .entry{padding:32px 20px 60px;}
     .chatwrap{display:block;height:auto;}
     .sidebar{display:none;}
+    .sbtoggle{display:none!important;}
     .main{height:calc(100vh - var(--appbar));display:flex;}
     .thread{padding:22px 18px 16px;}
     .dock{padding:12px 18px 18px;}
@@ -316,7 +333,7 @@
 <script src="data.js"></script>
 <script>
 const LOGO_FA='data:image/jpeg;base64,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';
-const LOGO_LP='data:image/png;base64,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';
+const LOGO_LP='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAACgCAIAAAB13AmIAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAC65JREFUeNrs3U9IG3kfx3H3YQ89GW95wPEJ7AMtiVBvifaQPfnn8Pgc6pMWhEJtFDwUJSvryWKlngpFWnooWJ8WhMKatYe2h0ZP9dBGLw8KRizsIesEntxM9uJze77xZ2anMYmTOMZk8n5RlknMTGYnk8985ze/zO+7jh8etQAAnOUvbAIAINwBAIQ7AIBwBwAQ7gAAwh0ACHcAAOEOACDcAQCEOwCAcAcAwh0AQLgDAAh3AADhDgAg3AGAcAcAEO4AAMIdAEC4AwAIdwAg3AEAhDsAgHAHABDuAADCHQBAuAMA4Q4AINwBAIQ7AIBwBwAQ7gBAuAMACHcAAOEOACDcAQCEOwCAcAcAwh0AQLgDAAh3AADhDgAg3AEAhDsAEO4AAMIdAEC4AwAIdwAA4Q4AhDsAgHAHABDuAADCHQBAuAMA4Q4AINwBAIQ7AIBwBwAQ7gBAuAMACHcAAOEOACDcAQCEOwCAcAcAwh0AQLgDAAh3AADhDgAg3AEAhDsAEO4AAMIdAEC4AwAIdwAA4Q4AhDsAgHAHABDuAADCHQBAuAMA4Q4AINwBAIQ7AIBwBwAQ7gBAuAMACHcAAOEOACDcAQCEOwCAcAcAwh0AQLgDAAh3AADhDgAg3AEAhDsAEO4AAMIdAEC4AwAIdwAA4Q4AhDsAgHAHABDuAADCHQBAuAMA4Q4AINwBAIQ7AIBwBwAQ7gBAuAMACHcAAOEOACDcAQCEOwCAcAcAwh0AQLgDAAh3AADhDgAg3AEAhDsAEO5sAgAg3AEAhDsAgHAHABDuAADCHQAIdwAA4Q4AINwBAIQ7AIBwBwDCnU0AAIQ7AIBwBwAQ7gAAwh0AQLgDAOEOACDcAQCEOwCAcAcAEO4AQLgDAAh3AADhDgAg3AEAhDsAEO4AAMIdAEC4AwAIdwAA4Q4AhDubAAAIdwAA4Q4AINwBAIQ7AIBwBwDCHQBAuAMACHcAAOEOACDcAYBwZxMAAOEOACDcAQCEOwCAcAcAEO4AQLgDAAh3AADhDgAg3AEAhDsAEO4AAMIdAEC4AwAIdwAA4Q4AhDsAgHAHABDuAADCHQBAuAMA4Q4AINwBAIQ7AIBwBwAQ7gBAuAMACHcAQP34vwADAJ0HnGAN9i6yAAAAAElFTkSuQmCC';
 const {PAGES,CONTENT,AGES,INTENTS,RESOURCES,ADMINX,DEEP,BROAD,EXAMPLES}=window.NFA;  // データは data.js
 
 /* ===== 探索エンジン（本番は analyze()/buildCloud() を RAG+LLM に差し替え） ===== */
@@ -450,22 +467,27 @@ function renderEntry(){
       <div class="inputbox">
         ${searchIcon}
         <input id="q" class="qin" type="text" autocomplete="off" placeholder="例）小学生の試合、審判になりたい…" aria-label="探したい情報を入力">
+        <button class="send" id="esend" aria-label="検索">↑</button>
       </div>
       <div class="exlab">あなたが興味がありそうな情報</div>
-      <div class="exrow">${EXAMPLES.map(e=>`<button class="ex" data-q="${esc(e)}"><span class="tl"><span class="hash">#</span>${esc(e)}</span></button>`).join('')}</div>
+      <div class="exrow">${EXAMPLES.map(e=>`<button class="ex" data-ex="${esc(e)}"><span class="tl"><span class="hash">#</span>${esc(e)}</span></button>`).join('')}</div>
     </div>
   </div>`;
   bindHeader();
   const i=document.getElementById('q');
   i.focus();
+  const esubmit=()=>{
+    const v=i.value.trim();
+    if(!v) return;                                  // 空では送らない
+    i.value='';                                     // 二度押しで同じ内容が飛ばないように
+    ask(v);
+  };
   i.addEventListener('keydown',e=>{
     if(e.key!=='Enter') return;
     if(e.isComposing || e.keyCode===229) return;   // 日本語変換の確定Enterは無視
-    const v=i.value.trim();
-    if(!v) return;                                  // 空Enterでは送らない
-    i.value='';                                     // 二度押しで同じ内容が飛ばないように
-    ask(v);
+    esubmit();
   });
+  document.getElementById('esend').addEventListener('click',esubmit);
 }
 
 /* ---------- CHAT ---------- */
@@ -565,9 +587,9 @@ function updateScrollCue(){
   cue.classList.toggle('show', more);
 }
 
-/* 0件のとき：ユーザーの言葉を解釈して、会話のまま次の道を示す
+/* 0件のとき：ユーザーの言葉を解釈して、次の道を示す（本文と関連区画に分けて、1つの吹き出しに収める）
    （本番では、この関数を Claude API 呼び出しに置き換える差し替え点） */
-function rescueBubbles(t){
+function rescueParts(t){
   const conds = t.conds || [];
   const inline = (arr, showCount) => arr.map(x=>
     `<button class="itag" data-swap="${esc(x.q)}"><span class="hash">#</span>${esc(x.label)}${showCount?`<span class="tn">（${x.n}件）</span>`:''}</button>`).join('');
@@ -575,10 +597,8 @@ function rescueBubbles(t){
   /* 0) 言葉そのものが汲み取れなかったとき */
   if(t.unread){
     const starts = AGES.slice(0,4).map(a=>({label:a.l,q:a.q,n:analyze(a.q).results.length})).filter(x=>x.n>0);
-    return `<div class="bubble">すみません、「${esc(t.raw||'')}」がうまく汲み取れませんでした。</div>`
-         + `<div class="bubble"><b>だれの</b>ことか、<b>何を</b>知りたいかを教えていただけると探せます。`
-         + `たとえば「小学生の試合結果」「審判になりたい」のように。まずはこちらからでも。`
-         + `<span class="inlinetags"> ${inline(starts,true)}</span></div>`;
+    return { main:`すみません、「${esc(t.raw||'')}」がうまく汲み取れませんでした。<b>だれの</b>ことか、<b>何を</b>知りたいかを教えていただけると探せます。たとえば「小学生の試合結果」「審判になりたい」のように。`,
+      secs:[{k:'まずはここから', html:inline(starts,true)}] };
   }
 
   /* 1) 条件が2つ以上：どれか1つを外せば見つかる、を具体的に示す */
@@ -590,8 +610,8 @@ function rescueBubbles(t){
     }).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,3);
     if(relax.length){
       const combo = conds.map(c=>`「${c}」`).join('と');
-      return `<div class="bubble">${esc(combo)}を両方みたす情報は、いまのところ無いようです。</div>`
-           + `<div class="bubble">どちらか片方だけなら見つかります。<span class="inlinetags"> ${inline(relax,false)}</span></div>`;
+      return { main:`${esc(combo)}を両方みたす情報は、いまのところ無いようです。どちらか片方だけなら見つかります。`,
+        secs:[{k:'条件をゆるめる', html:inline(relax,false)}] };
     }
   }
 
@@ -599,15 +619,13 @@ function rescueBubbles(t){
   const q = (t.raw || t.pick || t.q || '');
   const guess = interpret(q);
   if(guess.suggests.length){
-    return `<div class="bubble">${esc(guess.read)}</div>`
-         + `<div class="bubble">こちらでしたら、ご案内できます。<span class="inlinetags"> ${inline(guess.suggests,true)}</span></div>`;
+    return { main:esc(guess.read), secs:[{k:'こちらならご案内できます', html:inline(guess.suggests,true)}] };
   }
 
   /* 3) まったく手がかりが無い：探し方そのものを案内 */
   const starts = AGES.slice(0,4).map(a=>({label:a.l,q:a.q,n:analyze(a.q).results.length})).filter(x=>x.n>0);
-  return `<div class="bubble">うまく聞き取れませんでした。すみません。</div>`
-       + `<div class="bubble">「小学生の試合結果」「審判になりたい」のように、<b>だれの</b>・<b>何を</b>知りたいか教えていただけると探せます。まずはこちらから。`
-       + `<span class="inlinetags"> ${inline(starts,true)}</span></div>`;
+  return { main:`うまく聞き取れませんでした。すみません。「小学生の試合結果」「審判になりたい」のように、<b>だれの</b>・<b>何を</b>知りたいか教えていただけると探せます。`,
+    secs:[{k:'まずはここから', html:inline(starts,true)}] };
 }
 
 /* 自然文をゆるく解釈して、近い情報を提案する（AIレイヤーの代役） */
@@ -710,23 +728,50 @@ function turnHtml(t,i){
   const tagsInline = tags.map(x=>
     `<button class="itag" data-q="${esc(x.q)}"><span class="hash">#</span>${esc(x.label)}<span class="tn">（${x.n}件）</span></button>`).join('');
 
-  /* 協会の返事（会話として自然に） */
-  let bubbles='';
+  /* 協会の返事：1ターン＝1つの吹き出し。
+     関連のご案内は、同じ吹き出しの中の区画（.bsec）として主情報と明確に区別して同居させる */
+  let main=''; let secs=[]; let answerCard='';
   if(a.answer){
     const it=a.answer.item;
-    bubbles += `<div class="bubble"><b>${esc(it.title)}</b> が近そうです。${esc(it.committee)}が ${esc(it.date)} に更新しています。</div>`;
-    bubbles += `<div class="answer">
+    main = `<b>${esc(it.title)}</b> が近そうです。${esc(it.committee)}が ${esc(it.date)} に更新しています。`;
+    answerCard = `<div class="answer">
       <div class="top"><h2>${esc(it.title)}</h2><span class="badge"><span class="tl"><span class="bd"></span>確信度 ${a.answer.confidence}</span></span></div>
       <div class="src">出典：${esc(it.committee)} ・ ${esc(it.date)} 更新</div>
       <div class="sum">${esc(it.lead||it.snippet)}</div>
       <button class="btn" data-open="${it.id}">この結果ページを開く</button></div>`;
   } else if(a.ambiguous){
-    bubbles += `<div class="bubble">候補がいくつかあります。<b>どなたの情報でしょう？</b>${tagsInline?`<span class="inlinetags"> ${tagsInline}</span> から選べます。`:''}</div>`;
+    main = `候補がいくつかあります。<b>どなたの情報でしょう？</b>`;
+    if(tagsInline) secs.push({k:'選ぶと絞り込めます', html:tagsInline});
   } else if(now){
-    bubbles += `<div class="bubble">この条件だと、${now}件ありました。下にまとめています。</div>`;
+    main = `この条件だと、${now}件ありました。下にまとめています。`;
   } else {
-    bubbles += rescueBubbles(t);
+    const r = rescueParts(t);
+    main = r.main; secs = r.secs;
   }
+
+  /* 関連のご案内（さらに絞る・年代の入れ替え）を、同じ吹き出しの区画として追加 */
+  if(isLast && !a.ambiguous && !t.unread && now){
+    if(tagsInline){
+      secs.push({k: a.answer ? 'ほかにも、こんな情報' : 'さらに絞る', html:tagsInline});
+    }
+    /* 年代が決まっているなら、「別の年代で見る」は“入れ替え”として案内（AND条件と矛盾させない） */
+    const curAge2 = detect(t.q).age;
+    if(curAge2){
+      const swaps = AGES.filter(a2=>a2!==curAge2).map(a2=>{
+        const q = (t.conds||[]).map(c=>c===curAge2.q?a2.q:c).join(' ');
+        const n = analyze(q).results.length;
+        return {a:a2,q,n};
+      }).filter(x=>x.n>0).slice(0,5);
+      if(swaps.length){
+        const sw = swaps.map(x=>`<button class="itag" data-swap="${esc(x.q)}"><span class="hash">#</span>${esc(x.a.l)}<span class="tn">（${x.n}件）</span></button>`).join('');
+        secs.push({k:'同じ条件で、ほかの年代を見る', html:sw});
+      }
+    }
+  }
+  const secLab = (a.answer || (now && !a.ambiguous)) ? '関連のご案内' : '次の一歩';
+  const secHtml = secs.length ? `<div class="bsec"><div class="bh"><span class="barmini"></span>${secLab}</div>${
+    secs.map(s=>`<div class="brow"><span class="bk">${s.k}</span><span class="inlinetags">${s.html}</span></div>`).join('')}</div>` : '';
+  const bubble = `<div class="bubble">${main}${secHtml}</div>`;
 
   /* 一覧（会話の下に自然に続く） */
   const list=a.answer?a.results.filter(r=>r.id!==a.answer.item.id):a.results;
@@ -736,39 +781,15 @@ function turnHtml(t,i){
       <h3>${esc(it.title)}</h3>
       <div class="meta">出典：${esc(it.committee)} ・ ${esc(it.date)} 更新</div>
       <div class="snip">${esc(it.snippet)}</div>
-      <span class="open">出典ページを開く →</span></div>`).join('');
-  }
-
-  /* しめの吹き出し：ほかの切り口をタグで示す（自然な会話として） */
-  let closing='';
-  if(isLast && !a.ambiguous && !t.unread){
-    if(tagsInline){
-      const lead = a.answer
-        ? (list.length ? `ほかに、こんな情報もあります。` : `続けて、こんな絞り込みもできます。`)
-        : `もう少し絞るなら、こちらから。`;
-      closing += `<div class="bubble">${lead}<span class="inlinetags"> ${tagsInline}</span></div>`;
-    }
-    /* 年代が決まっているなら、「別の年代で見る」は“入れ替え”として案内（AND条件と矛盾させない） */
-    const curAge = detect(t.q).age;
-    if(curAge){
-      const swaps = AGES.filter(a2=>a2!==curAge).map(a2=>{
-        const q = (t.conds||[]).map(c=>c===curAge.q?a2.q:c).join(' ');
-        const n = analyze(q).results.length;
-        return {a:a2,q,n};
-      }).filter(x=>x.n>0).slice(0,5);
-      if(swaps.length){
-        const sw = swaps.map(x=>`<button class="itag" data-swap="${esc(x.q)}"><span class="hash">#</span>${esc(x.a.l)}<span class="tn">（${x.n}件）</span></button>`).join('');
-        closing += `<div class="bubble">同じ条件で、ほかの年代も見られます。<span class="inlinetags"> ${sw}</span></div>`;
-      }
-    }
+      <button class="openbtn" data-open="${it.id}">出典ページを開く →</button></div>`).join('');
   }
 
   return `<div class="turn">
     ${you}
     <div class="nfa"><div class="av">N</div><div class="side">
-      ${bubbles}
+      ${bubble}
+      ${answerCard}
       ${cards}
-      ${closing}
     </div></div>
   </div>`;
 }
@@ -801,6 +822,7 @@ function toFacets(text){
     [/監督|コーチ|指導/, '指導者'],
     [/講習|クリニック|研修/, '講習会'],
     [/様式|書類|申請|規約/, '規約'],
+    [/お知らせ|連絡/, 'お知らせ'],
     [/順位|何位|ランキング/, '順位表'],
     [/組み合わせ|組合せ|トーナメント/, '組み合わせ'],
     [/勝|負|スコア|得点|結果/, '試合結果'],
@@ -838,6 +860,23 @@ function dropCond(c){
   state.turns.push({ q:state.query, pick:c, via:'drop', conds:conds.slice(), res:analyze(state.query) });
   renderCondBar(); renderSidebar(); renderThread();
 }
+/* 出典ページの「関連する情報」：一意に決まればそのページへ、決まらなければ探索面で会話として続きを探す */
+function openRelated(r, ctx){
+  const tryQ = q => { const a=analyze(q); return a.answer ? a.answer.item : (a.results.length===1 ? a.results[0] : null); };
+  const hit = (ctx ? tryQ(ctx+' '+r) : null) || tryQ(r);
+  if(hit){ state.mode='source'; state.sourceId=hit.id; render(); window.scrollTo(0,0); return; }
+  state.conds = ctx ? [ctx] : [];
+  state.query = state.conds.join(' ');
+  ask(r);
+}
+/* toast（サンプル未接続リンクの通知） */
+let toastTimer=null;
+function toast(msg){
+  let el=document.getElementById('toast');
+  if(!el){ el=document.createElement('div'); el.id='toast'; el.className='toast'; document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
+}
 
 /* ---------- static page ---------- */
 function renderPage(id){
@@ -859,21 +898,23 @@ function renderSource(id){
   const target=(it.axes.target||[])[0];
   const type=(it.axes.type||[])[0]||(it.axes.purpose||[])[0]||(it.axes.admin||[])[0]||'情報';
   const chips=[]; if(target) chips.push('対象 · '+target); chips.push('情報タイプ · '+type);
+  /* 種別（4種など）→ 口語（小学生など）。関連リンクの文脈語として使う */
+  const ageQ=((AGES.find(a=>a.f===target)||{}).q)||'';
   let body='';
   if(it.results){
     body+=`<div class="sect"><div class="bar"></div><div class="en">RESULTS</div><div class="jp">第7節 結果</div></div>
     <table class="res"><thead><tr><th>会場</th><th>対戦カード</th><th>スコア</th></tr></thead><tbody>
     ${it.results.map(r=>`<tr><td class="venue">${esc(r[0])}</td><td>${esc(r[1])}</td><td class="score">${esc(r[2])}</td></tr>`).join('')}
     </tbody></table>
-    <div class="srclinks"><a href="#">第7節 詳細（PDF）をダウンロード ↓</a><a href="#">大会の組み合わせ・日程を見る →</a></div>`;
+    <div class="srclinks"><button class="srclink" data-dl="1">第7節 詳細（PDF）をダウンロード ↓</button><button class="srclink" data-rel="大会日程 組み合わせ" data-ctx="${esc(ageQ)}">大会の組み合わせ・日程を見る →</button></div>`;
   } else {
     body+=`<div class="sect"><div class="bar"></div><div class="en">DETAIL</div><div class="jp">内容</div></div>
-    <p class="lead">${esc(it.lead||it.snippet)} 詳細と申込・様式は、担当委員会の掲載ページに記載しています。</p>
-    <div class="srclinks"><a href="#">関連する様式・PDFをダウンロード ↓</a></div>`;
+    <p class="lead">詳細な要項・申込方法・各種様式は、${esc(it.committee)}の掲載ページに記載しています。最新の内容は下記からご確認ください。</p>
+    <div class="srclinks"><button class="srclink" data-dl="1">関連する様式・PDFをダウンロード ↓</button></div>`;
   }
   if(it.related){
     body+=`<div class="sect"><div class="bar"></div><div class="en">RELATED</div><div class="jp">関連する情報</div></div>`;
-    body+=it.related.map(r=>`<div class="listrow"><span>${esc(r)}</span><span class="arw">→</span></div>`).join('');
+    body+=it.related.map(r=>`<button class="listrow" data-rel="${esc(r)}" data-ctx="${esc(ageQ)}"><span>${esc(r)}</span><span class="arw">→</span></button>`).join('');
   }
   app.innerHTML = appbar() + `
   <div class="srcbody">
@@ -915,6 +956,9 @@ document.addEventListener('click',e=>{
   const drop=e.target.closest('[data-drop]');
   const swap=e.target.closest('[data-swap]');
   const clear=e.target.closest('[data-clear]');
+  const dl=e.target.closest('[data-dl]');
+  const rel=e.target.closest('[data-rel]');
+  const ex=e.target.closest('[data-ex]');
   const tag=e.target.closest('[data-q]');
   if(page){ closeMenu(); state.mode='page'; state.pageId=page.getAttribute('data-page'); render(); return; }
   if(open){ state.mode='source'; state.sourceId=open.getAttribute('data-open'); render(); return; }
@@ -923,6 +967,9 @@ document.addEventListener('click',e=>{
   if(drop){ dropCond(drop.getAttribute('data-drop')); return; }
   if(swap){ swapConds(swap.getAttribute('data-swap'), (swap.textContent||'').replace(/\d+$/,'').replace(/[#]/g,'').trim()); return; }
   if(clear){ state.query=''; state.conds=[]; state.turns=[]; state.mode='entry'; render(); return; }
+  if(dl){ toast('サンプルのため、PDFリンクは未接続です'); return; }
+  if(rel){ openRelated(rel.getAttribute('data-rel'), rel.getAttribute('data-ctx')||''); return; }
+  if(ex){ ask(ex.getAttribute('data-ex')); return; }
   if(tag){
     const fanEl=tag.closest('.fan');
     if(fanEl) fanEl.classList.add('converge');
