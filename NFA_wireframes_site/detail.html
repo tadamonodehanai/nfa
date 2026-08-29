@@ -226,6 +226,40 @@ body.menuOpen{overflow:hidden}
   .backList a{width:100%;text-align:center}
 }
 
+
+
+/* ========== スポンサー帯（全ページ共通・割付グリッド） ========== */
+.sponsorBand{background:#fff;border-top:1px solid var(--line);padding:66px 0 72px}
+.sbIn{max-width:1200px;margin:0 auto;padding:0 40px}
+.sbHead{display:flex;align-items:baseline;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-bottom:28px}
+.sbTtl{font-family:"Barlow","Noto Sans JP",sans-serif;font-size:13px;font-weight:600;letter-spacing:.26em;color:var(--cyan)}
+.sbMore{font-size:13px;color:var(--blue);border-bottom:1px solid var(--blue);padding-bottom:3px;transition:opacity .2s}
+.sbMore:hover{opacity:.7}
+.sbGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-bottom:none}
+.sbCell{
+  background:repeating-linear-gradient(45deg,var(--pale2) 0 10px,var(--pale) 10px 20px);
+  min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:9px;padding:18px 12px;text-align:center;transition:filter .2s;
+}
+.sbCell:hover{filter:brightness(1.03)}
+.sbCell .lb{font-family:"Barlow";font-size:9.5px;font-weight:600;letter-spacing:.2em;color:var(--cyan)}
+.sbCell .nm{font-size:12px;color:var(--ink2);background:rgba(255,255,255,.94);padding:6px 12px;line-height:1.6}
+.sbCell.gold{grid-column:span 2}
+.sbCell.gold .nm{font-size:13.5px;padding:8px 18px}
+.sbFoot{border:1px solid var(--line);border-top:none;padding:16px 26px;display:flex;align-items:baseline;gap:8px 26px;flex-wrap:wrap}
+.sbFoot .lb{font-family:"Barlow";font-size:9.5px;font-weight:600;letter-spacing:.2em;color:var(--muted)}
+.sbFoot a,.sbFoot span.co{font-size:12.5px;color:var(--ink2)}
+.sbFoot a{border-bottom:1px solid var(--line)}
+.sbFoot a:hover{color:var(--blue);border-color:var(--blue)}
+@media(max-width:640px){
+  .sponsorBand{padding:50px 0 56px}
+  .sbIn{padding:0 22px}
+  .sbGrid{grid-template-columns:1fr 1fr}
+  .sbCell{min-height:86px}
+  .sbCell.gold{grid-column:span 2}
+  .sbFoot{padding:14px 18px}
+  .sbMore{width:100%}
+}
 </style>
 </head>
 <body>
@@ -475,6 +509,43 @@ document.querySelectorAll('.vSwitch button').forEach(b=>{
 });
 document.getElementById('tg').onclick = ()=>document.body.classList.toggle('noNotes');
 </script>
+
+
+
+<!-- ===== スポンサー帯（全ページ共通テンプレート） ===== -->
+<section class="sponsorBand">
+  <div class="sbIn">
+    <div class="sbHead">
+      <p class="sbTtl">SPONSOR</p>
+      <a href="partner.html" class="sbMore">協賛について ─ ともに創る</a>
+    </div>
+    <div class="sbGrid">
+      <a class="sbCell gold" href="https://www.izumi.maxell.co.jp/" target="_blank" rel="noopener"><span class="lb">GOLD PARTNER</span><span class="nm">マクセルイズミ株式会社</span></a>
+      <a class="sbCell" href="https://holdings.alpico.co.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">アルピコグループ</span></a>
+      <a class="sbCell" href="https://www.tsb.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">テレビ信州</span></a>
+      <a class="sbCell" href="https://www.adbureau.co.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">ながのアド・ビューロ</span></a>
+      <a class="sbCell" href="http://www.richade.co.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">リッチエイド</span></a>
+      <a class="sbCell" href="https://www.abn-tv.co.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">abn長野放送</span></a>
+      <a class="sbCell" href="http://tutti-armonia.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">Tutti</span></a>
+      <a class="sbCell" href="https://www.mizuho-sc.com/index.html" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">みずほ証券</span></a>
+      <a class="sbCell" href="https://www.meijiyasuda.co.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">明治安田生命</span></a>
+      <a class="sbCell" href="https://www.adidas.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">アディダスジャパン</span></a>
+      <a class="sbCell" href="https://www.realsports.jp/" target="_blank" rel="noopener"><span class="lb">OFFICIAL</span><span class="nm">レアルスポーツ</span></a>
+    </div>
+    <div class="sbFoot">
+      <span class="lb">SUPPORTERS</span>
+      <a href="http://www.tombow.gr.jp/" target="_blank" rel="noopener">トンボ学生服</a>
+      <span class="co">ファーストビジネス株式会社</span>
+      <a href="https://www.m-t-i.jp/" target="_blank" rel="noopener">株式会社松本総合保険</a>
+    </div>
+  </div>
+</section>
+<div class="sbIn note" style="margin-top:10px">
+  <b>スポンサー帯｜全ページ共通テンプレート・割付</b>　6列の罫線グリッド。<b>ゴールド＝2セル分</b>で格を示し、オフィシャル10社で残りを埋めると 6列×2段がちょうど収まる。テキスト掲載はグリッドに接続した下段1行。<br>
+  ・セルは<b>プレースホルダー</b>（社名テキスト）。実ロゴは本番実装時に差し込む。現行の低解像度バナーはこの段階では使わず、各社から元データの再提供を受けるのが理想<br>
+  ・掲載順・区分は現行踏襲。理事会 検討事項 C（協賛メニュー整理）の結論で更新される前提<br>
+  ・社数が変わった場合：オフィシャルが 10 社以外になったら列数（4〜6列）で調整し、端数セルは「協賛募集中」枠として使う
+</div>
 
 <div class="spMenu" id="spMenu">
   <a href="about.html"><small>ABOUT</small>NFAについて</a>
