@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜NFAについて（Life+1） ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+
+/* ---- 注記 ---- */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+.todo{display:inline-block;background:#FFF3D6;border:1px solid #E0B84C;color:#8A6A16;font-size:11px;padding:4px 10px;margin-left:10px;vertical-align:middle}
+body.noNotes .todo{display:none}
+section{position:relative}
+.ph{position:relative;background:repeating-linear-gradient(45deg,var(--pale2) 0 10px,var(--pale) 10px 20px);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center}
+.ph span{font-size:12px;color:var(--ink2);background:rgba(255,255,255,.92);padding:8px 16px;line-height:1.8}
+.ph.onDark{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,rgba(255,255,255,.11) 10px 20px);border-color:rgba(255,255,255,.22)}
+.ph.onDark span{background:rgba(20,28,94,.85);color:#C8CFEA}
+
+/* ---- ヘッダー ---- */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ---- ヒーロー ---- */
+.hero{background:var(--navy);color:#fff;padding:0 0 96px;overflow:hidden}
+.hero .visual{position:relative;height:420px;margin-bottom:-130px}
+.hero .visual .ph{position:absolute;inset:0;border:none}
+.hero .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,28,94,.35) 0%,rgba(20,28,94,.15) 40%,rgba(20,28,94,.98) 100%)}
+.hero .copy{position:relative;z-index:3}
+.hero .crumb{font-size:12px;color:#8A93AD;margin-bottom:26px}
+.hero .crumb a:hover{color:#fff}
+.hero .mark{font-family:"Barlow";font-size:64px;font-weight:700;letter-spacing:.02em;color:var(--cyan);line-height:1;margin-bottom:28px}
+.hero h1{font-size:38px;font-weight:700;line-height:1.6;margin-bottom:26px}
+.hero .lead{font-size:16px;color:#B9C2DE;line-height:2.15;max-width:700px}
+
+/* ---- 共通 ---- */
+.sec{padding:120px 0 130px}
+.sec.pale{background:var(--pale2)}
+.sec.dark{background:var(--navy);color:#fff}
+.secHead{margin-bottom:60px}
+.secHead .no{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;color:var(--cyan);display:block;margin-bottom:16px}
+.secHead h2{font-size:32px;font-weight:700;line-height:1.6}
+.secHead p{font-size:15px;color:var(--ink2);margin-top:20px;line-height:2.1;max-width:700px}
+.sec.dark .secHead h2{color:#fff}
+.sec.dark .secHead p{color:#AAB3D2}
+
+/* ---- ミッション ---- */
+.mission{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.mission .ph{height:400px}
+.mvBox{border-left:3px solid var(--blue);padding-left:32px;margin-bottom:44px}
+.mvBox .lb{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--cyan);margin-bottom:14px}
+.mvBox .tx{font-size:21px;font-weight:500;line-height:2;color:var(--navy)}
+.mission p.ds{font-size:15px;color:var(--ink2);line-height:2.15}
+
+/* ---- 4語 ---- */
+.cycle{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.cell{background:#fff;padding:0;position:relative;display:flex;flex-direction:column}
+.cell .ph{height:150px;border:none;border-bottom:1px solid var(--line)}
+.cell .bd{padding:36px 30px 42px;flex:1}
+.cell .idx{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--muted);margin-bottom:20px}
+.cell h3{font-size:36px;font-weight:700;color:var(--blue);letter-spacing:.08em;line-height:1.25;margin-bottom:20px}
+.cell .sub{font-size:12.5px;color:var(--cyan);letter-spacing:.06em;margin-bottom:18px;font-family:"Barlow";font-weight:600}
+.cell p{font-size:13.5px;color:var(--ink2);line-height:2.05}
+.cell:not(:last-child) .arw{position:absolute;top:74px;right:-9px;width:18px;height:18px;background:var(--cyan);z-index:5;clip-path:polygon(0 0,100% 50%,0 100%)}
+.cycleFoot{margin-top:52px;padding:36px 40px;background:var(--pale2);font-size:15px;line-height:2.1;color:var(--ink)}
+
+/* ---- 系譜 ---- */
+.lineage{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
+.ln{border:1px solid var(--line);padding:32px 26px 36px;background:#fff;position:relative}
+.ln.me{background:var(--blue);border-color:var(--blue);color:#fff}
+.ln .st{font-family:"Barlow";font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--muted);margin-bottom:18px}
+.ln.me .st{color:#B6C0EA}
+.ln h3{font-size:17px;font-weight:700;line-height:1.6;margin-bottom:16px}
+.ln p{font-size:12.5px;line-height:1.95;color:var(--ink2)}
+.ln.me p{color:#C6CDEC}
+.ln:not(:last-child)::after{
+  content:"";position:absolute;top:50%;right:-14px;transform:translateY(-50%);
+  width:10px;height:10px;background:var(--cyan);clip-path:polygon(0 0,100% 50%,0 100%);z-index:5;
+}
+
+/* ---- 5つの約束 ---- */
+.vows{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.2)}
+.vow{background:var(--navy);padding:36px 34px 40px;display:flex;gap:22px;align-items:flex-start}
+.vow .n{font-family:"Barlow";font-size:15px;font-weight:600;color:var(--cyan);padding-top:5px;flex:none}
+.vow .tx{font-size:16px;font-weight:500;line-height:1.9;color:#fff}
+.vow .tx small{display:block;font-size:12.5px;color:#AAB3D2;font-weight:400;margin-top:10px;line-height:1.95}
+.vow.last{grid-column:1 / -1}
+
+/* ---- 2030 ---- */
+.plan2030{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.goal{border:1px solid var(--line);margin-bottom:20px;padding:28px 30px}
+.goal .lb{font-size:12px;color:var(--cyan);letter-spacing:.08em;margin-bottom:12px;font-weight:500}
+.goal .tx{font-size:19px;font-weight:700;line-height:1.75;color:var(--navy)}
+.goal p{font-size:13.5px;color:var(--ink2);line-height:2;margin-top:12px}
+.acts2030{list-style:none}
+.acts2030 li{border-bottom:1px solid var(--line);padding:20px 0;font-size:14px;line-height:1.9;display:flex;gap:18px}
+.acts2030 li:first-child{border-top:1px solid var(--line)}
+.acts2030 .dp{font-size:12px;color:var(--cyan);white-space:nowrap;padding-top:3px;min-width:66px}
+
+/* ---- 導線 ---- */
+.gates{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.gate{border:1px solid var(--line);background:#fff;padding:38px 32px 40px;transition:border-color .25s,transform .25s}
+.gate:hover{border-color:var(--blue);transform:translateY(-3px)}
+.gate .cat{font-size:11.5px;letter-spacing:.14em;color:var(--cyan);font-weight:500;margin-bottom:14px}
+.gate h3{font-size:21px;font-weight:700;line-height:1.65;margin-bottom:16px}
+.gate p{font-size:13.5px;color:var(--ink2);line-height:2;margin-bottom:26px}
+.gate .go{font-size:13.5px;font-weight:500;color:var(--blue);display:flex;align-items:center;gap:10px}
+.gate .go::after{content:"";width:22px;height:1px;background:var(--blue);transition:width .25s}
+.gate:hover .go::after{width:38px}
+
+/* ---- 下層リンク ---- */
+.subs{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.subs a{background:#fff;padding:30px 26px;transition:background .2s}
+.subs a:hover{background:var(--pale2)}
+.subs .t{font-size:15px;font-weight:500;line-height:1.7;margin-bottom:10px;display:block}
+.subs .d{font-size:12.5px;color:var(--muted);line-height:1.9}
+
+@media(max-width:1000px){
+  .mission,.plan2030{grid-template-columns:1fr;gap:44px}
+  .cycle,.lineage,.gates,.subs{grid-template-columns:1fr 1fr}
+  .vows{grid-template-columns:1fr}
+  .vow.last{grid-column:auto}
+  .ln:not(:last-child)::after{display:none}
+  .gnav nav{display:none}
+  .hero h1{font-size:28px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .hero .visual{height:230px;margin-bottom:-80px}
+  .hero{padding-bottom:64px}
+  .hero .mark{font-size:42px;margin-bottom:18px}
+  .hero h1{font-size:24px}
+  .hero .lead{font-size:13.5px}
+  .sec{padding:72px 0 78px}
+  .secHead h2{font-size:24px}
+  .secHead{margin-bottom:38px}
+  .mission .ph{height:230px}
+  .mvBox{padding-left:22px;margin-bottom:30px}
+  .mvBox .tx{font-size:18px}
+  .cycle{grid-template-columns:1fr}
+  .cell:not(:last-child) .arw{top:auto;bottom:-9px;right:calc(50% - 9px);transform:rotate(90deg)}
+  .cycleFoot{padding:24px 22px}
+  .lineage{grid-template-columns:1fr;gap:14px}
+  .plan2030{gap:30px}
+  .goal .tx{font-size:17px}
+  .gates,.subs{grid-template-columns:1fr}
+  .vow{padding:26px 24px 30px}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜NFAについて（Life+1） ワイヤー v1</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html" class="on">NFAについて</a><a href="start.html">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ===== ヒーロー ===== -->
+<section class="hero">
+  <span class="blockTag">HERO</span>
+  <div class="visual"><div class="ph onDark"><span>グラフィック／ムービー<br>TOP のファーストビューと同一素材（尺違い）</span></div></div>
+  <div class="wrap">
+    <div class="copy">
+      <p class="crumb"><a href="index.html">ホーム</a> ／ NFAについて</p>
+      <p class="mark en">Life+1</p>
+      <h1>サッカーは、人生を豊かにする<br>ツールである。</h1>
+      <p class="lead">勝つことだけが目的ではありません。ボールを蹴った経験が、その人の人生に何かをひとつ足していく。長野県サッカー協会は、そう考えて活動しています。</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note" style="margin-top:26px">
+  <b>ヒーロー｜TOP と素材を共有する</b>　TOP のファーストビューと<b>同じグラフィックの尺違い</b>を使う。別素材にすると、TOP から遷移したときに話が切り替わったように見える。<br>
+  ・「Life+1」の表記はロゴを使用（テキストではなく画像／SVG）<br>
+  ・見出しはミッション本文をそのまま使う。言い換えない
+</div></div>
+
+<!-- ===== ミッション・ビジョン ===== -->
+<section class="sec">
+  <span class="blockTag">MISSION</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">01 / MISSION &amp; VISION</span>
+      <h2>私たちが掲げているもの</h2>
+    </div>
+    <div class="mission">
+      <div>
+        <div class="mvBox">
+          <p class="lb en">MISSION</p>
+          <p class="tx">サッカーを通じて、<br>人生を豊かにする。</p>
+        </div>
+        <div class="mvBox">
+          <p class="lb en">VISION</p>
+          <p class="tx">長野県から全国、<br>そして世界へ。</p>
+        </div>
+        <p class="ds">サッカーは、勝敗を競うだけのものではありません。仲間と過ごした時間、うまくいかなかった経験、支えてくれた人への感謝。そのすべてが、人生に「＋1」を足していきます。<br>私たちは、県内のすべての世代に、その機会が行き渡る状態をつくろうとしています。</p>
+      </div>
+      <div class="ph"><span>写真｜世代の広がりが伝わるもの<br>（キッズ・育成年代・シニアの並置）</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 夢・挑戦・成長・貢献 ===== -->
+<section class="sec pale">
+  <span class="blockTag">CYCLE</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">02 / CYCLE</span>
+      <h2>夢を持ち、挑戦し、成長し、貢献する。</h2>
+      <p>ビジョンに書かれている 4 つの言葉です。この循環が回り続けることが、私たちの目指すかたちそのものです。</p>
+    </div>
+    <div class="cycle">
+      <div class="cell">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="idx en">01</p>
+          <p class="sub en">DREAM</p>
+          <h3>夢</h3>
+          <p>ボールに触れたその日から、なりたい自分が生まれます。年齢も経験も問わず、はじめられる場所をつくります。</p>
+        </div>
+        <span class="arw"></span>
+      </div>
+      <div class="cell">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="idx en">02</p>
+          <p class="sub en">CHALLENGE</p>
+          <h3>挑戦</h3>
+          <p>県大会、全国、その先へ。うまくいかない日も含めて、挑み続けられる環境を整えます。</p>
+        </div>
+        <span class="arw"></span>
+      </div>
+      <div class="cell">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="idx en">03</p>
+          <p class="sub en">GROWTH</p>
+          <h3>成長</h3>
+          <p>技術だけでなく、人として育つ。選手だけでなく、指導者・審判・運営に関わる人も、同じように成長していきます。</p>
+        </div>
+        <span class="arw"></span>
+      </div>
+      <div class="cell">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="idx en">04</p>
+          <p class="sub en">CONTRIBUTION</p>
+          <h3>貢献</h3>
+          <p>受け取ったものを、次の世代へ返していく。サッカーが地域に還っていく循環をつくります。</p>
+        </div>
+      </div>
+    </div>
+    <div class="cycleFoot">
+      この 4 つは、順番に並んでいるだけではありません。貢献した人がまた新しい夢を持ち、次の誰かの挑戦を支える。<b>循環し続けること</b>が、Life+1 の意味するところです。
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>4 語｜TOP との役割分担</b>　TOP では 4 語を<b>短く見せる</b>だけ。このページで写真つきの詳細版を置く。同じ内容を 2 か所に持つことになるが、TOP は「わかる」、ここは「納得する」ためのもので目的が違う。<br>
+  ・写真 4 枚はグラフィック制作と同時に選定する（PHASE 2）<br>
+  ・末尾の一文で<b>循環</b>であることを明示する。並列の 4 項目に見えると意味が伝わらない
+</div></div>
+
+<!-- ===== 系譜 ===== -->
+<section class="sec">
+  <span class="blockTag">LINEAGE</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">03 / LINEAGE</span>
+      <h2>この理念は、受け継がれてきたものです。</h2>
+      <p>日本サッカー協会の掲げる考え方を、長野県協会として受け継ぎ、この地域のかたちにしています。</p>
+    </div>
+    <div class="lineage">
+      <div class="ln">
+        <p class="st en">JFA</p>
+        <h3>日本サッカー協会 理念</h3>
+        <p>サッカーを通じて、豊かなスポーツ文化を創造する。</p>
+      </div>
+      <div class="ln">
+        <p class="st en">JAPAN'S WAY</p>
+        <h3>目指すべき道すじ</h3>
+        <p>個の育成・指導者・環境を一体で考え、将来のありたい姿から逆算する。</p>
+      </div>
+      <div class="ln me">
+        <p class="st en">NFA MISSION</p>
+        <h3>Life+1</h3>
+        <p>サッカーを通じて、人生を豊かにする。長野県協会としての言葉。</p>
+      </div>
+      <div class="ln">
+        <p class="st en">NFA VISION</p>
+        <h3>長野県から全国、<br>そして世界へ</h3>
+        <p>夢・挑戦・成長・貢献の好循環を、県内に広げていく。</p>
+      </div>
+      <div class="ln">
+        <p class="st en">ACTION</p>
+        <h3>2020年宣言<br>2030アクションプラン</h3>
+        <p>理念を実行に移すための、具体的な約束と達成目標。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5つの約束 ===== -->
+<section class="sec dark">
+  <span class="blockTag">VOWS</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">04 / 2020 DECLARATION</span>
+      <h2>5 つの約束</h2>
+      <p>2020年宣言として掲げた、県協会が果たすべき目標です。</p>
+    </div>
+    <div class="vows">
+      <div class="vow">
+        <span class="n en">01</span>
+        <p class="tx">県民の 10 人に 1 人が<br>サッカーファミリーに
+          <small>プレーする人だけでなく、応援する人・支える人を含めて。</small></p>
+      </div>
+      <div class="vow">
+        <span class="n en">02</span>
+        <p class="tx">県内 4 地区に<br>フットボールセンターを整備
+          <small>北信・東信・中信・南信、それぞれの拠点として。</small></p>
+      </div>
+      <div class="vow">
+        <span class="n en">03</span>
+        <p class="tx">代表チームが<br>全国大会で上位進出
+          <small>各年代の県代表が、全国の舞台で結果を残す。</small></p>
+      </div>
+      <div class="vow">
+        <span class="n en">04</span>
+        <p class="tx">各種大会・チームに<br>ウェルフェアオフィサーを配置
+          <small>誰もが安全に、安心してプレーできる環境を守る。</small></p>
+      </div>
+      <div class="vow last">
+        <span class="n en">05</span>
+        <p class="tx">2027 国民スポーツ大会で、開催成功と優勝
+          <small>長野県で開催される大会を成功に導き、そして勝つ。</small></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2030 ===== -->
+<section class="sec">
+  <span class="blockTag">2030 PLAN</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">05 / 2030 ACTION PLAN</span>
+      <h2>2030 年に向けて、進めていること</h2>
+      <p>約束を実行に移すための行動計画です。各委員会がそれぞれの領域で取り組んでいます。</p>
+    </div>
+    <div class="plan2030">
+      <div>
+        <div class="goal">
+          <p class="lb">達成目標</p>
+          <p class="tx">JFA 全国都道府県チャート 5 位以内<span class="todo">最新の順位を要確認</span></p>
+          <p>登録者数、指導者・審判の育成、普及活動など複数の指標から算出される全国順位です。県協会の総合的な活動水準を示します。</p>
+        </div>
+        <div class="goal">
+          <p class="lb">位置づけ</p>
+          <p class="tx">今回のサイトリニューアルも、<br>この計画に含まれています</p>
+          <p>事務局の実施事項として「ホームページのリニューアル」「理念・ビジョンの理解による協賛企業の獲得」が明記されています。</p>
+        </div>
+      </div>
+      <div>
+        <ul class="acts2030">
+          <li><span class="dp">技術委員会</span><span>各年代の一貫指導、トレセン制度の充実</span></li>
+          <li><span class="dp">普及委員会</span><span>キッズ・グラスルーツ活動の拡大、巡回指導</span></li>
+          <li><span class="dp">女子委員会</span><span>なでしこひろばの開催、女子チームの増加</span></li>
+          <li><span class="dp">審判委員会</span><span>審判員の確保と育成、若手審判の登用</span></li>
+          <li><span class="dp">指導者養成</span><span>ライセンス講習会の開催、リフレッシュ研修</span></li>
+          <li><span class="dp">施設委員会</span><span>4 地区フットボールセンターの整備</span></li>
+          <li><span class="dp">事務局</span><span>ホームページのリニューアル、協賛企業の獲得</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>2030｜サイトリニューアルを計画の中に置く</b>　このページ自体が「計画の実行結果」であることを明示する。理事会で示した論理を、そのまま公開側にも置くかたち。<br>
+  ・委員会別の一覧は、この <b>1 か所にだけ</b>置く。ここ以外では委員会名を情報の分類に使わない<br>
+  ・全国チャートの順位は最新値の確認が必要
+</div></div>
+
+<!-- ===== 導線 ===== -->
+<section class="sec pale">
+  <span class="blockTag">GATEWAY</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">06 / NEXT</span>
+      <h2>理念を、かたちにしている場所へ。</h2>
+    </div>
+    <div class="gates">
+      <a href="grow.html" class="gate">
+        <p class="cat">育成強化</p>
+        <h3>選手が、育っていく場所</h3>
+        <p>長野スタイルの考え方、トレセン制度、指導者と審判の育成。</p>
+        <span class="go">育成・強化について</span>
+      </a>
+      <a href="start.html" class="gate">
+        <p class="cat">普及活動</p>
+        <h3>はじめる人が、増えていく場所</h3>
+        <p>キッズフェスティバル、なでしこひろば、シニア・障がい者サッカー。</p>
+        <span class="go">普及活動について</span>
+      </a>
+      <a href="partner.html" class="gate">
+        <p class="cat">地域活動</p>
+        <h3>地域と、ともに創る場所</h3>
+        <p>フットボールセンター整備、自治体との連携、企業の協賛。</p>
+        <span class="go">地域活動について</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 下層 ===== -->
+<section class="sec">
+  <span class="blockTag">SUB PAGES</span>
+  <div class="wrap">
+    <div class="secHead" style="margin-bottom:44px">
+      <span class="no en">07 / ABOUT NFA</span>
+      <h2>協会について</h2>
+    </div>
+    <div class="subs">
+      <a href="#"><span class="t">協会概要</span><span class="d">名称・所在地・設立・役員構成</span></a>
+      <a href="#"><span class="t">組織・委員会</span><span class="d">各委員会の役割と担当領域</span></a>
+      <a href="#"><span class="t">事業報告・決算</span><span class="d">年度ごとの活動実績と会計報告</span></a>
+      <a href="#"><span class="t">郡市サッカー協会</span><span class="d">県内各地区の協会一覧</span></a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note" style="margin-top:40px">
+    <b>ページ全体｜読ませる順番</b>　<b>ミッション → 4 語 → 系譜 → 約束 → 計画 → 導線</b>。抽象から具体へ一直線に降ろす。<br>
+    ・前半（ミッション・4 語）は共感層、後半（約束・計画）は<b>自治体・企業が読む部分</b>。同じページに置くことで、共感から信頼まで一度に伝わる<br>
+    ・協会概要・組織図といった事務的な情報は最下部。ここを上に置くと共感層のページでなくなる
+  </div>
+  <div class="note">
+    <b>ページ全体｜NFA 側にご確認いただくもの</b><br>
+    ・ミッション／ビジョンの文言（現行サイトからの転記のため、最新版かどうか）<br>
+    ・JFA 全国都道府県チャートの最新順位<br>
+    ・委員会一覧が現在の組織と一致しているか<br>
+    ・4 語に添える写真の選定（グラフィック制作と同時進行）
+  </div>
+</div>
+
+<script>
+document.getElementById('tg').onclick=()=>document.body.classList.toggle('noNotes');
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜はじめる・つづける ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+
+/* 注記 */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+section{position:relative}
+.ph{position:relative;background:repeating-linear-gradient(45deg,var(--pale2) 0 10px,var(--pale) 10px 20px);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center}
+.ph span{font-size:12px;color:var(--ink2);background:rgba(255,255,255,.92);padding:8px 16px;line-height:1.8}
+.ph.onDark{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,rgba(255,255,255,.11) 10px 20px);border-color:rgba(255,255,255,.22)}
+.ph.onDark span{background:rgba(20,28,94,.85);color:#C8CFEA}
+
+/* ヘッダー */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ヒーロー */
+.hero{background:var(--navy);color:#fff;padding:0 0 88px;overflow:hidden}
+.hero .visual{position:relative;height:380px;margin-bottom:-120px}
+.hero .visual .ph{position:absolute;inset:0;border:none}
+.hero .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,28,94,.4) 0%,rgba(20,28,94,.2) 40%,rgba(20,28,94,.98) 100%)}
+.hero .copy{position:relative;z-index:3}
+.hero .crumb{font-size:12px;color:#8A93AD;margin-bottom:26px}
+.hero .crumb a:hover{color:#fff}
+.hero .kicker{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.28em;color:var(--cyan);margin-bottom:20px}
+.hero h1{font-size:42px;font-weight:700;line-height:1.55;margin-bottom:24px}
+.hero .lead{font-size:16px;color:#B9C2DE;line-height:2.15;max-width:660px}
+
+/* セクション */
+.sec{padding:118px 0 126px}
+.sec.pale{background:var(--pale2)}
+.secHead{margin-bottom:56px}
+.secHead .no{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;color:var(--cyan);display:block;margin-bottom:16px}
+.secHead h2{font-size:31px;font-weight:700;line-height:1.6}
+.secHead p{font-size:15px;color:var(--ink2);margin-top:20px;line-height:2.1;max-width:700px}
+
+/* 分岐（誰ですか） */
+.who{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.whoCard{border:1px solid var(--line);background:#fff;padding:34px 30px 36px;transition:border-color .25s,transform .25s;display:flex;flex-direction:column}
+.whoCard:hover{border-color:var(--blue);transform:translateY(-3px)}
+.whoCard .ic{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.16em;color:var(--cyan);margin-bottom:18px}
+.whoCard h3{font-size:20px;font-weight:700;line-height:1.65;margin-bottom:14px}
+.whoCard p{font-size:13.5px;color:var(--ink2);line-height:2;margin-bottom:24px;flex:1}
+.whoCard .go{font-size:13.5px;font-weight:500;color:var(--blue);display:flex;align-items:center;gap:10px}
+.whoCard .go::after{content:"";width:22px;height:1px;background:var(--blue);transition:width .25s}
+.whoCard:hover .go::after{width:38px}
+
+/* 3ステップ */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+.stp{position:relative}
+.stp::before{content:"";display:block;height:3px;background:var(--blue);margin-bottom:24px}
+.stp:nth-child(n+2)::before{background:var(--pale)}
+.stp .n{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--cyan);margin-bottom:14px}
+.stp h3{font-size:19px;font-weight:700;margin-bottom:14px;line-height:1.7}
+.stp p{font-size:14px;color:var(--ink2);line-height:2.05;margin-bottom:20px}
+.stp .lk{font-size:13px;color:var(--blue);border-bottom:1px solid var(--blue);padding-bottom:3px}
+
+/* 活動一覧 */
+.acts{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
+.actRow{background:#fff;display:grid;grid-template-columns:270px 1fr 190px;gap:0;align-items:stretch;transition:background .2s}
+.actRow:hover{background:var(--pale2)}
+.actRow .ph{border:none;border-right:1px solid var(--line);min-height:170px}
+.actRow .bd{padding:32px 34px}
+.actRow .cat{font-size:11.5px;letter-spacing:.12em;color:var(--cyan);font-weight:500;margin-bottom:12px}
+.actRow h3{font-size:21px;font-weight:700;margin-bottom:14px;line-height:1.6}
+.actRow p{font-size:13.5px;color:var(--ink2);line-height:2}
+.actRow .side{border-left:1px solid var(--line);padding:32px 26px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.actRow .side .mt{font-size:12px;color:var(--muted);line-height:1.85}
+.actRow .side .mt b{display:block;color:var(--ink);font-weight:500;font-size:13px;margin-bottom:3px}
+.actRow .side .go{font-size:13px;color:var(--blue);font-weight:500}
+
+/* チームを探す */
+.findIn{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.findIn .ph{height:320px}
+.findBox{border:1px solid var(--line);padding:36px 34px 38px}
+.findBox h3{font-size:22px;font-weight:700;line-height:1.65;margin-bottom:16px}
+.findBox p{font-size:14px;color:var(--ink2);line-height:2.05;margin-bottom:28px}
+.findRow{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.findRow select{flex:1;min-width:150px;border:1px solid var(--line);padding:15px 16px;font-size:14px;background:#fff;color:var(--ink)}
+.findBox .btn{display:block;width:100%;text-align:center;background:var(--blue);color:#fff;font-size:14.5px;font-weight:500;padding:17px;margin-top:8px;transition:background .2s}
+.findBox .btn:hover{background:var(--navy)}
+
+/* FAQ */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{padding:26px 40px 26px 4px;font-size:15px;font-weight:500;cursor:pointer;list-style:none;position:relative;line-height:1.8}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"＋";position:absolute;right:8px;top:26px;color:var(--blue);font-size:15px}
+.faq details[open] summary::after{content:"−"}
+.faq .a{padding:0 40px 28px 4px;font-size:14px;color:var(--ink2);line-height:2.1}
+
+/* 関連情報 */
+.rel{border-top:1px solid var(--line)}
+.rel a{display:grid;grid-template-columns:110px 126px 1fr;gap:24px;align-items:center;padding:24px 8px;border-bottom:1px solid var(--line);transition:background .2s}
+.rel a:hover{background:var(--pale2)}
+.rel .d{font-family:"Barlow";font-size:13.5px;color:var(--muted)}
+.rel .c{font-size:11.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);text-align:center;padding:6px 8px}
+.rel .t{font-size:14.5px;line-height:1.8}
+.relMore{margin-top:38px;text-align:center}
+.relMore a{display:inline-block;border:1px solid var(--blue);color:var(--blue);font-size:14px;padding:16px 48px;transition:background .2s,color .2s}
+.relMore a:hover{background:var(--blue);color:#fff}
+
+/* CTA */
+.cta{background:var(--navy);color:#fff;padding:88px 0 92px;text-align:center}
+.cta h2{font-size:28px;font-weight:700;line-height:1.65;margin-bottom:18px}
+.cta p{font-size:15px;color:#AAB3D2;line-height:2.1;margin-bottom:40px;max-width:600px;margin-left:auto;margin-right:auto}
+.cta .acts2{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.btnMain{background:var(--cyan);color:#fff;font-size:15px;font-weight:500;padding:19px 44px;transition:background .2s}
+.btnMain:hover{background:#0079A8}
+.btnGhost{border:1px solid rgba(255,255,255,.45);color:#fff;font-size:15px;padding:18px 38px;transition:background .2s}
+.btnGhost:hover{background:rgba(255,255,255,.1)}
+
+@media(max-width:1000px){
+  .who,.steps{grid-template-columns:1fr}
+  .actRow{grid-template-columns:1fr}
+  .actRow .ph{border-right:none;border-bottom:1px solid var(--line)}
+  .actRow .side{border-left:none;border-top:1px solid var(--line)}
+  .findIn{grid-template-columns:1fr;gap:40px}
+  .gnav nav{display:none}
+  .hero h1{font-size:30px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .hero .visual{height:230px;margin-bottom:-80px}
+  .hero{padding-bottom:64px}
+  .hero h1{font-size:26px}
+  .hero .lead{font-size:13.5px}
+  .sec{padding:72px 0 78px}
+  .secHead h2{font-size:24px}
+  .secHead{margin-bottom:38px}
+  .whoCard{padding:28px 24px 30px}
+  .stp h3{font-size:17px}
+  .actRow .bd{padding:24px 22px}
+  .actRow .side{padding:22px}
+  .findBox{padding:26px 22px 28px}
+  .findIn .ph{height:190px}
+  .rel a{grid-template-columns:1fr;gap:8px;padding:20px 4px}
+  .rel .c{justify-self:start;padding:6px 16px}
+  .cta{padding:64px 0 70px}
+  .cta h2{font-size:22px}
+  .cta .acts2{flex-direction:column;padding:0 4px}
+  .btnMain,.btnGhost{width:100%;text-align:center;justify-content:center}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜はじめる・つづける ワイヤー v1（中間層テンプレート A 面）</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html">NFAについて</a><a href="start.html" class="on">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="blockTag">HERO</span>
+  <div class="visual"><div class="ph onDark"><span>写真｜はじめての体験の場面<br>（キッズフェスティバル・なでしこひろば等）</span></div></div>
+  <div class="wrap">
+    <div class="copy">
+      <p class="crumb"><a href="index.html">ホーム</a> ／ はじめる・つづける</p>
+      <p class="kicker en">GET STARTED</p>
+      <h1>はじめるのに、<br>遅すぎることはありません。</h1>
+      <p class="lead">サッカーをやったことがなくても、しばらく離れていても、体力に自信がなくても大丈夫です。長野県には、それぞれの世代・立場に合わせた場所があります。</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note" style="margin-top:26px">
+  <b>中間層テンプレート｜共通の型</b>　「はじめる・つづける」と「強くなる・関わる」は<b>同一のブロック構成</b>で組む。中身が違うだけで、順番と役割は同じ。<br>
+  ①ヒーロー ②誰向けかの分岐 ③はじめかた／進みかたの手順 ④領域ごとの活動一覧 ⑤具体的な行動（探す・申し込む）⑥ FAQ ⑦関連する最新情報 ⑧ CTA<br>
+  ・種別ごとに別デザインをつくらないことで、公開後の追加ページも同じ型で足せる
+</div></div>
+
+<!-- 分岐 -->
+<section class="sec">
+  <span class="blockTag">WHO</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">01 / WHO</span>
+      <h2>どなたが、はじめますか。</h2>
+      <p>ご自身に近いものからお進みください。</p>
+    </div>
+    <div class="who">
+      <a href="#" class="whoCard">
+        <p class="ic en">FOR KIDS</p>
+        <h3>子どもに、<br>やらせてみたい</h3>
+        <p>未就学児から小学生まで。まずは体験から。用具がなくても参加できるプログラムがあります。</p>
+        <span class="go">子どもの、はじめかた</span>
+      </a>
+      <a href="#" class="whoCard">
+        <p class="ic en">FOR WOMEN</p>
+        <h3>女子サッカーを、<br>やってみたい</h3>
+        <p>小学生から大人まで。経験がなくても参加できる「なでしこひろば」を県内各地で開催しています。</p>
+        <span class="go">女子サッカーについて</span>
+      </a>
+      <a href="#" class="whoCard">
+        <p class="ic en">FOR ADULTS</p>
+        <h3>また、<br>プレーしたい</h3>
+        <p>社会人・シニア世代の方へ。長く続けられるリーグと、無理のない環境があります。</p>
+        <span class="go">大人・シニアの活動</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- はじめかた -->
+<section class="sec pale">
+  <span class="blockTag">HOW</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">02 / HOW</span>
+      <h2>はじめかたは、3 つの段階です。</h2>
+      <p>いきなりチームに入る必要はありません。まず体験してから決められます。</p>
+    </div>
+    <div class="steps">
+      <div class="stp">
+        <p class="n en">STEP 01</p>
+        <h3>体験してみる</h3>
+        <p>県内各地で開催しているフェスティバル・体験教室に参加します。申込不要のものもあります。用具の貸し出しがあります。</p>
+        <a href="list.html" class="lk">開催予定を見る</a>
+      </div>
+      <div class="stp">
+        <p class="n en">STEP 02</p>
+        <h3>チームを探す</h3>
+        <p>お住まいの地域と年代から、活動しているチームを探せます。見学や体験入部を受け付けているチームが多くあります。</p>
+        <a href="teams.html" class="lk">チームを探す</a>
+      </div>
+      <div class="stp">
+        <p class="n en">STEP 03</p>
+        <h3>登録する</h3>
+        <p>チームが決まったら、選手登録の手続きをします。手続きはチームを通じて行うため、個人での作業はほとんどありません。</p>
+        <a href="#" class="lk">登録について</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 活動一覧 -->
+<section class="sec">
+  <span class="blockTag">PROGRAMS</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">03 / PROGRAMS</span>
+      <h2>県内で行われている活動</h2>
+      <p>年代や立場に応じて、さまざまな取り組みがあります。</p>
+    </div>
+    <div class="acts">
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">キッズ・グラスルーツ</p>
+          <h3>キッズサッカーフェスティバル</h3>
+          <p>未就学児・小学校低学年を対象とした体験イベント。ボールに触れることを目的としており、勝敗はつけません。保護者の方も一緒に参加できます。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>対象</b>未就学児〜小学3年生</p>
+          <p class="mt"><b>開催</b>年 4 回・県内 4 地区</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">女子サッカー</p>
+          <h3>なでしこひろば</h3>
+          <p>女子を対象とした体験プログラム。小学生から大人まで、年齢の上限はありません。参加者の約 6 割がサッカー未経験の方です。用具の貸し出しがあります。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>対象</b>女子・年齢不問</p>
+          <p class="mt"><b>開催</b>春・秋／県内各地</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">シニア</p>
+          <h3>シニアリーグ（O-40 / O-50）</h3>
+          <p>40 歳以上・50 歳以上を対象としたリーグ戦。無理のない試合時間と運用で、長く続けられることを目的としています。チーム単位での参加になります。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>対象</b>40 歳以上</p>
+          <p class="mt"><b>開催</b>年間リーグ戦</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">障がい者サッカー</p>
+          <h3>障がい者サッカーの取り組み</h3>
+          <p>知的障がい・視覚障がい・聴覚障がい・電動車椅子など、さまざまなかたちのサッカーがあります。県内での活動状況と、参加できる交流会をご案内しています。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>対象</b>障がいのある方</p>
+          <p class="mt"><b>開催</b>交流会・体験会</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">フットサル</p>
+          <h3>フットサルの活動</h3>
+          <p>少人数・屋内でできるため、天候に左右されず年間を通じて活動できます。サッカー経験者だけでなく、これからはじめる方の入口としても適しています。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>対象</b>年代・性別問わず</p>
+          <p class="mt"><b>開催</b>大会・リーグ</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>活動一覧｜横 1 行のリスト形式にした理由</b>　カード 5 枚を並べると視線が分散し、対象と開催頻度が読み比べにくい。<b>1 行 1 活動</b>にして、右列に「対象・開催」を固定配置すると、上から順に比較できる。<br>
+  ・右列の 2 項目は全活動で共通。項目名を変えない<br>
+  ・活動が増えても行が伸びるだけで、レイアウトが破綻しない
+</div></div>
+
+<!-- チームを探す -->
+<section class="sec pale">
+  <span class="blockTag">FIND</span>
+  <div class="wrap">
+    <div class="findIn">
+      <div class="findBox">
+        <h3>近くのチームを探す</h3>
+        <p>お住まいの地域と、対象の年代を選んでください。活動しているチームの一覧が表示されます。</p>
+        <div class="findRow">
+          <select><option>地域を選ぶ</option><option>北信</option><option>東信</option><option>中信</option><option>南信</option></select>
+          <select><option>年代を選ぶ</option><option>小学生（4種）</option><option>中学生（3種）</option><option>高校生（2種）</option><option>大人・社会人（1種）</option><option>女子</option><option>シニア</option></select>
+        </div>
+        <a href="teams.html" class="btn">チームを探す</a>
+      </div>
+      <div class="ph"><span>地図または写真｜県内 4 地区のイメージ</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec">
+  <span class="blockTag">FAQ</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">04 / FAQ</span>
+      <h2>はじめる前に、よくいただくご質問</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>サッカーの経験がまったくありませんが、大丈夫でしょうか。</summary>
+        <div class="a">問題ありません。体験プログラムの参加者の多くは未経験の方です。ボールに触れることからはじめられる内容になっています。</div>
+      </details>
+      <details>
+        <summary>用具を持っていません。何を用意すればよいですか。</summary>
+        <div class="a">体験の段階では、動きやすい服装と運動靴があれば参加できます。ボールやビブスは会場でお貸しします。チームに入る段階で、あらためてご相談ください。</div>
+      </details>
+      <details>
+        <summary>費用はどのくらいかかりますか。</summary>
+        <div class="a">体験プログラムの多くは無料または少額の参加費です。チームに所属する場合の会費はチームごとに異なりますので、見学の際にご確認ください。選手登録料は別途必要です。</div>
+      </details>
+      <details>
+        <summary>保護者が付き添う必要はありますか。</summary>
+        <div class="a">未就学児・小学校低学年の体験プログラムでは、保護者の方の同伴をお願いしています。一緒に参加していただける内容です。</div>
+      </details>
+      <details>
+        <summary>途中でやめたくなったら、どうすればよいですか。</summary>
+        <div class="a">体験プログラムはその都度のご参加ですので、続ける義務はありません。チームに所属したあとの退会についても、チームにお申し出いただければ手続きできます。</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>FAQ｜協会視点ではなく保護者視点で書く</b>　ここに並べるのは、<b>はじめる前の不安</b>であって制度の説明ではない。経験・用具・費用・付き添い・やめかたの 5 つが実際に多い問い合わせ。<br>
+  ・「やめたくなったら」を入れておくと、はじめる心理的な負荷が下がる<br>
+  ・制度や規程の説明は、下層の「登録について」に置いてここには書かない
+</div></div>
+
+<!-- 関連情報 -->
+<section class="sec pale">
+  <span class="blockTag">NEWS</span>
+  <div class="wrap">
+    <div class="secHead" style="margin-bottom:40px">
+      <span class="no en">05 / NEWS</span>
+      <h2>この分野の最新情報</h2>
+    </div>
+    <div class="rel">
+      <a href="detail.html"><span class="d en">2026.08.15</span><span class="c">お知らせ</span><span class="t">なでしこひろば 秋季開催のご案内 ─ 参加者を募集しています</span></a>
+      <a href="detail.html"><span class="d en">2026.07.22</span><span class="c">お知らせ</span><span class="t">キッズサッカーフェスティバル（中信）開催のご案内</span></a>
+      <a href="detail.html"><span class="d en">2026.07.18</span><span class="c">登録・手続き</span><span class="t">フットサル選手権大会 県予選 エントリー受付開始</span></a>
+      <a href="detail.html"><span class="d en">2026.07.14</span><span class="c">お知らせ</span><span class="t">障がい者サッカー交流会 参加チーム募集について</span></a>
+    </div>
+    <div class="relMore"><a href="list.html">この分野の情報をすべて見る</a></div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>関連情報｜一覧テンプレートを条件付きで呼ぶ</b>　このブロックは、一覧ページを<b>「対象＝女子・シニア・障がい者・フットサル」で絞り込んだ状態</b>で表示しているのと同じ。専用の記事管理はしない。<br>
+  ・「すべて見る」は、その絞り込み条件を保持したまま一覧ページへ遷移する<br>
+  ・中間層ページごとに、どの条件で引くかを CMS 側で設定する
+</div></div>
+
+<section class="cta">
+  <span class="blockTag">CTA</span>
+  <div class="wrap">
+    <h2>まず、見学からでも構いません。</h2>
+    <p>どこに問い合わせればよいかわからない場合は、協会事務局までご連絡ください。お近くの活動をご案内します。</p>
+    <div class="acts2">
+      <a href="search.html" class="btnMain">体験・イベントを探す</a>
+      <a href="utility.html#form" class="btnGhost">事務局に問い合わせる</a>
+    </div>
+  </div>
+</section>
+
+<script>document.getElementById('tg').onclick=()=>document.body.classList.toggle('noNotes');</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

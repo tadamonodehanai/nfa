@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜ともに創る（協賛） ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+
+/* ---- 注記 ---- */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+.todo{
+  display:inline-block;background:#FFF3D6;border:1px solid #E0B84C;color:#8A6A16;
+  font-size:11px;padding:4px 10px;margin-left:10px;vertical-align:middle;letter-spacing:.04em;
+}
+body.noNotes .todo{display:none}
+section{position:relative}
+.ph{
+  position:relative;
+  background:repeating-linear-gradient(45deg,var(--pale2) 0 10px,var(--pale) 10px 20px);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center;
+}
+.ph span{font-size:12px;color:var(--ink2);background:rgba(255,255,255,.92);padding:8px 16px;line-height:1.8}
+.ph.onDark{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,rgba(255,255,255,.11) 10px 20px);border-color:rgba(255,255,255,.22)}
+.ph.onDark span{background:rgba(20,28,94,.85);color:#C8CFEA}
+
+/* ---- ヘッダー ---- */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ---- ページヒーロー ---- */
+.hero{background:var(--navy);color:#fff;padding:0 0 90px;overflow:hidden}
+.hero .visual{position:relative;height:400px;margin-bottom:-120px}
+.hero .visual .ph{position:absolute;inset:0;border:none}
+.hero .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,28,94,.4) 0%,rgba(20,28,94,.2) 40%,rgba(20,28,94,.98) 100%)}
+.hero .copy{position:relative;z-index:3}
+.hero .crumb{font-size:12px;color:#8A93AD;margin-bottom:26px}
+.hero .crumb a:hover{color:#fff}
+.hero .kicker{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.28em;color:var(--cyan);margin-bottom:22px}
+.hero h1{font-size:44px;font-weight:700;line-height:1.55;margin-bottom:26px}
+.hero .lead{font-size:16px;color:#B9C2DE;line-height:2.15;max-width:680px}
+
+/* ---- 共通セクション ---- */
+.sec{padding:120px 0 130px}
+.sec.pale{background:var(--pale2)}
+.sec.dark{background:var(--navy);color:#fff}
+.secHead{margin-bottom:60px}
+.secHead .no{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;color:var(--cyan);display:block;margin-bottom:16px}
+.secHead h2{font-size:32px;font-weight:700;line-height:1.6}
+.secHead p{font-size:15px;color:var(--ink2);margin-top:20px;line-height:2.1;max-width:700px}
+.sec.dark .secHead p{color:#AAB3D2}
+
+/* ---- 数字 ---- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.stat{background:#fff;padding:38px 30px 42px}
+.stat .n{font-family:"Barlow";font-size:46px;font-weight:600;color:var(--blue);line-height:1.1;letter-spacing:-.01em}
+.stat .n small{font-size:17px;font-weight:500;margin-left:5px}
+.stat .lb{font-size:13px;color:var(--ink2);margin-top:14px;line-height:1.85}
+
+/* ---- 5つの約束 ---- */
+.promise{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
+.pRow{background:#fff;display:grid;grid-template-columns:78px 1fr 1fr 1fr;gap:0;align-items:stretch}
+.pRow.hd{background:var(--pale2)}
+.pRow.hd div{font-size:11.5px;font-weight:500;color:var(--blue);letter-spacing:.06em;padding:16px 24px}
+.pRow>div{padding:26px 24px;border-right:1px solid var(--line);display:flex;align-items:center}
+.pRow>div:last-child{border-right:none}
+.pRow .num{font-family:"Barlow";font-size:15px;font-weight:600;color:var(--cyan);justify-content:center}
+.pRow .what{font-size:14.5px;font-weight:500;line-height:1.85}
+.pRow .where{font-size:13.5px;color:var(--ink2);line-height:1.9}
+.pRow .value{font-size:13.5px;color:var(--ink2);line-height:1.9}
+
+/* ---- 協賛メニュー ---- */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.plan{border:1px solid var(--line);background:#fff;display:flex;flex-direction:column;transition:border-color .25s}
+.plan:hover{border-color:var(--blue)}
+.plan.rec{border-color:var(--blue);border-width:2px}
+.plan .tp{padding:34px 30px 30px;border-bottom:1px solid var(--line);position:relative}
+.plan.rec .tp{background:var(--pale2)}
+.plan .rib{position:absolute;top:0;right:0;background:var(--blue);color:#fff;font-size:11px;padding:6px 14px;letter-spacing:.06em}
+.plan .nm{font-size:20px;font-weight:700;margin-bottom:8px}
+.plan .en-nm{font-family:"Barlow";font-size:11.5px;letter-spacing:.16em;color:var(--muted);margin-bottom:22px}
+.plan .amt{font-family:"Barlow";font-size:32px;font-weight:600;color:var(--blue);line-height:1.2}
+.plan .amt small{font-family:"Noto Sans JP";font-size:13px;font-weight:400;color:var(--ink2);margin-left:6px}
+.plan .bd{padding:30px;flex:1}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.plan li{font-size:13.5px;line-height:1.85;padding-left:22px;position:relative;color:var(--ink2)}
+.plan li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:8px;background:var(--pale);border:1px solid var(--blue)}
+.plan li.no{color:var(--muted)}
+.plan li.no::before{background:#fff;border-color:var(--line)}
+.plan .ft{padding:0 30px 30px}
+.plan .ft a{display:block;text-align:center;border:1px solid var(--blue);color:var(--blue);font-size:13.5px;padding:15px;transition:background .2s,color .2s}
+.plan .ft a:hover{background:var(--blue);color:#fff}
+.plan.rec .ft a{background:var(--blue);color:#fff}
+.plan.rec .ft a:hover{background:var(--navy);border-color:var(--navy)}
+
+/* ---- 使いみち可視化 ---- */
+.useIn{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.useIn .ph{height:360px}
+.bars{display:flex;flex-direction:column;gap:24px}
+.bar .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.bar .lb{font-size:14px;font-weight:500}
+.bar .pc{font-family:"Barlow";font-size:15px;font-weight:600;color:var(--blue)}
+.bar .track{height:8px;background:var(--pale)}
+.bar .fill{height:100%;background:var(--blue)}
+.bar .fill.c2{background:var(--cyan)}
+.bar .fill.c3{background:#4A5AB8}
+.bar .fill.c4{background:#8A93AD}
+.bar .ds{font-size:12.5px;color:var(--ink2);margin-top:9px;line-height:1.85}
+
+/* ---- 協賛企業 ---- */
+.logos{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.logos .ph{height:112px;border:none;background:#fff}
+.logos .ph span{background:none;font-size:11px;color:var(--muted)}
+
+/* ---- 流れ ---- */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.step{position:relative}
+.step .n{
+  font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.18em;
+  color:var(--cyan);margin-bottom:16px;
+}
+.step h3{font-size:17px;font-weight:700;margin-bottom:14px;line-height:1.7}
+.step p{font-size:13.5px;color:var(--ink2);line-height:2}
+.step::before{content:"";display:block;height:3px;background:var(--blue);margin-bottom:22px}
+.step:nth-child(n+2)::before{background:var(--pale)}
+
+/* ---- FAQ ---- */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{
+  padding:26px 40px 26px 4px;font-size:15px;font-weight:500;cursor:pointer;
+  list-style:none;position:relative;line-height:1.8;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"＋";position:absolute;right:8px;top:26px;color:var(--blue);font-size:15px;
+}
+.faq details[open] summary::after{content:"−"}
+.faq .a{padding:0 40px 28px 4px;font-size:14px;color:var(--ink2);line-height:2.1}
+
+/* ---- CTA ---- */
+.cta{background:var(--navy);color:#fff;padding:96px 0 100px;text-align:center}
+.cta h2{font-size:30px;font-weight:700;line-height:1.65;margin-bottom:20px}
+.cta p{font-size:15px;color:#AAB3D2;line-height:2.1;margin-bottom:44px;max-width:640px;margin-left:auto;margin-right:auto}
+.cta .acts{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.btnMain{background:var(--cyan);color:#fff;font-size:15px;font-weight:500;padding:20px 46px;transition:background .2s}
+.btnMain:hover{background:#0079A8}
+.btnGhost{border:1px solid rgba(255,255,255,.45);color:#fff;font-size:15px;padding:19px 40px;transition:background .2s}
+.btnGhost:hover{background:rgba(255,255,255,.1)}
+.cta .tel{margin-top:40px;font-size:13px;color:#8A93AD;line-height:2}
+
+@media(max-width:1000px){
+  .stats,.plans,.flow{grid-template-columns:1fr 1fr}
+  .useIn{grid-template-columns:1fr;gap:40px}
+  .logos{grid-template-columns:repeat(3,1fr)}
+  .pRow{grid-template-columns:60px 1fr}
+  .pRow .where,.pRow .value{grid-column:2}
+  .gnav nav{display:none}
+  .hero h1{font-size:32px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .hero .visual{height:230px;margin-bottom:-78px}
+  .hero{padding-bottom:60px}
+  .hero h1{font-size:28px}
+  .hero .lead{font-size:13.5px}
+  .sec{padding:72px 0 78px}
+  .secHead h2{font-size:23px}
+  .secHead{margin-bottom:38px}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat{padding:26px 22px 30px}
+  .stat .n{font-size:32px}
+  .pRow{grid-template-columns:1fr;border-bottom:6px solid var(--pale2)}
+  .pRow.hd{display:none}
+  .pRow>div{border-right:none;padding:12px 20px;display:block}
+  .pRow .num{padding-bottom:0;padding-top:18px}
+  .pRow .what{font-size:15px}
+  .pRow .what br{display:none}
+  .pRow .where::before{content:"支援が向かう活動";display:block;font-size:10.5px;color:var(--cyan);font-weight:500;letter-spacing:.06em;margin-bottom:3px}
+  .pRow .value::before{content:"企業にとっての接点";display:block;font-size:10.5px;color:var(--cyan);font-weight:500;letter-spacing:.06em;margin-bottom:3px}
+  .pRow .value{padding-bottom:20px}
+  .plans{grid-template-columns:1fr}
+  .useIn .ph{height:200px}
+  .logos{grid-template-columns:1fr 1fr}
+  .flow{grid-template-columns:1fr}
+  .faq summary{padding-right:34px}
+  .cta{padding:64px 0 70px}
+  .cta h2{font-size:22px}
+  .cta .acts{flex-direction:column;padding:0 4px}
+  .btnMain,.btnGhost{width:100%;text-align:center}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜ともに創る（協賛） ワイヤー v1</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html">NFAについて</a><a href="start.html">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html" class="on">ともに創る</a><a href="search.html">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ===== ヒーロー ===== -->
+<section class="hero">
+  <span class="blockTag">HERO</span>
+  <div class="visual"><div class="ph onDark"><span>写真｜支援が活きている現場<br>（大会運営・施設・遠征のいずれか）</span></div></div>
+  <div class="wrap">
+    <div class="copy">
+      <p class="crumb"><a href="index.html">ホーム</a> ／ ともに創る</p>
+      <p class="kicker en">PARTNERSHIP</p>
+      <h1>その支援が、<br>どこに届くのか。</h1>
+      <p class="lead">長野県サッカー協会は、2020年宣言として 5 つの約束を掲げています。いただいた協賛は、この約束を実現するための活動に使われます。何に使われ、何が生まれたのか。見えるかたちで、企業のみなさまとご一緒したいと考えています。</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note" style="margin-top:26px">
+  <b>ヒーロー｜主語を変える</b>　「ご支援ください」ではなく<b>「支援が、どこに届くのか」</b>を見出しに置く。協賛を寄付ではなく事業への参加として読ませることが、このページ全体の目的。<br>
+  ・写真は選手の集合写真ではなく、<b>支援の使途が写っているもの</b>を選ぶ（施設・運営・遠征）<br>
+  ・現状は「協会について ＞ スポンサー ＞ 申込概要」と 3 階層の奥。グローバルナビに独立させる
+</div></div>
+
+<!-- ===== 規模の数字 ===== -->
+<section class="sec">
+  <span class="blockTag">SCALE</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">01 / SCALE</span>
+      <h2>長野県のサッカーは、<br>これだけの人が関わっています。<span class="todo">数値は要確認</span></h2>
+      <p>県内の登録者・チーム・大会の規模です。協賛は、この人数との接点を持つことを意味します。</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><p class="n en">◯◯,◯◯◯<small>名</small></p><p class="lb">県内サッカー登録者数<br>（選手・指導者・審判）</p></div>
+      <div class="stat"><p class="n en">◯,◯◯◯<small>チーム</small></p><p class="lb">県内登録チーム数<br>（1種〜4種・女子・シニア）</p></div>
+      <div class="stat"><p class="n en">◯◯◯<small>大会</small></p><p class="lb">年間の主催・主管大会数</p></div>
+      <div class="stat"><p class="n en">◯◯<small>万PV</small></p><p class="lb">公式サイト 年間閲覧数<br>（大会シーズンに集中）</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>規模｜企業が最初に見る情報</b>　協賛の検討は「どれだけの人に届くか」から始まる。理念より先に<b>規模を数字で示す</b>ことで、読み進める理由をつくる。<br>
+  ・4 つの数値は NFA 側にご提供いただく必要あり（登録者数・チーム数・大会数・サイト PV）<br>
+  ・PV は現行サイトの実績値を使う。リニューアル後は改めて計測して更新する<br>
+  ・出せない数値があれば、項目ごと差し替える（空欄や「準備中」は載せない）
+</div></div>
+
+<!-- ===== 5つの約束 ===== -->
+<section class="sec pale">
+  <span class="blockTag">PROMISE</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">02 / PROMISE</span>
+      <h2>5 つの約束が、支援の届く先です。</h2>
+      <p>2020年宣言として掲げた 5 つの目標。それぞれに、支援が向かう活動と、企業にとっての接点があります。</p>
+    </div>
+    <div class="promise">
+      <div class="pRow hd">
+        <div>No.</div><div>2020年宣言（協会の約束）</div><div>支援が向かう活動</div><div>企業にとっての接点</div>
+      </div>
+      <div class="pRow">
+        <div class="num en">01</div>
+        <div class="what">県民の 10 人に 1 人が<br>サッカーファミリーに</div>
+        <div class="where">普及活動・フェスティバル運営、巡回指導</div>
+        <div class="value">県内全域・全世代へのリーチ</div>
+      </div>
+      <div class="pRow">
+        <div class="num en">02</div>
+        <div class="what">県内 4 地区に<br>フットボールセンターを整備</div>
+        <div class="where">施設整備・環境づくり、備品の更新</div>
+        <div class="value">地域拠点での継続的な接点</div>
+      </div>
+      <div class="pRow">
+        <div class="num en">03</div>
+        <div class="what">代表チームが<br>全国大会で上位進出</div>
+        <div class="where">遠征費用・強化活動、トレセン運営</div>
+        <div class="value">成果とともに露出する機会</div>
+      </div>
+      <div class="pRow">
+        <div class="num en">04</div>
+        <div class="what">大会・チームに<br>ウェルフェアオフィサーを配置</div>
+        <div class="where">安全・安心な環境の担保、講習の実施</div>
+        <div class="value">社会的責任の共同発信</div>
+      </div>
+      <div class="pRow">
+        <div class="num en">05</div>
+        <div class="what">2027 国民スポーツ大会で<br>開催成功と優勝</div>
+        <div class="where">大会運営・県外への発信</div>
+        <div class="value">全国規模での認知</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 使いみち ===== -->
+<section class="sec">
+  <span class="blockTag">ALLOCATION</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">03 / ALLOCATION</span>
+      <h2>いただいた協賛の、使いみち。<span class="todo">公開範囲は要判断</span></h2>
+      <p>どの活動にどれだけ使われたかを、毎年度お知らせしています。</p>
+    </div>
+    <div class="useIn">
+      <div class="bars">
+        <div class="bar">
+          <div class="top"><span class="lb">普及活動・フェスティバル</span><span class="pc en">◯◯%</span></div>
+          <div class="track"><div class="fill" style="width:38%"></div></div>
+          <p class="ds">キッズフェスティバル、巡回指導、なでしこひろばの運営費</p>
+        </div>
+        <div class="bar">
+          <div class="top"><span class="lb">代表チームの強化・遠征</span><span class="pc en">◯◯%</span></div>
+          <div class="track"><div class="fill c2" style="width:27%"></div></div>
+          <p class="ds">全国大会・北信越大会への遠征費、トレセン活動費</p>
+        </div>
+        <div class="bar">
+          <div class="top"><span class="lb">大会運営・施設整備</span><span class="pc en">◯◯%</span></div>
+          <div class="track"><div class="fill c3" style="width:22%"></div></div>
+          <p class="ds">会場使用料、審判員派遣、備品の更新</p>
+        </div>
+        <div class="bar">
+          <div class="top"><span class="lb">指導者・審判の育成</span><span class="pc en">◯◯%</span></div>
+          <div class="track"><div class="fill c4" style="width:13%"></div></div>
+          <p class="ds">ライセンス講習会、研修会の開催費</p>
+        </div>
+      </div>
+      <div class="ph"><span>写真｜活動レポートの表紙<br>または前年度の実績ダイジェスト</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>使いみち｜理事会 検討事項 C に直結</b>　<b>「どこまで公開するか」が判断ポイント</b>。ここは 3 段階のいずれかを選ぶ形にしている。<br>
+  ・<b>案 1</b>：構成比のみ（％）を出す ─ 本ワイヤーの想定。金額を出さずに透明性を示せる<br>
+  ・<b>案 2</b>：金額まで出す ─ 説得力は最も強いが、事業報告との整合が毎年必要になる<br>
+  ・<b>案 3</b>：使途の項目だけ出す（比率なし）─ 運用負荷は最小だが、他団体との差がつかない<br>
+  ・いずれの案でも、決算資料からの転記作業が年 1 回発生する。<b>誰が更新するか</b>を併せて決めたい
+</div></div>
+
+<!-- ===== 協賛メニュー ===== -->
+<section class="sec pale">
+  <span class="blockTag">PLAN</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">04 / PLAN</span>
+      <h2>協賛のかたち<span class="todo">区分・金額・特典すべて仮</span></h2>
+      <p>ご予算とご希望に応じて、3 つの区分をご用意しています。記載以外のかたちについても、ご相談ください。</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <div class="tp">
+          <p class="nm">サポート</p>
+          <p class="en-nm">SUPPORT</p>
+          <p class="amt en">◯◯<small>万円／年〜</small></p>
+        </div>
+        <div class="bd">
+          <ul>
+            <li>公式サイトへの社名掲載</li>
+            <li>年次活動レポートへの掲載</li>
+            <li>主催大会でのアナウンス</li>
+            <li class="no">大会会場でのバナー掲出</li>
+            <li class="no">冠大会としての名称使用</li>
+          </ul>
+        </div>
+        <div class="ft"><a href="utility.html#form">このかたちで相談する</a></div>
+      </div>
+
+      <div class="plan rec">
+        <div class="tp">
+          <span class="rib">推奨</span>
+          <p class="nm">パートナー</p>
+          <p class="en-nm">PARTNER</p>
+          <p class="amt en">◯◯<small>万円／年〜</small></p>
+        </div>
+        <div class="bd">
+          <ul>
+            <li>公式サイトへのロゴ掲載</li>
+            <li>年次活動レポートへの掲載</li>
+            <li>主催大会でのアナウンス</li>
+            <li>大会会場でのバナー掲出</li>
+            <li class="no">冠大会としての名称使用</li>
+          </ul>
+        </div>
+        <div class="ft"><a href="utility.html#form">このかたちで相談する</a></div>
+      </div>
+
+      <div class="plan">
+        <div class="tp">
+          <p class="nm">オフィシャル</p>
+          <p class="en-nm">OFFICIAL</p>
+          <p class="amt en">◯◯◯<small>万円／年〜</small></p>
+        </div>
+        <div class="bd">
+          <ul>
+            <li>公式サイトへのロゴ掲載（上位）</li>
+            <li>年次活動レポートへの掲載</li>
+            <li>主催大会でのアナウンス</li>
+            <li>大会会場でのバナー掲出</li>
+            <li>冠大会としての名称使用</li>
+          </ul>
+        </div>
+        <div class="ft"><a href="utility.html#form">このかたちで相談する</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>協賛メニュー｜表の作り方</b>　3 区分すべてに<b>同じ 5 項目</b>を並べ、含まれないものは薄い表示で残す。項目自体を消すと、上位区分との差が読み取れなくなる。<br>
+  ・区分数は 3 が上限。4 つ以上になると選べなくなる<br>
+  ・金額は「〜万円／年〜」と下限のみ表示。上限を書くと相談の余地がなくなる<br>
+  ・現物支給・物品提供など<b>金銭以外の協賛</b>をどう扱うか、区分設計とあわせて要判断<br>
+  ・ボタン文言は「申し込む」ではなく<b>「相談する」</b>。初回接触のハードルを下げる
+</div></div>
+
+<!-- ===== 協賛企業 ===== -->
+<section class="sec">
+  <span class="blockTag">PARTNERS</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">05 / PARTNERS</span>
+      <h2>ご協賛いただいている皆さま</h2>
+      <p>長野県のサッカーを、ともに支えていただいています。</p>
+    </div>
+    <div class="logos">
+      <div class="ph"><span>ロゴ</span></div><div class="ph"><span>ロゴ</span></div>
+      <div class="ph"><span>ロゴ</span></div><div class="ph"><span>ロゴ</span></div>
+      <div class="ph"><span>ロゴ</span></div><div class="ph"><span>ロゴ</span></div>
+      <div class="ph"><span>ロゴ</span></div><div class="ph"><span>ロゴ</span></div>
+      <div class="ph"><span>ロゴ</span></div><div class="ph"><span>ロゴ</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 流れ ===== -->
+<section class="sec pale">
+  <span class="blockTag">FLOW</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">06 / FLOW</span>
+      <h2>お申し込みまでの流れ</h2>
+    </div>
+    <div class="flow">
+      <div class="step">
+        <p class="n en">STEP 01</p>
+        <h3>ご相談</h3>
+        <p>フォームまたはお電話でご連絡ください。ご予算やご希望をお聞かせいただきます。</p>
+      </div>
+      <div class="step">
+        <p class="n en">STEP 02</p>
+        <h3>ご提案</h3>
+        <p>ご希望に沿った協賛のかたちをご提案します。区分にとらわれない設計も可能です。</p>
+      </div>
+      <div class="step">
+        <p class="n en">STEP 03</p>
+        <h3>ご契約</h3>
+        <p>内容確定後、協賛契約を締結します。ロゴデータ等をご提供ください。</p>
+      </div>
+      <div class="step">
+        <p class="n en">STEP 04</p>
+        <h3>掲出・ご報告</h3>
+        <p>速やかに掲出を開始します。年度末には活動レポートをお届けします。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="sec">
+  <span class="blockTag">FAQ</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">07 / FAQ</span>
+      <h2>よくいただくご質問</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>年度の途中からでも協賛できますか。</summary>
+        <div class="a">可能です。年度途中からのお申し込みの場合、掲出期間に応じた金額でご相談させていただきます。まずはお問い合わせください。</div>
+      </details>
+      <details>
+        <summary>特定の大会や活動を指定して支援することはできますか。</summary>
+        <div class="a">できます。特定の大会への冠協賛、遠征費用への支援など、使途を限定したかたちにも対応しています。ご希望をお聞かせください。</div>
+      </details>
+      <details>
+        <summary>金銭ではなく、物品や役務の提供でも協賛になりますか。<span class="todo">要判断</span></summary>
+        <div class="a">用具・飲料の提供、輸送や会場の手配など、金銭以外のかたちについてもご相談を承っています。内容に応じて掲出のかたちをご提案します。</div>
+      </details>
+      <details>
+        <summary>協賛金はどのように使われますか。</summary>
+        <div class="a">普及活動、代表チームの強化・遠征、大会運営、指導者・審判の育成に充てられます。年度ごとの構成比は本ページの「使いみち」でご確認いただけます。</div>
+      </details>
+      <details>
+        <summary>個人でも支援できますか。<span class="todo">要判断</span></summary>
+        <div class="a">個人の皆さまからのご支援についても、受け付けのかたちを検討しています。詳細が決まりしだい、このページでお知らせいたします。</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>FAQ｜営業の代わりに置く</b>　協賛検討の初期に出る疑問を先に潰しておくと、問い合わせの質が上がる（「いくらですか」ではなく「この形は可能ですか」から始まる）。<br>
+  ・<b>金銭以外の協賛</b>と<b>個人からの支援</b>は、受けるかどうかの方針決定が必要。方針が決まらない項目は掲載しない<br>
+  ・回答は 3 行以内。長い説明が必要なものは、そもそも FAQ に向かない<br>
+  ・1 つ目だけ開いた状態にして、開閉できることを示す
+</div></div>
+
+<!-- ===== CTA ===== -->
+<section class="cta">
+  <span class="blockTag">CONTACT</span>
+  <div class="wrap">
+    <h2>まずは、お話を聞かせてください。</h2>
+    <p>ご予算やご希望のかたちが決まっていない段階でも構いません。長野県のサッカーに何ができるか、ご一緒に考えさせてください。</p>
+    <div class="acts">
+      <a href="utility.html#form" class="btnMain">協賛について相談する</a>
+      <a href="#" class="btnGhost">活動レポートを見る</a>
+    </div>
+    <p class="tel">一般社団法人 長野県サッカー協会 事務局<br>TEL ◯◯◯-◯◯◯-◯◯◯◯（平日 9:00–17:00）</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note" style="margin-top:40px">
+    <b>ページ全体｜読ませる順番</b>　<b>規模 → 約束 → 使いみち → メニュー → 実績 → 流れ → FAQ → 相談</b>。金額の話（メニュー）を中盤に置き、その前に「何に使われるか」を必ず読ませる。<br>
+    ・先にメニューを見せると金額比較だけで判断され、理念が読まれない<br>
+    ・協賛企業のロゴはメニューの<b>後ろ</b>。先に置くと「大企業向け」と見えて中小企業が離脱する
+  </div>
+  <div class="note">
+    <b>ページ全体｜NFA 側にご用意いただくもの</b>　黄色のラベルが付いた箇所が、内容確定を要する項目。<br>
+    ・登録者数／チーム数／大会数／サイト PV の 4 数値<br>
+    ・使いみちの公開範囲（案 1〜3 のいずれか）<br>
+    ・協賛区分の名称・金額・特典の 5 項目<br>
+    ・金銭以外の協賛、個人からの支援の受け入れ方針<br>
+    ・既存協賛企業のロゴデータと掲載可否の確認
+  </div>
+</div>
+
+<script>
+document.getElementById('tg').onclick=()=>document.body.classList.toggle('noNotes');
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

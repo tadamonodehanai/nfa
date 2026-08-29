@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA MV スタイルフレーム比較｜A案 × B案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--pale2);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+
+/* コントロールバー */
+.bar{
+  position:sticky;top:0;z-index:100;background:var(--navy);color:#fff;
+  display:flex;align-items:center;gap:26px;padding:0 28px;height:60px;
+}
+.bar .t{font-size:13.5px;font-weight:500;letter-spacing:.04em}
+.bar .sp{flex:1}
+.seg{display:flex;border:1px solid rgba(255,255,255,.35)}
+.seg button{padding:9px 26px;font-size:13px;color:#B9C2DE;transition:background .2s,color .2s}
+.seg button.on{background:var(--cyan);color:#fff;font-weight:500}
+.chap{display:flex;gap:2px}
+.chap button{
+  width:88px;padding:9px 0;font-size:12px;color:#B9C2DE;
+  border:1px solid rgba(255,255,255,.25);transition:background .2s,color .2s;
+}
+.chap button.on{background:#fff;color:var(--navy);font-weight:700}
+.chap button small{display:block;font-family:"Barlow";font-size:9.5px;letter-spacing:.14em;opacity:.7}
+
+/* FVはめ込み */
+.fv{position:relative;background:var(--navy);overflow:hidden;color:#fff}
+.fv .img{position:relative;height:72vh;min-height:520px}
+.fv .img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .35s}
+.fv .img::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(20,28,94,.28) 0%,rgba(20,28,94,.08) 45%,rgba(20,28,94,.96) 100%);
+}
+.fv .copy{position:relative;z-index:3;max-width:1200px;margin:-260px auto 0;padding:0 48px 88px}
+.fv .kicker{font-family:"Barlow";font-size:14px;font-weight:600;letter-spacing:.3em;color:var(--cyan);margin-bottom:20px}
+.fv h1{font-size:48px;font-weight:700;line-height:1.5;margin-bottom:22px}
+.fv h1 em{font-style:normal;color:var(--cyan)}
+.fv .lead{font-size:15px;color:#C6CDEC;line-height:2.1;max-width:620px;margin-bottom:38px}
+.fv .acts{display:flex;gap:16px;flex-wrap:wrap}
+.btnMain{background:var(--cyan);color:#fff;font-size:14.5px;font-weight:500;padding:18px 38px}
+.btnGhost{border:1px solid rgba(255,255,255,.45);color:#fff;font-size:14.5px;padding:17px 34px}
+
+/* 章キャプション */
+.cap{max-width:1200px;margin:0 auto;padding:34px 48px 10px;display:flex;gap:26px;align-items:baseline;flex-wrap:wrap}
+.cap .no{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.22em;color:var(--cyan)}
+.cap h2{font-size:22px;font-weight:700}
+.cap p{font-size:13px;color:var(--ink2);flex:1;min-width:280px}
+
+/* 8枚ギャラリー */
+.gal{max-width:1200px;margin:0 auto;padding:36px 48px 80px}
+.gal h3{font-size:15px;font-weight:700;margin:36px 0 16px;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.grid figure{cursor:pointer;border:2px solid transparent;transition:border-color .2s}
+.grid figure.on{border-color:var(--cyan)}
+.grid img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+.grid figcaption{font-size:11.5px;color:var(--ink2);padding:8px 2px 0;line-height:1.7}
+.grid figcaption b{font-family:"Barlow";color:var(--navy);margin-right:8px}
+
+/* 注記 */
+.notes{max-width:1200px;margin:0 auto;padding:0 48px 90px}
+.note{border-left:2px solid var(--blue);background:#fff;padding:18px 24px;font-size:13px;line-height:2;color:var(--ink2);margin-bottom:10px}
+.note b{color:var(--navy);font-weight:700}
+
+@media(max-width:900px){
+  .bar{flex-wrap:wrap;height:auto;padding:12px 16px;gap:12px}
+  .fv .copy{margin-top:-200px;padding:0 24px 60px}
+  .fv h1{font-size:30px}
+  .cap,.gal,.notes{padding-left:24px;padding-right:24px}
+  .grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="t">NFA MV スタイルフレーム比較</span>
+  <div class="seg">
+    <button class="on" data-plan="A">A案 実写</button>
+    <button data-plan="B">B案 イラスト</button>
+  </div>
+  <div class="chap">
+    <button class="on" data-ch="1"><small class="en">DREAM</small>夢</button>
+    <button data-ch="2"><small class="en">CHALLENGE</small>挑戦</button>
+    <button data-ch="3"><small class="en">GROWTH</small>成長</button>
+    <button data-ch="4"><small class="en">CONTRIBUTION</small>貢献</button>
+  </div>
+  <span class="sp"></span>
+  <span class="t en" id="cur">A-1</span>
+</div>
+
+<!-- FVはめ込み -->
+<section class="fv">
+  <div class="img"><img id="fvImg" src="img/A1.jpg" alt=""></div>
+  <div class="copy">
+    <p class="kicker en">LIFE + 1</p>
+    <h1>サッカーが、<br>人生に<em>ひとつ</em>を足していく。</h1>
+    <p class="lead">長野県サッカー協会は、勝つためだけの場所ではありません。夢を持ち、挑戦し、成長し、そして誰かに貢献する。その循環をこの県のすみずみに広げていくために、私たちは活動しています。</p>
+    <div class="acts">
+      <span class="btnMain">Life+1 とは <span class="en">→</span></span>
+      <span class="btnGhost">はじめての方へ <span class="en">→</span></span>
+    </div>
+  </div>
+</section>
+
+<div class="cap">
+  <span class="no en" id="capNo">01 / DREAM</span>
+  <h2 id="capTtl">夢 ─ 夜明け</h2>
+  <p id="capDs">朝霧のグラウンド。子どもがボールに歩み寄る、世界が始まる直前の静けさ。ムービーはここから始まります。</p>
+</div>
+
+<!-- ギャラリー -->
+<div class="gal">
+  <h3>A案｜実写ドキュメンタリー調「一日の光」</h3>
+  <div class="grid" id="gridA"></div>
+  <h3>B案｜イラストレーション調「青の一日」</h3>
+  <div class="grid" id="gridB"></div>
+</div>
+
+<div class="notes">
+  <div class="note"><b>見かた</b>　上のバーで案と章を切り替えると、実際のトップページのファーストビューに画像がはまった状態で確認できます。文字の可読性・世界観との一体感を含めてご判断ください。下のサムネイルをクリックしても切り替わります。</div>
+  <div class="note"><b>これは静止画（キーフレーム）です</b>　採用案が決まりしだい、この絵をもとに各章8秒の映像を生成し、16〜20秒のループムービーに仕上げます。4章の最後は1章の夜明けへ繋がる循環構造です。</div>
+  <div class="note"><b>A案をお選びの場合</b>　実写のように見えますが、実際の活動写真ではなくAIによる生成映像です。サイト上でその旨を注記するかどうか、あわせてご判断ください。</div>
+  <div class="note"><b>B案をお選びの場合</b>　同じ絵柄のイラストを、ムービー以外のページの画像にも展開できます（写真素材が揃うまでの代替としても機能します）。</div>
+</div>
+
+<script>
+const CAPS = {
+  1:{no:'01 / DREAM', t:'夢 ─ 夜明け', d:'朝霧のグラウンド。子どもがボールに歩み寄る、世界が始まる直前の静けさ。ムービーはここから始まります。'},
+  2:{no:'02 / CHALLENGE', t:'挑戦 ─ 昼', d:'試合の熱。ボールを追う足元と土埃。挑み続ける時間。'},
+  3:{no:'03 / GROWTH', t:'成長 ─ 夕', d:'練習後の帰り道。指導する人と育つ人が、並んで歩く。'},
+  4:{no:'04 / CONTRIBUTION', t:'貢献 ─ 宵、そして夜明けへ', d:'手から手へ、ボールが渡る。空が白み始め、映像は1章の夜明けへ戻ります。'}
+};
+let plan='A', ch=1;
+const $=s=>document.querySelector(s);
+
+function draw(){
+  const key=plan+ch;
+  $('#fvImg').src='img/'+key+'.jpg';
+  $('#cur').textContent=plan+'-'+ch;
+  const c=CAPS[ch];
+  $('#capNo').textContent=c.no; $('#capTtl').textContent=c.t; $('#capDs').textContent=c.d;
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.plan===plan));
+  document.querySelectorAll('.chap button').forEach(b=>b.classList.toggle('on',+b.dataset.ch===ch));
+  document.querySelectorAll('.grid figure').forEach(f=>f.classList.toggle('on',f.dataset.key===key));
+}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{plan=b.dataset.plan;draw();window.scrollTo({top:0,behavior:'smooth'});});
+document.querySelectorAll('.chap button').forEach(b=>b.onclick=()=>{ch=+b.dataset.ch;draw();window.scrollTo({top:0,behavior:'smooth'});});
+
+const NAMES={1:'夢（夜明け）',2:'挑戦（昼）',3:'成長（夕）',4:'貢献（宵）'};
+['A','B'].forEach(p=>{
+  const g=$('#grid'+p);
+  for(let i=1;i<=4;i++){
+    const f=document.createElement('figure');
+    f.dataset.key=p+i;
+    f.innerHTML='<img src="img/'+p+i+'.jpg" loading="lazy" alt=""><figcaption><b class="en">'+p+'-'+i+'</b>'+NAMES[i]+'</figcaption>';
+    f.onclick=()=>{plan=p;ch=i;draw();window.scrollTo({top:0,behavior:'smooth'});};
+    g.appendChild(f);
+  }
+});
+draw();
+</script>
+</body>
+</html>

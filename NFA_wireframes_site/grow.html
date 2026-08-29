@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜強くなる・関わる ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+
+/* 注記 */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+section{position:relative}
+.ph{position:relative;background:repeating-linear-gradient(45deg,var(--pale2) 0 10px,var(--pale) 10px 20px);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center}
+.ph span{font-size:12px;color:var(--ink2);background:rgba(255,255,255,.92);padding:8px 16px;line-height:1.8}
+.ph.onDark{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,rgba(255,255,255,.11) 10px 20px);border-color:rgba(255,255,255,.22)}
+.ph.onDark span{background:rgba(20,28,94,.85);color:#C8CFEA}
+
+/* ヘッダー */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ヒーロー */
+.hero{background:var(--navy);color:#fff;padding:0 0 88px;overflow:hidden}
+.hero .visual{position:relative;height:380px;margin-bottom:-120px}
+.hero .visual .ph{position:absolute;inset:0;border:none}
+.hero .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,28,94,.4) 0%,rgba(20,28,94,.2) 40%,rgba(20,28,94,.98) 100%)}
+.hero .copy{position:relative;z-index:3}
+.hero .crumb{font-size:12px;color:#8A93AD;margin-bottom:26px}
+.hero .crumb a:hover{color:#fff}
+.hero .kicker{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.28em;color:var(--cyan);margin-bottom:20px}
+.hero h1{font-size:42px;font-weight:700;line-height:1.55;margin-bottom:24px}
+.hero .lead{font-size:16px;color:#B9C2DE;line-height:2.15;max-width:660px}
+
+/* セクション */
+.sec{padding:118px 0 126px}
+.sec.pale{background:var(--pale2)}
+.sec.dark{background:var(--navy);color:#fff}
+.secHead{margin-bottom:56px}
+.secHead .no{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;color:var(--cyan);display:block;margin-bottom:16px}
+.secHead h2{font-size:31px;font-weight:700;line-height:1.6}
+.secHead p{font-size:15px;color:var(--ink2);margin-top:20px;line-height:2.1;max-width:700px}
+.sec.dark .secHead h2{color:#fff}
+.sec.dark .secHead p{color:#AAB3D2}
+
+/* 分岐 */
+.who{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.whoCard{border:1px solid var(--line);background:#fff;padding:32px 26px 34px;transition:border-color .25s,transform .25s;display:flex;flex-direction:column}
+.whoCard:hover{border-color:var(--blue);transform:translateY(-3px)}
+.whoCard .ic{font-family:"Barlow";font-size:11.5px;font-weight:600;letter-spacing:.16em;color:var(--cyan);margin-bottom:16px}
+.whoCard h3{font-size:19px;font-weight:700;line-height:1.65;margin-bottom:14px}
+.whoCard p{font-size:13px;color:var(--ink2);line-height:2;margin-bottom:22px;flex:1}
+.whoCard .go{font-size:13px;font-weight:500;color:var(--blue);display:flex;align-items:center;gap:9px}
+.whoCard .go::after{content:"";width:20px;height:1px;background:var(--blue);transition:width .25s}
+.whoCard:hover .go::after{width:34px}
+
+/* 長野スタイル */
+.styleIn{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.styleIn .ph{height:380px}
+.pillars{display:flex;flex-direction:column;gap:26px;margin-top:34px}
+.pil{border-left:3px solid var(--blue);padding-left:26px}
+.pil h4{font-size:17px;font-weight:700;margin-bottom:10px;line-height:1.7}
+.pil p{font-size:13.5px;color:var(--ink2);line-height:2}
+
+/* 階段（トレセン・ライセンス） */
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.rung{background:#fff;padding:0;display:flex;flex-direction:column;position:relative}
+.rung .hd{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--pale2)}
+.rung .hd .lv{font-family:"Barlow";font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--cyan);margin-bottom:8px}
+.rung .hd h3{font-size:18px;font-weight:700;line-height:1.5}
+.rung .bd{padding:24px;flex:1}
+.rung .bd p{font-size:13px;color:var(--ink2);line-height:2}
+.rung .bd .req{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.9}
+.rung .bd .req b{display:block;color:var(--ink);font-weight:500;margin-bottom:4px}
+.rung:not(:last-child)::after{
+  content:"";position:absolute;top:34px;right:-9px;width:18px;height:18px;
+  background:var(--cyan);clip-path:polygon(0 0,100% 50%,0 100%);z-index:5;
+}
+.ladderNote{margin-top:34px;font-size:13.5px;color:var(--ink2);line-height:2.05}
+.ladderNote a{color:var(--blue);border-bottom:1px solid var(--blue)}
+
+/* 領域一覧 */
+.acts{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
+.actRow{background:#fff;display:grid;grid-template-columns:270px 1fr 190px;align-items:stretch;transition:background .2s}
+.actRow:hover{background:var(--pale2)}
+.actRow .ph{border:none;border-right:1px solid var(--line);min-height:170px}
+.actRow .bd{padding:32px 34px}
+.actRow .cat{font-size:11.5px;letter-spacing:.12em;color:var(--cyan);font-weight:500;margin-bottom:12px}
+.actRow h3{font-size:21px;font-weight:700;margin-bottom:14px;line-height:1.6}
+.actRow p{font-size:13.5px;color:var(--ink2);line-height:2}
+.actRow .side{border-left:1px solid var(--line);padding:32px 26px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.actRow .side .mt{font-size:12px;color:var(--muted);line-height:1.85}
+.actRow .side .mt b{display:block;color:var(--ink);font-weight:500;font-size:13px;margin-bottom:3px}
+.actRow .side .go{font-size:13px;color:var(--blue);font-weight:500}
+
+/* 安全 */
+.safe{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.2)}
+.safe > div{background:var(--navy);padding:34px 30px 38px}
+.safe h4{font-size:17px;font-weight:500;color:#fff;margin-bottom:14px;line-height:1.7}
+.safe p{font-size:13px;color:#AAB3D2;line-height:2}
+.safeFoot{margin-top:34px;font-size:14px;color:#AAB3D2;line-height:2.1}
+.safeFoot a{color:var(--cyan);border-bottom:1px solid var(--cyan)}
+
+/* FAQ */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{padding:26px 40px 26px 4px;font-size:15px;font-weight:500;cursor:pointer;list-style:none;position:relative;line-height:1.8}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"＋";position:absolute;right:8px;top:26px;color:var(--blue);font-size:15px}
+.faq details[open] summary::after{content:"−"}
+.faq .a{padding:0 40px 28px 4px;font-size:14px;color:var(--ink2);line-height:2.1}
+
+/* 関連 */
+.rel{border-top:1px solid var(--line)}
+.rel a{display:grid;grid-template-columns:110px 126px 1fr;gap:24px;align-items:center;padding:24px 8px;border-bottom:1px solid var(--line);transition:background .2s}
+.rel a:hover{background:var(--pale2)}
+.rel .d{font-family:"Barlow";font-size:13.5px;color:var(--muted)}
+.rel .c{font-size:11.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);text-align:center;padding:6px 8px}
+.rel .t{font-size:14.5px;line-height:1.8}
+.relMore{margin-top:38px;text-align:center}
+.relMore a{display:inline-block;border:1px solid var(--blue);color:var(--blue);font-size:14px;padding:16px 48px;transition:background .2s,color .2s}
+.relMore a:hover{background:var(--blue);color:#fff}
+
+/* CTA */
+.cta{background:var(--pale2);padding:88px 0 92px;text-align:center;border-top:1px solid var(--line)}
+.cta h2{font-size:28px;font-weight:700;line-height:1.65;margin-bottom:18px}
+.cta p{font-size:15px;color:var(--ink2);line-height:2.1;margin-bottom:40px;max-width:620px;margin-left:auto;margin-right:auto}
+.cta .acts2{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.btnMain{background:var(--blue);color:#fff;font-size:15px;font-weight:500;padding:19px 44px;transition:background .2s}
+.btnMain:hover{background:var(--navy)}
+.btnLine{border:1px solid var(--blue);color:var(--blue);font-size:15px;padding:18px 38px;transition:background .2s,color .2s}
+.btnLine:hover{background:var(--blue);color:#fff}
+
+@media(max-width:1000px){
+  .who,.ladder,.safe{grid-template-columns:1fr 1fr}
+  .styleIn{grid-template-columns:1fr;gap:40px}
+  .actRow{grid-template-columns:1fr}
+  .actRow .ph{border-right:none;border-bottom:1px solid var(--line)}
+  .actRow .side{border-left:none;border-top:1px solid var(--line)}
+  .rung:not(:last-child)::after{display:none}
+  .gnav nav{display:none}
+  .hero h1{font-size:30px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .hero .visual{height:230px;margin-bottom:-80px}
+  .hero{padding-bottom:64px}
+  .hero h1{font-size:26px}
+  .hero .lead{font-size:13.5px}
+  .sec{padding:72px 0 78px}
+  .secHead h2{font-size:24px}
+  .secHead{margin-bottom:38px}
+  .who{grid-template-columns:1fr}
+  .styleIn .ph{height:210px}
+  .ladder{grid-template-columns:1fr}
+  .rung:not(:last-child)::after{display:block;top:auto;bottom:-9px;right:calc(50% - 9px);transform:rotate(90deg)}
+  .actRow .bd{padding:24px 22px}
+  .actRow .side{padding:22px}
+  .safe{grid-template-columns:1fr}
+  .safe>div{padding:26px 24px 30px}
+  .rel a{grid-template-columns:1fr;gap:8px;padding:20px 4px}
+  .rel .c{justify-self:start;padding:6px 16px}
+  .cta{padding:64px 0 70px}
+  .cta h2{font-size:22px}
+  .cta .acts2{flex-direction:column;padding:0 4px}
+  .btnMain,.btnLine{width:100%;text-align:center}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜強くなる・関わる ワイヤー v1（中間層テンプレート B 面）</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html">NFAについて</a><a href="start.html">はじめる・つづける</a><a href="grow.html" class="on">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="blockTag">HERO</span>
+  <div class="visual"><div class="ph onDark"><span>写真｜育成年代のトレーニング、または指導者・審判の姿</span></div></div>
+  <div class="wrap">
+    <div class="copy">
+      <p class="crumb"><a href="index.html">ホーム</a> ／ 強くなる・関わる</p>
+      <p class="kicker en">DEVELOPMENT</p>
+      <h1>うまくなりたい人と、<br>それを支える人のために。</h1>
+      <p class="lead">選手が育つには、指導者と審判が必要です。長野県サッカー協会は、プレーする人だけでなく、関わるすべての人が成長できる仕組みをつくっています。</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note" style="margin-top:26px">
+  <b>中間層テンプレート｜「はじめる・つづける」と同じ型</b>　ブロック構成は完全に同一。①ヒーロー ②分岐 ③考え方・手順 ④領域一覧 ⑤具体的な行動 ⑥ FAQ ⑦関連情報 ⑧ CTA。<br>
+  ・違うのは③の中身だけ。A 面は「はじめかたの 3 ステップ」、B 面は「長野スタイル＋育成の階段」<br>
+  ・CTA の背景を淡色にしている。A 面（濃色）と続けて見たときに単調にならないための差し替え程度で、構造上の違いではない
+</div></div>
+
+<!-- 分岐 -->
+<section class="sec">
+  <span class="blockTag">WHO</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">01 / WHO</span>
+      <h2>どの立場で、関わりますか。</h2>
+    </div>
+    <div class="who">
+      <a href="#" class="whoCard">
+        <p class="ic en">PLAYER</p>
+        <h3>選手として、<br>うまくなりたい</h3>
+        <p>県トレセン、各年代のリーグ戦、代表チーム。上を目指すための道すじがあります。</p>
+        <span class="go">育成について</span>
+      </a>
+      <a href="#" class="whoCard">
+        <p class="ic en">COACH</p>
+        <h3>指導者として、<br>関わりたい</h3>
+        <p>ライセンス取得から更新まで。指導をはじめる方も、続けている方も。</p>
+        <span class="go">指導者について</span>
+      </a>
+      <a href="#" class="whoCard">
+        <p class="ic en">REFEREE</p>
+        <h3>審判として、<br>関わりたい</h3>
+        <p>4 級からはじめられます。試合を成立させる、もうひとつの関わりかた。</p>
+        <span class="go">審判について</span>
+      </a>
+      <a href="#" class="whoCard">
+        <p class="ic en">SAFETY</p>
+        <h3>安全な環境を、<br>つくりたい</h3>
+        <p>ウェルフェアオフィサー、熱中症・脳振盪への対応。守るための知識。</p>
+        <span class="go">医学・安全について</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 長野スタイル -->
+<section class="sec pale">
+  <span class="blockTag">PHILOSOPHY</span>
+  <div class="wrap">
+    <div class="styleIn">
+      <div>
+        <div class="secHead" style="margin-bottom:0">
+          <span class="no en">02 / NAGANO STYLE</span>
+          <h2>長野スタイル</h2>
+          <p>年代ごとにばらばらに指導するのではなく、小学生から大人まで一貫した考え方で育てる。それが長野県の育成の基本です。</p>
+        </div>
+        <div class="pillars">
+          <div class="pil">
+            <h4>一貫した指導</h4>
+            <p>4 種から 1 種まで、年代が変わっても指導の考え方が変わらないようにする。指導者間で共通の言葉を持ちます。</p>
+          </div>
+          <div class="pil">
+            <h4>個を育てる</h4>
+            <p>チームの勝敗より、一人ひとりが何を身につけたかを重視します。育成年代では特にこの原則を優先します。</p>
+          </div>
+          <div class="pil">
+            <h4>環境を整える</h4>
+            <p>選手・指導者・審判の三者がそろってはじめて成立します。どれか一つが欠けないよう、同時に育てます。</p>
+          </div>
+        </div>
+      </div>
+      <div class="ph"><span>写真または図｜長野スタイルの考え方<br>（年代をまたぐ一貫指導のイメージ）</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>長野スタイル｜JFA との関係を明示する</b>　この考え方は JFA の掲げる<b>三位一体（選手・指導者・審判）＋普及</b>を県のかたちにしたもの。「NFA について」の系譜と接続するため、<b>環境を整える</b>の項に三者が揃うことを明記している。<br>
+  ・内容は現行サイトの記載を要確認。実際の長野スタイルの定義文があればそちらを優先する
+</div></div>
+
+<!-- 育成の階段 -->
+<section class="sec">
+  <span class="blockTag">PATHWAY</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">03 / PATHWAY</span>
+      <h2>選手が上を目指す、道すじ</h2>
+      <p>所属チームでの活動を土台に、段階的に選抜されていきます。</p>
+    </div>
+    <div class="ladder">
+      <div class="rung">
+        <div class="hd"><p class="lv en">STAGE 01</p><h3>所属チーム</h3></div>
+        <div class="bd">
+          <p>すべての土台。日常のトレーニングと公式戦が、評価の基礎になります。</p>
+          <p class="req"><b>対象</b>登録しているすべての選手</p>
+        </div>
+      </div>
+      <div class="rung">
+        <div class="hd"><p class="lv en">STAGE 02</p><h3>地区トレセン</h3></div>
+        <div class="bd">
+          <p>北信・東信・中信・南信の 4 地区ごとに選抜。地区内での合同トレーニングを行います。</p>
+          <p class="req"><b>選考</b>所属チームの推薦・選考会</p>
+        </div>
+      </div>
+      <div class="rung">
+        <div class="hd"><p class="lv en">STAGE 03</p><h3>県トレセン</h3></div>
+        <div class="bd">
+          <p>地区トレセンから選抜された選手が集まります。県代表の母体となります。</p>
+          <p class="req"><b>選考</b>地区トレセンからの推薦</p>
+        </div>
+      </div>
+      <div class="rung">
+        <div class="hd"><p class="lv en">STAGE 04</p><h3>北信越・全国</h3></div>
+        <div class="bd">
+          <p>北信越トレセン、ナショナルトレセンへ。全国の舞台につながります。</p>
+          <p class="req"><b>選考</b>県トレセンからの推薦</p>
+        </div>
+      </div>
+    </div>
+    <p class="ladderNote">選考の時期・方法は年代ごとに異なります。詳細は<a href="#">各年代のトレセン情報</a>をご確認ください。所属チームの指導者を通じてご案内しています。</p>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>育成の階段｜保護者の一番の疑問に答える</b>　「トレセンってどうやったら入れるのか」が、育成年代の保護者から最も多い問い。<b>段階と選考方法をセットで</b>示すことで、問い合わせを減らす。<br>
+  ・下段の「選考」欄が実質の回答。ここを空欄にすると意味がなくなる<br>
+  ・年代ごとの差異は書ききれないため、下層ページへ送る。ここでは全体像だけ
+</div></div>
+
+<!-- 領域一覧 -->
+<section class="sec pale">
+  <span class="blockTag">AREAS</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">04 / AREAS</span>
+      <h2>それぞれの、関わりかた</h2>
+    </div>
+    <div class="acts">
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">指導者</p>
+          <h3>指導者ライセンス</h3>
+          <p>D 級からはじまり、C 級・B 級・A 級と段階があります。D 級は指導経験がなくても受講でき、県内で年に複数回開催しています。取得後は 4 年ごとのリフレッシュ研修が必要です。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>入口</b>D 級コーチ養成講習会</p>
+          <p class="mt"><b>更新</b>4 年ごとの研修</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">審判</p>
+          <h3>審判資格</h3>
+          <p>4 級から取得できます。講習を受ければ、その日のうちに資格が得られます。3 級・2 級・1 級と上位資格があり、上位ほど担当できる試合の規模が大きくなります。毎年の登録更新が必要です。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>入口</b>4 級審判員 新規講習会</p>
+          <p class="mt"><b>更新</b>毎年度の登録更新</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+      <a href="#" class="actRow">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">育成</p>
+          <h3>各年代のリーグ・大会</h3>
+          <p>4 種（小学生）から 1 種（社会人）まで、年代ごとにリーグ戦と大会が組まれています。年間を通じた公式戦の経験が、選手の成長の土台になります。</p>
+        </div>
+        <div class="side">
+          <p class="mt"><b>対象</b>登録チーム</p>
+          <p class="mt"><b>時期</b>年間を通じて</p>
+          <span class="go">くわしく見る →</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- 安全 -->
+<section class="sec dark">
+  <span class="blockTag">SAFETY</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">05 / SAFETY</span>
+      <h2>安全でなければ、続けられません。</h2>
+      <p>強くなることと同じくらい、安全に関わることを重視しています。</p>
+    </div>
+    <div class="safe">
+      <div>
+        <h4>ウェルフェアオフィサー</h4>
+        <p>暴力・暴言・ハラスメントのない環境を守る担当者です。各種大会・チームへの配置を進めています。相談窓口としても機能します。</p>
+      </div>
+      <div>
+        <h4>熱中症への対応</h4>
+        <p>気温・湿度にもとづく開催判断の基準を定めています。飲水タイムの運用、日程変更の判断も基準にしたがって行います。</p>
+      </div>
+      <div>
+        <h4>脳振盪への対応</h4>
+        <p>疑いがある場合は、その時点でプレーを中止します。復帰までの手順を定めており、指導者・審判に周知しています。</p>
+      </div>
+    </div>
+    <p class="safeFoot">各種ガイドラインと、緊急時の対応手順は<a href="#">医学・安全のページ</a>にまとめています。指導者・保護者の方はご確認ください。</p>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>安全｜濃色にして独立させる</b>　安全は他の領域と並列に置かず、<b>面の色を変えて独立させる</b>。並べると「4 つの選択肢のひとつ」に見えるが、実際は全領域に関わる前提条件のため。<br>
+  ・ウェルフェアオフィサーは 2020年宣言の 04 と直結。理念ページと相互に参照させる<br>
+  ・相談窓口としての機能があることを明示する（現サイトでは見つけにくい）
+</div></div>
+
+<!-- FAQ -->
+<section class="sec">
+  <span class="blockTag">FAQ</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">06 / FAQ</span>
+      <h2>よくいただくご質問</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>指導経験がありませんが、ライセンスは取得できますか。</summary>
+        <div class="a">D 級コーチ養成講習会は、指導経験がない方でも受講できます。お子さんのチームを手伝うことになった保護者の方の受講も多くあります。</div>
+      </details>
+      <details>
+        <summary>審判の資格を取ると、必ず試合を担当しなければなりませんか。</summary>
+        <div class="a">義務ではありません。所属チームの試合でのみ担当される方も多くいらっしゃいます。まず 4 級を取得し、できる範囲で関わっていただくかたちで問題ありません。</div>
+      </details>
+      <details>
+        <summary>トレセンに入るには、どうすればよいですか。</summary>
+        <div class="a">まず所属チームでの活動が前提となります。地区トレセンの選考は、所属チームの推薦または選考会を通じて行われます。時期や方法は年代ごとに異なりますので、所属チームの指導者にご確認ください。</div>
+      </details>
+      <details>
+        <summary>ライセンスや審判資格の更新を忘れてしまいました。</summary>
+        <div class="a">更新期限を過ぎた場合の手続きは、資格の種類と経過期間によって異なります。協会事務局までご連絡ください。再取得が必要になる場合もあります。</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- 関連 -->
+<section class="sec pale">
+  <span class="blockTag">NEWS</span>
+  <div class="wrap">
+    <div class="secHead" style="margin-bottom:40px">
+      <span class="no en">07 / NEWS</span>
+      <h2>この分野の最新情報</h2>
+    </div>
+    <div class="rel">
+      <a href="detail.html"><span class="d en">2026.08.19</span><span class="c">講習会</span><span class="t">JFA公認 D級コーチ養成講習会（北信会場）受講者募集</span></a>
+      <a href="detail.html"><span class="d en">2026.08.08</span><span class="c">講習会</span><span class="t">4級審判員 新規取得講習会（南信会場）の開催について</span></a>
+      <a href="detail.html"><span class="d en">2026.08.05</span><span class="c">登録・手続き</span><span class="t">審判員登録の更新手続きについて（2026年度）</span></a>
+      <a href="detail.html"><span class="d en">2026.07.10</span><span class="c">お知らせ</span><span class="t">U-12 トレセン選考会 実施要項および参加方法</span></a>
+    </div>
+    <div class="relMore"><a href="list.html">この分野の情報をすべて見る</a></div>
+  </div>
+</section>
+
+<section class="cta">
+  <span class="blockTag">CTA</span>
+  <div class="wrap">
+    <h2>関わりかたは、ひとつではありません。</h2>
+    <p>選手として、指導者として、審判として。どのかたちでも、長野県のサッカーを支えることになります。</p>
+    <div class="acts2">
+      <a href="search.html" class="btnMain">講習会・研修を探す</a>
+      <a href="utility.html#form" class="btnLine">事務局に問い合わせる</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note" style="margin-top:44px">
+    <b>ページ全体｜NFA 側にご確認いただくもの</b><br>
+    ・長野スタイルの正式な定義文（3 つの柱は仮の整理）<br>
+    ・トレセンの段階と選考方法が現行の運用と一致しているか<br>
+    ・指導者ライセンスの級と更新周期、審判資格の級と更新周期<br>
+    ・ウェルフェアオフィサーの配置状況と相談窓口の連絡先
+  </div>
+</div>
+
+<script>document.getElementById('tg').onclick=()=>document.body.classList.toggle('noNotes');</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

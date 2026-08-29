@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜チーム一覧 ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1360px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font:inherit}
+
+/* 注記 */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+.todo{display:inline-block;background:#FFF3D6;border:1px solid #E0B84C;color:#8A6A16;font-size:11px;padding:4px 10px;margin-left:10px;vertical-align:middle}
+body.noNotes .todo{display:none}
+
+/* ヘッダー */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ページ見出し */
+.pHead{background:var(--pale2);border-bottom:1px solid var(--line);padding:46px 0 0;position:relative}
+.pHead .in{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+.crumb{font-size:12px;color:var(--muted);margin-bottom:20px}
+.crumb a:hover{color:var(--blue)}
+.pHead h1{font-size:30px;font-weight:700;line-height:1.5;margin-bottom:10px}
+.pHead .sub{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:8px;max-width:760px}
+.pHead .yr{font-size:12.5px;color:var(--muted);margin-bottom:30px}
+.tabs{display:flex;gap:30px;overflow-x:auto}
+.tabs button{font-size:14.5px;color:var(--muted);padding:0 2px 18px;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s}
+.tabs button.on{color:var(--blue);border-color:var(--blue);font-weight:500}
+.tabs button:hover{color:var(--blue)}
+.tabs .n{font-family:"Barlow";font-size:11.5px;color:var(--muted);margin-left:7px}
+
+/* レイアウト */
+.stage{max-width:var(--maxw);margin:0 auto;padding:44px 40px 90px}
+.cols{display:grid;grid-template-columns:280px 1fr;gap:44px;align-items:start}
+
+/* サイド */
+.side{border:1px solid var(--line);position:sticky;top:136px}
+.sideHd{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.sideHd h2{font-size:13.5px;font-weight:500}
+.sideHd button{font-size:11.5px;color:var(--muted)}
+.sideHd button:hover{color:var(--blue)}
+.facet{border-bottom:1px solid var(--line);padding:20px 22px 22px}
+.facet:last-child{border-bottom:none}
+.facet h3{font-size:11.5px;font-weight:500;letter-spacing:.12em;color:var(--cyan);margin-bottom:14px}
+.facet .opts{display:flex;flex-wrap:wrap;gap:9px}
+.opt{border:1px solid var(--line);background:var(--pale2);font-size:12.5px;padding:8px 14px;border-radius:999px;transition:background .18s,border-color .18s,color .18s}
+.opt:hover{border-color:var(--blue);background:#fff}
+.opt.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.opt.dead{opacity:.32;pointer-events:none}
+.opt .n{font-family:"Barlow";font-size:11px;color:var(--muted);margin-left:6px}
+.opt.on .n{color:rgba(255,255,255,.72)}
+.chk{display:flex;align-items:center;gap:11px;font-size:13px;cursor:pointer;user-select:none}
+.chk .box{width:18px;height:18px;border:1px solid var(--line);background:#fff;flex:none;position:relative}
+.chk.on .box{background:var(--blue);border-color:var(--blue)}
+.chk.on .box::after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg)}
+.sideOp{margin-top:18px;border:1px solid var(--line);background:var(--pale2);padding:22px}
+.sideOp p{font-size:12.5px;color:var(--ink2);line-height:1.95;margin-bottom:14px}
+.sideOp a{display:block;text-align:center;border:1px solid var(--navy);color:var(--navy);font-size:13px;padding:12px;transition:background .2s,color .2s}
+.sideOp a:hover{background:var(--navy);color:#fff}
+
+/* 検索・結果ヘッダ */
+.findBar{display:flex;gap:14px;margin-bottom:26px}
+.findBar .box{flex:1;display:flex;border:1px solid var(--line)}
+.findBar input{flex:1;border:none;outline:none;padding:15px 18px;font-size:14.5px;background:#fff}
+.findBar input::placeholder{color:var(--muted)}
+.findBar .go{background:var(--blue);color:#fff;font-size:13.5px;font-weight:500;padding:0 28px;transition:background .2s}
+.findBar .go:hover{background:var(--navy)}
+.resHd{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.resHd .cnt{font-size:13.5px;color:var(--ink2)}
+.resHd .cnt b{font-family:"Barlow";font-size:21px;font-weight:600;color:var(--blue);margin:0 4px}
+.chip{display:inline-flex;align-items:center;gap:9px;background:var(--pale);border:1px solid #C3CDEA;color:var(--blue);font-size:12.5px;padding:7px 11px 7px 14px;border-radius:999px}
+.chip button{color:var(--blue);font-size:14px;line-height:1;opacity:.6}
+.chip button:hover{opacity:1}
+
+/* 地区グループ */
+.grp{margin-top:34px}
+.grpHd{display:flex;align-items:baseline;gap:16px;margin-bottom:2px}
+.grpHd h2{font-size:19px;font-weight:700;color:var(--navy)}
+.grpHd .n{font-family:"Barlow";font-size:13px;color:var(--muted)}
+.grpHd::after{content:"";flex:1;height:1px;background:var(--line);align-self:center}
+
+/* チーム行 */
+.tRow{
+  display:grid;grid-template-columns:1fr 150px 190px 120px 110px;
+  gap:20px;align-items:center;padding:20px 8px;
+  border-bottom:1px solid var(--line);transition:background .2s;
+}
+.tRow:hover{background:var(--pale2)}
+.tRow .nm{font-size:15px;font-weight:500;line-height:1.7}
+.tRow .nm small{display:block;font-size:11.5px;color:var(--muted);font-weight:400;margin-top:3px;letter-spacing:.04em}
+.tRow .kind{font-size:11.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);text-align:center;padding:6px 8px}
+.tRow .city{font-size:13px;color:var(--ink2)}
+.tRow .visit{font-size:11px;text-align:center}
+.tRow .visit .ok{display:inline-block;color:var(--cyan);border:1px solid var(--cyan);padding:5px 11px;letter-spacing:.04em}
+.tRow .visit .no{color:var(--muted)}
+.tRow .lk{font-size:12.5px;color:var(--blue);text-align:right;white-space:nowrap}
+.tRow .lk span{color:var(--muted)}
+
+.empty{padding:70px 20px;text-align:center;border-bottom:1px solid var(--line)}
+.empty p{font-size:14.5px;color:var(--ink2);margin-bottom:22px}
+.empty .opts{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+
+/* チーム向け導線 */
+.forTeam{margin-top:60px;border:1px solid var(--line);display:grid;grid-template-columns:1fr auto;align-items:center;gap:30px;padding:32px 36px}
+.forTeam h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.forTeam p{font-size:13px;color:var(--ink2);line-height:1.95}
+.forTeam a{white-space:nowrap;border:1px solid var(--blue);color:var(--blue);font-size:13.5px;padding:15px 32px;transition:background .2s,color .2s}
+.forTeam a:hover{background:var(--blue);color:#fff}
+
+@media(max-width:1000px){
+  .cols{grid-template-columns:1fr}
+  .side{position:static}
+  .tRow{grid-template-columns:1fr 110px;row-gap:8px}
+  .tRow .city,.tRow .visit,.tRow .lk{grid-column:1 / -1;text-align:left}
+  .forTeam{grid-template-columns:1fr}
+  .gnav nav{display:none}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .side .facet{display:none}
+  .side.open .facet{display:block}
+  .sideHd{cursor:pointer}
+  .sideHd h2::after{content:"　開く ▼";font-size:10.5px;color:var(--muted);font-weight:400}
+  .side.open .sideHd h2::after{content:"　閉じる ▲"}
+}
+
+@media(max-width:640px){
+  .pHead{padding:36px 0 0}
+  .pHead .in,.stage{padding-left:22px;padding-right:22px}
+  .pHead h1{font-size:23px}
+  .tabs{gap:18px}
+  .findBar .go{padding:0 18px;font-size:12.5px}
+  .grpHd h2{font-size:17px}
+  .tRow{padding:16px 4px}
+  .tRow .visit{text-align:left}
+  .forTeam{padding:22px;gap:18px}
+  .forTeam a{text-align:center}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜チーム一覧 ワイヤー v1（ディレクトリ型テンプレート）</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html">NFAについて</a><a href="start.html" class="on">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="pHead">
+  <span class="blockTag">TEAM DIRECTORY</span>
+  <div class="in">
+    <p class="crumb"><a href="index.html">ホーム</a> ／ <a href="start.html">はじめる・つづける</a> ／ チームを探す</p>
+    <h1>チームを探す</h1>
+    <p class="sub">県内で活動している登録チームの一覧です。地域と年代で絞り込めます。見学や体験入部については、各チームの窓口またはリンク先でご確認ください。</p>
+    <p class="yr">2026年度 登録チーム（毎年度、登録更新にあわせて更新されます）<span class="todo">実データ件数・更新運用は要確認</span></p>
+    <div class="tabs" id="tabs"></div>
+  </div>
+</section>
+
+<div class="stage">
+  <div class="cols">
+
+    <aside>
+      <div class="side">
+        <div class="sideHd">
+          <h2>条件で絞り込む</h2>
+          <button id="clr">解除</button>
+        </div>
+        <div class="facet">
+          <h3>地域</h3>
+          <div class="opts" id="fArea"></div>
+        </div>
+        <div class="facet">
+          <h3>市町村</h3>
+          <div class="opts">
+            <select id="fCity" style="width:100%;border:1px solid var(--line);padding:12px 14px;font-size:13px;background:#fff;color:var(--ink)">
+              <option value="">すべての市町村</option>
+            </select>
+          </div>
+        </div>
+        <div class="facet">
+          <h3>受け入れ</h3>
+          <button class="chk" id="fVisit"><span class="box"></span>見学・体験を受け入れ中</button>
+        </div>
+      </div>
+      <div class="sideOp">
+        <p>チーム名がわかっている場合は、上の検索欄に直接入力するのが早道です。</p>
+        <a href="search.html">AIに聞いて探す</a>
+      </div>
+    </aside>
+
+    <main>
+      <div class="findBar">
+        <div class="box">
+          <input type="text" id="q" placeholder="チーム名で探す（例：FC、ジュニア など）">
+          <button class="go" id="qGo">検索</button>
+        </div>
+      </div>
+
+      <div class="resHd">
+        <span class="cnt">該当 <b id="hitN">0</b> チーム</span>
+        <span id="chips" style="display:flex;gap:10px;flex-wrap:wrap"></span>
+      </div>
+
+      <div id="list"></div>
+
+      <div class="forTeam">
+        <div>
+          <h3>チームの掲載情報を変更したい方へ</h3>
+          <p>活動拠点・連絡先・見学受け入れ状況の変更は、所属の郡市協会を通じてお手続きください。年度の途中でも反映されます。</p>
+        </div>
+        <a href="#">変更手続きについて</a>
+      </div>
+    </main>
+  </div>
+
+  <div class="note" style="margin-top:44px">
+    <b>チーム一覧｜記事テンプレートと分けた理由</b>　記事は「新しい順に流れるもの」、チームは「<b>ある時点の全体像を引くもの</b>」。時系列・ページネーションが意味を持たないため、別テンプレートにしている。<br>
+    ・並び順は<b>地区グループ＋チーム名順</b>で固定。並び替え機能は付けない（使い分ける理由がない）<br>
+    ・ページ送りも付けない。絞り込み後の件数は多くても数十件で、1 画面で見渡せる方が比較しやすい<br>
+    ・初期表示は種別「4種」を選択済みにする。全種別を一度に出すと数百件になり、一覧の意味がなくなる
+  </div>
+  <div class="note">
+    <b>チーム一覧｜連絡先を直接載せない</b>　現行サイトのチーム情報には代表者名・電話番号が含まれるものがあるが、<b>新サイトでは個人の連絡先を掲載しない</b>。<br>
+    ・掲載するのは：チーム名／種別／市町村・活動拠点／見学受け入れ状況／チーム自身の公開窓口（サイト・SNS）のみ<br>
+    ・公開窓口を持たないチームへの連絡は、郡市協会または県協会事務局を経由する導線にする<br>
+    ・移行時に現行データから電話番号・個人名を<b>機械的に除外</b>する処理を入れる（CSV 変換スクリプトの仕様に含める）
+  </div>
+  <div class="note">
+    <b>チーム一覧｜「見学・体験受け入れ」フラグ</b>　保護者にとって最も価値のある情報だが、<b>チーム側の申告がないと成立しない</b>。登録更新時の項目に追加できるかが前提条件。<br>
+    ・取得できない場合、この列とファセットは<b>非表示にして公開</b>し、次年度の登録更新から追加する<br>
+    ・「受け入れ中」表示のみとし、「受け入れなし」は明示しない（断っている印象を避ける）— UI 上は「−」表示
+  </div>
+  <div class="note">
+    <b>チーム一覧｜データの鮮度を明示する</b>　ヘッダに「2026年度 登録チーム」と年度を出し、<b>いつ時点の情報か</b>を常に示す。古い情報への問い合わせは、協会とチーム双方の負担になる。<br>
+    ・年度切り替え時期（登録更新期間中）は「更新作業中」の注記を出せるようにする<br>
+    ・変更手続きの導線（最下部）は、チーム運営者がこのページを見たときのためのもの。掲載情報の鮮度は運営者の申告に依存するため、導線を切らさない
+  </div>
+</div>
+
+<script>
+/* 種別・地区・市町村 */
+const KINDS=['4種（小学生）','3種（中学生）','2種（高校生）','1種（社会人）','女子','シニア','フットサル'];
+const AREAS={
+  '北信':['長野市','須坂市','中野市','飯山市','千曲市'],
+  '東信':['上田市','佐久市','小諸市','東御市'],
+  '中信':['松本市','塩尻市','安曇野市','大町市'],
+  '南信':['飯田市','伊那市','諏訪市','岡谷市','茅野市','駒ヶ根市']
+};
+/* ダミーデータ（実装時は登録システム由来のデータに置換） */
+const NAMES1=['FC','SC','ユナイテッド','クラブ','キッカーズ','SS'];
+const TEAMS=[];
+(function(){
+  let i=0;
+  const plan=[ ['4種（小学生）',18], ['3種（中学生）',8], ['2種（高校生）',5], ['1種（社会人）',7], ['女子',4], ['シニア',3], ['フットサル',3] ];
+  const cities=Object.entries(AREAS).flatMap(([a,cs])=>cs.map(c=>[a,c]));
+  plan.forEach(([kind,n])=>{
+    for(let k=0;k<n;k++){
+      const [area,city]=cities[(i*7+k*3)%cities.length];
+      TEAMS.push({
+        name:'（ダミー）'+city.replace(/市/,'')+NAMES1[(i+k)%NAMES1.length]+(kind.startsWith('4')?' ジュニア':kind.startsWith('3')?' Jrユース':''),
+        kana:'だみー',
+        kind, area, city,
+        home:city+'内グラウンド',
+        visit:(i+k)%3!==0,
+        url:(i+k)%2===0
+      });
+      i++;
+    }
+  });
+  TEAMS.sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+})();
+
+let kind='4種（小学生）', area='', city='', visitOnly=false, q='';
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e;};
+
+function filt(o){
+  o=o||{};
+  const K=('kind' in o)?o.kind:kind, A=('area' in o)?o.area:area,
+        C=('city' in o)?o.city:city, V=('visit' in o)?o.visit:visitOnly, Q=('q' in o)?o.q:q;
+  return TEAMS.filter(t=>
+    (!K||t.kind===K)&&(!A||t.area===A)&&(!C||t.city===C)&&(!V||t.visit)&&
+    (!Q||t.name.toLowerCase().includes(Q.toLowerCase()))
+  );
+}
+
+function drawTabs(){
+  const box=$('#tabs');box.innerHTML='';
+  KINDS.forEach(k=>{
+    const n=filt({kind:k}).length;
+    const b=el('button',k===kind?'on':'',k+'<span class="n en">'+n+'</span>');
+    b.onclick=()=>{kind=k;city='';drawAll();};
+    box.appendChild(b);
+  });
+}
+function drawArea(){
+  const box=$('#fArea');box.innerHTML='';
+  Object.keys(AREAS).forEach(a=>{
+    const n=filt({area:a,city:''}).length;
+    const b=el('button','opt'+(area===a?' on':'')+(n===0&&area!==a?' dead':''),a+'<span class="n en">'+n+'</span>');
+    b.onclick=()=>{ area===a ? (area='',city='') : (area=a,city=''); drawAll(); };
+    box.appendChild(b);
+  });
+  const sel=$('#fCity');
+  const cities=area?AREAS[area]:Object.values(AREAS).flat();
+  sel.innerHTML='<option value="">すべての市町村</option>'+cities.map(c=>{
+    const n=filt({city:c}).length;
+    return '<option value="'+c+'"'+(city===c?' selected':'')+(n===0?' disabled':'')+'>'+c+'（'+n+'）</option>';
+  }).join('');
+}
+function drawChips(){
+  const c=$('#chips');c.innerHTML='';
+  [['地域',area,()=>{area='';city=''}],['市町村',city,()=>city=''],
+   ['見学・体験を受け入れ中',visitOnly?'ON':'',()=>visitOnly=false],
+   ['検索',q,()=>{q='';$('#q').value=''}]].forEach(([lb,v,off])=>{
+    if(!v)return;
+    const ch=el('span','chip',(lb==='検索'?'「'+v+'」':v==='ON'?lb:v)+'<button>×</button>');
+    ch.querySelector('button').onclick=()=>{off();drawAll();};
+    c.appendChild(ch);
+  });
+}
+function drawList(){
+  const list=filt();
+  $('#hitN').textContent=list.length;
+  const box=$('#list');box.innerHTML='';
+
+  if(list.length===0){
+    const e=el('div','empty');
+    e.appendChild(el('p',null,'この条件に当てはまるチームは見つかりませんでした。'));
+    const o=el('div','opts');
+    if(city){const b=el('button','opt','「'+city+'」を外す');b.onclick=()=>{city='';drawAll();};o.appendChild(b);}
+    if(area){const b=el('button','opt','「'+area+'」を外す');b.onclick=()=>{area='';city='';drawAll();};o.appendChild(b);}
+    if(visitOnly){const b=el('button','opt','「見学・体験」の条件を外す');b.onclick=()=>{visitOnly=false;drawAll();};o.appendChild(b);}
+    if(q){const b=el('button','opt','検索語を消す');b.onclick=()=>{q='';$('#q').value='';drawAll();};o.appendChild(b);}
+    e.appendChild(o);box.appendChild(e);
+    return;
+  }
+
+  Object.keys(AREAS).forEach(a=>{
+    const sub=list.filter(t=>t.area===a);
+    if(sub.length===0)return;
+    const g=el('div','grp');
+    g.appendChild(el('div','grpHd','<h2>'+a+'</h2><span class="n en">'+sub.length+' チーム</span>'));
+    sub.forEach(t=>{
+      const r=el('div','tRow');
+      r.innerHTML=
+        '<div class="nm">'+t.name+'<small>'+t.home+'</small></div>'+
+        '<div class="kind">'+t.kind.replace(/（.+）/,'')+'</div>'+
+        '<div class="city">'+t.city+'</div>'+
+        '<div class="visit">'+(t.visit?'<span class="ok">見学・体験 受け入れ中</span>':'<span class="no">−</span>')+'</div>'+
+        '<div class="lk">'+(t.url?'<a href="#">チームの窓口 →</a>':'<span>窓口は協会経由</span>')+'</div>';
+      g.appendChild(r);
+    });
+    box.appendChild(g);
+  });
+}
+function drawAll(){drawTabs();drawArea();drawChips();drawList();}
+
+$('#clr').onclick=()=>{area='';city='';visitOnly=false;q='';$('#q').value='';drawAll();};
+$('#fCity').onchange=e=>{city=e.target.value;if(city){const a=Object.keys(AREAS).find(k=>AREAS[k].includes(city));if(a)area=a;}drawAll();};
+$('#fVisit').onclick=function(){visitOnly=!visitOnly;this.classList.toggle('on',visitOnly);drawAll();};
+$('#qGo').onclick=()=>{q=$('#q').value.trim();drawAll();};
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'){q=$('#q').value.trim();drawAll();}});
+$('#tg').onclick=()=>document.body.classList.toggle('noNotes');
+drawAll();
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜一覧テンプレート ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --alert:#C33; --maxw:1360px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font:inherit}
+
+/* ---- ワイヤー注記 ---- */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+
+/* ---- ヘッダー ---- */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ---- ページ見出し ---- */
+.pHead{background:var(--pale2);border-bottom:1px solid var(--line);padding:46px 0 0;position:relative}
+.pHead .in{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+.crumb{font-size:12px;color:var(--muted);margin-bottom:20px}
+.crumb a:hover{color:var(--blue)}
+.pHead h1{font-size:30px;font-weight:700;line-height:1.5;margin-bottom:10px}
+.pHead .sub{font-size:14px;color:var(--ink2);line-height:2;margin-bottom:30px;max-width:720px}
+
+/* 掲載目的タブ */
+.tabs{display:flex;gap:32px;overflow-x:auto}
+.tabs button{
+  font-size:14.5px;color:var(--muted);padding:0 2px 18px;white-space:nowrap;
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;
+}
+.tabs button.on{color:var(--blue);border-color:var(--blue);font-weight:500}
+.tabs button:hover{color:var(--blue)}
+.tabs .n{font-family:"Barlow";font-size:11.5px;color:var(--muted);margin-left:7px}
+
+/* ---- レイアウト ---- */
+.stage{max-width:var(--maxw);margin:0 auto;padding:44px 40px 90px}
+.cols{display:grid;grid-template-columns:280px 1fr;gap:44px;align-items:start}
+
+/* ---- サイドバー（ファセット） ---- */
+.side{border:1px solid var(--line);position:sticky;top:136px}
+.sideHd{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.sideHd h2{font-size:13.5px;font-weight:500}
+.sideHd button{font-size:11.5px;color:var(--muted)}
+.sideHd button:hover{color:var(--blue)}
+.facet{border-bottom:1px solid var(--line);padding:20px 22px 22px}
+.facet:last-child{border-bottom:none}
+.facet h3{font-size:11.5px;font-weight:500;letter-spacing:.12em;color:var(--cyan);margin-bottom:4px}
+.facet .axis{font-size:11px;color:var(--muted);display:block;margin-bottom:14px}
+.facet .opts{display:flex;flex-wrap:wrap;gap:9px}
+.opt{border:1px solid var(--line);background:var(--pale2);font-size:12.5px;padding:8px 14px;border-radius:999px;transition:background .18s,border-color .18s,color .18s}
+.opt:hover{border-color:var(--blue);background:#fff}
+.opt.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.opt.dead{opacity:.32;pointer-events:none}
+.opt .n{font-family:"Barlow";font-size:11px;color:var(--muted);margin-left:6px}
+.opt.on .n{color:rgba(255,255,255,.72)}
+.sideAI{margin-top:18px;border:1px solid var(--line);background:var(--pale2);padding:22px}
+.sideAI p{font-size:12.5px;color:var(--ink2);line-height:1.9;margin-bottom:14px}
+.sideAI a{display:block;text-align:center;background:var(--navy);color:#fff;font-size:13px;padding:13px;transition:background .2s}
+.sideAI a:hover{background:var(--blue)}
+
+/* ---- 重要なお知らせ（表示フラグ） ---- */
+.pinned{border:1px solid var(--alert);margin-bottom:34px}
+.pinned .hd{background:var(--alert);color:#fff;font-size:12px;font-weight:500;letter-spacing:.08em;padding:9px 18px}
+.pinned ul{list-style:none}
+.pinned li{border-bottom:1px solid #F0D5D5}
+.pinned li:last-child{border-bottom:none}
+.pinned a{display:grid;grid-template-columns:110px 1fr;gap:20px;align-items:center;padding:18px 20px;background:#FFF6F6;transition:background .2s}
+.pinned a:hover{background:#FCEDED}
+.pinned .date{font-family:"Barlow";font-size:13px;color:#B06060}
+.pinned .ttl{font-size:14.5px;color:#8A2A2A;line-height:1.8}
+
+/* ---- 結果ヘッダ ---- */
+.resHd{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.resHd .cnt{font-size:13.5px;color:var(--ink2)}
+.resHd .cnt b{font-family:"Barlow";font-size:21px;font-weight:600;color:var(--blue);margin:0 4px}
+.resHd .chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:9px;background:var(--pale);border:1px solid #C3CDEA;color:var(--blue);font-size:12.5px;padding:7px 11px 7px 14px;border-radius:999px}
+.chip button{color:var(--blue);font-size:14px;line-height:1;opacity:.6}
+.chip button:hover{opacity:1}
+.resHd .sort{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
+.resHd select{border:1px solid var(--line);padding:9px 14px;font-size:13px;color:var(--ink);background:#fff}
+
+/* ---- 記事リスト ---- */
+.list{border-top:1px solid var(--line)}
+.list a.row{
+  display:grid;grid-template-columns:112px 128px 1fr auto;gap:24px;align-items:center;
+  padding:24px 8px;border-bottom:1px solid var(--line);transition:background .2s;
+}
+.list a.row:hover{background:var(--pale2)}
+.row .date{font-family:"Barlow";font-size:13.5px;color:var(--muted)}
+.row .purpose{font-size:11.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);text-align:center;padding:6px 8px}
+.row .main .ttl{font-size:15px;line-height:1.8;display:block}
+.row .main .tags{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.row .main .tags span{font-size:11px;color:var(--ink2);background:#fff;border:1px solid var(--line);padding:3px 9px}
+.row .new{font-size:10.5px;color:#fff;background:var(--cyan);padding:3px 8px;font-family:"Barlow";font-weight:600;letter-spacing:.06em}
+.row .file{font-size:11px;color:var(--muted);white-space:nowrap;border:1px solid var(--line);padding:4px 9px}
+
+.empty{padding:70px 20px;text-align:center;border-bottom:1px solid var(--line)}
+.empty p{font-size:14.5px;color:var(--ink2);margin-bottom:22px}
+.empty .opts{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+
+/* ---- ページャ ---- */
+.pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:48px}
+.pager a,.pager span{
+  min-width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);font-family:"Barlow";font-size:14px;transition:background .2s,border-color .2s,color .2s;
+}
+.pager a:hover{border-color:var(--blue);color:var(--blue)}
+.pager .cur{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.pager .arw{padding:0 18px;font-size:13px;font-family:"Noto Sans JP"}
+.pager .gap{border:none}
+
+@media(max-width:1000px){
+  .cols{grid-template-columns:1fr}
+  .side{position:static}
+  .gnav nav{display:none}
+}
+@media(max-width:640px){
+  .stage,.pHead .in,.gnav .inner{padding-left:22px;padding-right:22px}
+  .list a.row{grid-template-columns:1fr;gap:10px}
+  .row .purpose{justify-self:start;padding:6px 16px}
+  .pinned a{grid-template-columns:1fr;gap:8px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .side .facet{display:none}
+  .side.open .facet{display:block}
+  .sideHd{cursor:pointer}
+  .sideHd h2::after{content:"　開く ▼";font-size:10.5px;color:var(--muted);font-weight:400}
+  .side.open .sideHd h2::after{content:"　閉じる ▲"}
+}
+
+@media(max-width:640px){
+  .pHead{padding:36px 0 0}
+  .pHead .in,.stage{padding-left:22px;padding-right:22px}
+  .pHead h1{font-size:23px}
+  .tabs{gap:20px}
+  .resHd .sort{margin-left:0;width:100%}
+  .pinned a{padding:14px 16px}
+  .newsMore a,.relMore a{width:100%;text-align:center}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜一覧テンプレート ワイヤー v1</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html">NFAについて</a><a href="start.html">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html" class="on">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="pHead">
+  <span class="blockTag">LIST TEMPLATE</span>
+  <div class="in">
+    <p class="crumb"><a href="index.html">ホーム</a> ／ <a href="search.html">情報を探す</a> ／ お知らせ・大会情報</p>
+    <h1>お知らせ・大会情報</h1>
+    <p class="sub">協会からのお知らせ、大会日程、試合結果、各種手続きの案内をまとめています。上のタブで目的を、左の条件で対象を絞り込めます。</p>
+    <div class="tabs" id="tabs"></div>
+  </div>
+</section>
+
+<div class="stage">
+  <div class="cols">
+
+    <aside>
+      <div class="side">
+        <div class="sideHd">
+          <h2>条件で絞り込む</h2>
+          <button id="clr">解除</button>
+        </div>
+        <div id="facets"></div>
+      </div>
+      <div class="sideAI">
+        <p>探しているものが決まっているなら、言葉のまま聞くこともできます。</p>
+        <a href="search.html">AIに聞いて探す</a>
+      </div>
+    </aside>
+
+    <main>
+      <div class="pinned" id="pinned">
+        <div class="hd">重要なお知らせ</div>
+        <ul>
+          <li><a href="detail.html"><span class="date en">2026.08.27</span><span class="ttl">【注意喚起】協会名を騙る不審な連絡についてのご報告とご確認のお願い</span></a></li>
+          <li><a href="detail.html"><span class="date en">2026.08.20</span><span class="ttl">【重要】荒天時における大会運営の判断基準の改定について</span></a></li>
+        </ul>
+      </div>
+
+      <div class="resHd">
+        <span class="cnt">該当 <b id="hitN">0</b> 件</span>
+        <span class="chips" id="chips"></span>
+        <span class="sort">
+          並び順
+          <select id="sort">
+            <option value="new">新しい順</option>
+            <option value="old">古い順</option>
+          </select>
+        </span>
+      </div>
+
+      <div class="list" id="list"></div>
+      <div class="pager" id="pager"></div>
+    </main>
+  </div>
+
+  <div class="note" style="margin-top:44px">
+    <b>一覧｜4 軸の置きどころ</b>　現行 45 カテゴリで混在していた軸を、<b>画面上の役割ごとに置き分ける</b>のがこのテンプレートの主眼。<br>
+    ・<b>掲載目的</b>（大会情報・試合結果・登録手続き・講習会・お知らせ）＝ 上部タブ。一度に 1 つだけ選ぶ<br>
+    ・<b>対象／地域</b>＝ 左サイドの絞り込み。軸をまたいで重ねられる<br>
+    ・審判・指導者は<b>対象</b>に含める。「立場」を独立軸にすると 1 記事に複数の立場が絡み、記事側で付与しきれない<br>
+    ・<b>担当部署</b>＝ 画面には出さない。CMS 内部の管理項目として保持し、公開側の分類には使わない
+  </div>
+  <div class="note">
+    <b>一覧｜表示フラグの分離</b>　「重要」「注意喚起」「トップ掲載」は<b>内容の分類ではなく表示の指示</b>。本文リストとは別枠（赤の固定枠）に出し、タブやサイド条件の対象にしない。<br>
+    ・該当 0 件のときは枠ごと非表示。件数が多い場合も表示は上位 3 件まで<br>
+    ・CMS 側ではチェックボックスとして持ち、カテゴリ欄には入れない
+  </div>
+  <div class="note">
+    <b>一覧｜運用上の設計</b>　記事投稿の負荷を上げないため、<b>入力必須は「掲載目的」1 つのみ</b>とし、他の軸は任意にする。未設定でも一覧には出るが、絞り込み結果には現れない扱い。<br>
+    ・PDF 添付のある記事は一覧上でファイル種別を明示（現サイトで多いパターン）<br>
+    ・公開後 7 日以内は NEW 表示。自動判定のため運用作業は発生しない<br>
+    ・0 件時は条件を外す導線を出す（行き止まりをつくらない）
+  </div>
+  <div class="note">
+    <b>一覧｜このテンプレートが使い回される範囲</b>　お知らせ／大会情報／試合結果／登録・手続き／講習会。<b>同一テンプレートでタブの初期値だけを変える</b>運用とし、種別ごとに別デザインをつくらない。<br>
+    ・チーム一覧・組織一覧は情報構造が異なるため、別テンプレートとして扱う
+  </div>
+</div>
+
+<script>
+const AXES=[
+ {key:'target',name:'対象',axis:'誰に向けた情報か',opts:['小学生（4種）','中学生（3種）','高校生（2種）','大人・社会人（1種）','女子','シニア','フットサル','障がい者サッカー','審判','指導者']},
+ {key:'area',name:'地域',axis:'開催・対象エリア',opts:['北信','東信','中信','南信','県全域']}
+];
+const PURPOSES=['すべて','大会情報','試合結果','登録・手続き','講習会','お知らせ'];
+
+const DATA=[
+ {d:'2026.08.26',t:'第◯回 長野県ユース（U-15）サッカー選手権大会 組み合わせ決定のお知らせ',p:'大会情報',target:'中学生（3種）',area:'県全域',file:'PDF'},
+ {d:'2026.08.24',t:'長野県中学校総合体育大会 サッカー競技 最終結果',p:'試合結果',target:'中学生（3種）',area:'県全域',file:'PDF'},
+ {d:'2026.08.21',t:'2026年度 チーム登録の受付期間および手続き方法について',p:'登録・手続き',target:'小学生（4種）',area:'県全域',file:''},
+ {d:'2026.08.19',t:'JFA公認 D級コーチ養成講習会（北信会場）受講者募集',p:'講習会',target:'指導者',area:'北信',file:'PDF'},
+ {d:'2026.08.15',t:'なでしこひろば 秋季開催のご案内 ─ 参加者を募集しています',p:'お知らせ',target:'女子',area:'中信',file:''},
+ {d:'2026.08.12',t:'第◯回 長野県少年サッカー大会（4種）日程および会場のご案内',p:'大会情報',target:'小学生（4種）',area:'県全域',file:'PDF'},
+ {d:'2026.08.08',t:'4級審判員 新規取得講習会（南信会場）の開催について',p:'講習会',target:'審判',area:'南信',file:''},
+ {d:'2026.08.05',t:'審判員登録の更新手続きについて（2026年度）',p:'登録・手続き',target:'審判',area:'県全域',file:'PDF'},
+ {d:'2026.08.01',t:'長野県高等学校総合体育大会 サッカー競技 結果報告',p:'試合結果',target:'高校生（2種）',area:'県全域',file:''},
+ {d:'2026.07.28',t:'シニアリーグ（O-40）後期日程のお知らせ',p:'大会情報',target:'シニア',area:'東信',file:''},
+ {d:'2026.07.25',t:'長野県女子サッカーリーグ 第◯節 結果',p:'試合結果',target:'女子',area:'県全域',file:''},
+ {d:'2026.07.22',t:'キッズサッカーフェスティバル（中信）開催のご案内',p:'お知らせ',target:'小学生（4種）',area:'中信',file:'PDF'},
+ {d:'2026.07.18',t:'フットサル選手権大会 県予選 エントリー受付開始',p:'登録・手続き',target:'フットサル',area:'県全域',file:''},
+ {d:'2026.07.14',t:'障がい者サッカー交流会 参加チーム募集について',p:'お知らせ',target:'障がい者サッカー',area:'県全域',file:''},
+ {d:'2026.07.10',t:'U-12 トレセン選考会 実施要項および参加方法',p:'お知らせ',target:'小学生（4種）',area:'県全域',file:'PDF'},
+ {d:'2026.07.06',t:'中学生年代 リーグ戦（3種）前期 順位表を更新しました',p:'試合結果',target:'中学生（3種）',area:'県全域',file:''},
+ {d:'2026.07.02',t:'指導者ライセンス リフレッシュ研修会（東信）のご案内',p:'講習会',target:'指導者',area:'東信',file:''},
+ {d:'2026.06.28',t:'小学生年代 大会参加チームの登録変更について',p:'登録・手続き',target:'小学生（4種）',area:'県全域',file:'PDF'}
+];
+
+let purpose='すべて', cond={}, sort='new';
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e;};
+const TODAY=new Date('2026-08-28');
+
+function base(){ return purpose==='すべて' ? DATA : DATA.filter(i=>i.p===purpose); }
+function match(i,c){ return Object.keys(c).every(k=>i[k]===c[k]); }
+function hits(c, p){
+  const b = (p||purpose)==='すべて' ? DATA : DATA.filter(i=>i.p===(p||purpose));
+  return b.filter(i=>match(i,c));
+}
+function isNew(d){
+  const dt=new Date(d.replace(/\./g,'-'));
+  return (TODAY-dt)/(1000*60*60*24) <= 7;
+}
+
+function drawTabs(){
+  const box=$('#tabs'); box.innerHTML='';
+  PURPOSES.forEach(p=>{
+    const n = hits(cond,p).length;
+    const b=el('button', p===purpose?'on':'', p+'<span class="n en">'+n+'</span>');
+    b.onclick=()=>{purpose=p;drawAll();};
+    box.appendChild(b);
+  });
+}
+function drawFacets(){
+  const box=$('#facets'); box.innerHTML='';
+  AXES.forEach(ax=>{
+    const f=el('div','facet');
+    f.appendChild(el('h3',null,ax.name));
+    f.appendChild(el('span','axis','軸：'+ax.axis));
+    const o=el('div','opts');
+    ax.opts.forEach(v=>{
+      const test=Object.assign({},cond); test[ax.key]=v;
+      const n=hits(test).length;
+      const b=el('button','opt'+(cond[ax.key]===v?' on':'')+(n===0&&cond[ax.key]!==v?' dead':''),
+        v+'<span class="n en">'+n+'</span>');
+      b.onclick=()=>{ cond[ax.key]===v ? delete cond[ax.key] : cond[ax.key]=v; drawAll(); };
+      o.appendChild(b);
+    });
+    f.appendChild(o); box.appendChild(f);
+  });
+}
+function drawChips(){
+  const c=$('#chips'); c.innerHTML='';
+  AXES.forEach(ax=>{
+    if(!cond[ax.key])return;
+    const ch=el('span','chip',cond[ax.key]+'<button>×</button>');
+    ch.querySelector('button').onclick=()=>{delete cond[ax.key];drawAll();};
+    c.appendChild(ch);
+  });
+}
+function drawList(){
+  let list=hits(cond);
+  list = list.slice().sort((a,b)=> sort==='new' ? (a.d<b.d?1:-1) : (a.d>b.d?1:-1));
+  $('#hitN').textContent=list.length;
+  const box=$('#list'); box.innerHTML='';
+
+  if(list.length===0){
+    const e=el('div','empty');
+    e.appendChild(el('p',null,'この条件に当てはまる情報はありませんでした。'));
+    const o=el('div','opts');
+    Object.keys(cond).forEach(k=>{
+      const b=el('button','opt','「'+cond[k]+'」を外す');
+      b.onclick=()=>{delete cond[k];drawAll();};
+      o.appendChild(b);
+    });
+    if(purpose!=='すべて'){
+      const b=el('button','opt','「'+purpose+'」を外す');
+      b.onclick=()=>{purpose='すべて';drawAll();};
+      o.appendChild(b);
+    }
+    e.appendChild(o); box.appendChild(e);
+    $('#pager').innerHTML=''; return;
+  }
+
+  list.slice(0,10).forEach(i=>{
+    const a=el('a','row'); a.href='detail.html';
+    a.innerHTML =
+      '<span class="date en">'+i.d+(isNew(i.d)?' <span class="new en">NEW</span>':'')+'</span>'+
+      '<span class="purpose">'+i.p+'</span>'+
+      '<span class="main"><span class="ttl">'+i.t+'</span><span class="tags">'+
+        '<span>'+i.target+'</span><span>'+i.area+'</span>'+
+      '</span></span>'+
+      (i.file?'<span class="file">'+i.file+'</span>':'<span></span>');
+    box.appendChild(a);
+  });
+
+  const pages=Math.ceil(list.length/10);
+  const p=$('#pager'); p.innerHTML='';
+  if(pages>1){
+    p.appendChild(el('span','arw','前へ'));
+    for(let n=1;n<=Math.min(pages,5);n++){
+      const b=el(n===1?'span':'a', n===1?'cur':'', String(n));
+      if(n!==1) b.href='#';
+      p.appendChild(b);
+    }
+    if(pages>5){ p.appendChild(el('span','gap','…')); const l=el('a','',String(pages)); l.href='#'; p.appendChild(l); }
+    const nx=el('a','arw','次へ'); nx.href='#'; p.appendChild(nx);
+  }
+}
+function drawAll(){ drawTabs(); drawFacets(); drawChips(); drawList(); }
+
+$('#clr').onclick=()=>{cond={};purpose='すべて';drawAll();};
+$('#sort').onchange=e=>{sort=e.target.value;drawList();};
+$('#tg').onclick=()=>document.body.classList.toggle('noNotes');
+drawAll();
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

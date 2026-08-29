@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜詳細テンプレート ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1360px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+
+/* ---- ワイヤー注記 ---- */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+.vSwitch{display:flex;gap:0;border:1px solid var(--line);margin:0 0 34px}
+.vSwitch button{flex:1;padding:14px;font-size:13px;color:var(--ink2);border-right:1px solid var(--line);transition:background .2s,color .2s}
+.vSwitch button:last-child{border-right:none}
+.vSwitch button.on{background:var(--navy);color:#fff;font-weight:500}
+body.noNotes .vSwitch{display:none}
+
+/* ---- ヘッダー ---- */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ---- 本体 ---- */
+.stage{max-width:var(--maxw);margin:0 auto;padding:38px 40px 90px}
+.crumb{font-size:12px;color:var(--muted);margin-bottom:34px}
+.crumb a:hover{color:var(--blue)}
+.cols{display:grid;grid-template-columns:1fr 300px;gap:56px;align-items:start}
+
+/* ---- 記事ヘッダ ---- */
+.artHd{padding-bottom:34px;border-bottom:1px solid var(--line);margin-bottom:44px}
+.artHd .flags{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.flag{font-size:11.5px;font-weight:500;padding:6px 13px;letter-spacing:.06em}
+.flag.alert{background:var(--wire);color:#fff}
+.flag.imp{background:#B8860B;color:#fff}
+.artHd .line1{display:flex;align-items:center;gap:18px;margin-bottom:20px;flex-wrap:wrap}
+.artHd .purpose{font-size:12px;color:#fff;background:var(--blue);padding:7px 16px}
+.artHd .date{font-family:"Barlow";font-size:14px;color:var(--muted)}
+.artHd .upd{font-size:12px;color:var(--muted);border-left:1px solid var(--line);padding-left:18px}
+.artHd h1{font-size:32px;font-weight:700;line-height:1.65;letter-spacing:.01em;margin-bottom:26px}
+.artHd .tags{display:flex;gap:10px;flex-wrap:wrap}
+.artHd .tags a{font-size:12.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);padding:7px 14px;transition:background .2s}
+.artHd .tags a:hover{background:var(--pale)}
+
+/* ---- 概要ブロック（構造化データ） ---- */
+.spec{border:1px solid var(--line);margin-bottom:44px}
+.spec .hd{background:var(--pale2);border-bottom:1px solid var(--line);padding:15px 24px;font-size:13.5px;font-weight:500}
+.spec dl{display:grid;grid-template-columns:150px 1fr}
+.spec dt{
+  padding:18px 24px;font-size:13px;color:var(--ink2);background:var(--pale2);
+  border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+}
+.spec dd{padding:18px 24px;font-size:14px;border-bottom:1px solid var(--line);line-height:1.9}
+.spec dl>*:nth-last-child(-n+2){border-bottom:none}
+.spec dd .sub{display:block;font-size:12.5px;color:var(--muted);margin-top:5px}
+
+/* ---- 添付ファイル ---- */
+.files{border:1px solid var(--line);margin-bottom:44px}
+.files .hd{background:var(--pale2);border-bottom:1px solid var(--line);padding:15px 24px;font-size:13.5px;font-weight:500}
+.files a{
+  display:flex;align-items:center;gap:18px;padding:18px 24px;
+  border-bottom:1px solid var(--line);transition:background .2s;
+}
+.files a:last-child{border-bottom:none}
+.files a:hover{background:var(--pale2)}
+.files .ic{
+  width:44px;height:44px;flex:none;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Barlow";font-size:11px;font-weight:600;letter-spacing:.04em;
+}
+.files .nm{flex:1;font-size:14px;line-height:1.7}
+.files .nm small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
+.files .dl{font-size:12.5px;color:var(--blue);white-space:nowrap}
+
+/* ---- 本文 ---- */
+.body{font-size:15.5px;line-height:2.15;margin-bottom:52px}
+.body h2{
+  font-size:20px;font-weight:700;line-height:1.7;margin:52px 0 22px;
+  padding-left:16px;border-left:3px solid var(--blue);
+}
+.body h3{font-size:16.5px;font-weight:500;margin:38px 0 16px;color:var(--blue)}
+.body p{margin-bottom:26px}
+.body ul,.body ol{margin:0 0 26px 24px}
+.body li{margin-bottom:10px}
+.body table{width:100%;border-collapse:collapse;margin-bottom:32px;font-size:14px}
+.body th{background:var(--pale2);border:1px solid var(--line);padding:13px 16px;text-align:left;font-weight:500}
+.body td{border:1px solid var(--line);padding:13px 16px}
+.body .cap{
+  background:var(--pale2);border-left:3px solid var(--cyan);
+  padding:22px 26px;font-size:14px;line-height:2;margin-bottom:32px;
+}
+.body a.inl{color:var(--blue);border-bottom:1px solid var(--blue)}
+
+/* ---- 問い合わせ ---- */
+.contact{border:1px solid var(--line);padding:30px 32px;margin-bottom:52px}
+.contact h3{font-size:14px;font-weight:500;margin-bottom:14px}
+.contact p{font-size:13.5px;color:var(--ink2);line-height:2}
+
+/* ---- 前後ナビ ---- */
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:30px}
+.pn a{background:#fff;padding:24px 26px;transition:background .2s}
+.pn a:hover{background:var(--pale2)}
+.pn .lb{font-size:11.5px;color:var(--muted);margin-bottom:10px;display:block}
+.pn .t{font-size:14px;line-height:1.8}
+.pn a.next{text-align:right}
+.backList{text-align:center}
+.backList a{display:inline-block;border:1px solid var(--blue);color:var(--blue);font-size:14px;padding:16px 52px;transition:background .2s,color .2s}
+.backList a:hover{background:var(--blue);color:#fff}
+
+/* ---- サイドバー ---- */
+.side>*{margin-bottom:26px}
+.sBox{border:1px solid var(--line)}
+.sBox .hd{background:var(--pale2);border-bottom:1px solid var(--line);padding:15px 20px;font-size:13px;font-weight:500}
+.rel{list-style:none}
+.rel li{border-bottom:1px solid var(--line)}
+.rel li:last-child{border-bottom:none}
+.rel a{display:block;padding:17px 20px;transition:background .2s}
+.rel a:hover{background:var(--pale2)}
+.rel .d{font-family:"Barlow";font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+.rel .t{font-size:13.5px;line-height:1.8}
+.sAI{background:var(--navy);color:#fff;padding:28px 24px}
+.sAI h3{font-size:15px;font-weight:500;margin-bottom:12px;line-height:1.7}
+.sAI p{font-size:12.5px;color:#AAB3D2;line-height:1.95;margin-bottom:18px}
+.sAI a{display:block;text-align:center;background:var(--cyan);color:#fff;font-size:13px;padding:14px;transition:background .2s}
+.sAI a:hover{background:#0079A8}
+.sTag{padding:20px}
+.sTag .lb{font-size:12px;color:var(--muted);margin-bottom:14px}
+.sTag .opts{display:flex;flex-wrap:wrap;gap:9px}
+.sTag a{font-size:12.5px;border:1px solid var(--line);background:var(--pale2);padding:8px 14px;border-radius:999px;transition:border-color .2s,color .2s}
+.sTag a:hover{border-color:var(--blue);color:var(--blue)}
+
+.hide{display:none}
+
+@media(max-width:1000px){
+  .cols{grid-template-columns:1fr;gap:44px}
+  .gnav nav{display:none}
+}
+@media(max-width:640px){
+  .stage,.gnav .inner{padding-left:22px;padding-right:22px}
+  .artHd h1{font-size:24px}
+  .spec dl{grid-template-columns:1fr}
+  .spec dt{border-right:none}
+  .pn{grid-template-columns:1fr}
+  .pn a.next{text-align:left}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .stage{padding:26px 22px 70px}
+  .vSwitch{flex-direction:column}
+  .vSwitch button{border-right:none;border-bottom:1px solid var(--line)}
+  .vSwitch button:last-child{border-bottom:none}
+  .artHd h1{font-size:21px}
+  .artHd .line1{gap:12px}
+  .artHd .upd{border-left:none;padding-left:0;width:100%}
+  .spec dt{padding:12px 18px 4px;border-bottom:none}
+  .spec dd{padding:0 18px 14px;border-bottom:1px solid var(--line)}
+  .files a{flex-wrap:wrap;padding:14px 18px}
+  .files .nm{flex-basis:calc(100% - 62px)}
+  .files .dl{margin-left:62px}
+  .body{font-size:14.5px}
+  .body h2{font-size:17.5px}
+  .body table{font-size:12.5px}
+  .body th,.body td{padding:10px 10px}
+  .contact{padding:22px}
+  .backList a{width:100%;text-align:center}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜詳細テンプレート ワイヤー v1</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html">NFAについて</a><a href="start.html">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html" class="on">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="stage">
+  <span class="blockTag" style="position:static;display:inline-block;margin-bottom:20px">DETAIL TEMPLATE</span>
+
+  <div class="vSwitch">
+    <button class="on" data-v="taikai">① 大会情報（概要あり・添付あり）</button>
+    <button data-v="oshirase">② お知らせ（概要なし・本文のみ）</button>
+    <button data-v="kekka">③ 試合結果（結果表あり）</button>
+  </div>
+
+  <p class="crumb"><a href="index.html">ホーム</a> ／ <a href="search.html">情報を探す</a> ／ <a href="list.html" id="cbCat">大会情報</a> ／ <span id="cbTtl">第◯回 長野県少年サッカー大会</span></p>
+
+  <div class="cols">
+    <main>
+
+      <!-- ===== 記事ヘッダ ===== -->
+      <div class="artHd">
+        <div class="flags" id="flags">
+          <span class="flag imp">重要</span>
+        </div>
+        <div class="line1">
+          <span class="purpose" id="pPurpose">大会情報</span>
+          <span class="date en" id="pDate">2026.08.12</span>
+          <span class="upd" id="pUpd">最終更新 2026.08.20</span>
+        </div>
+        <h1 id="pTitle">第◯回 長野県少年サッカー大会（4種）日程および会場のご案内</h1>
+        <div class="tags" id="pTags">
+          <a href="list.html">小学生（4種）</a>
+          <a href="list.html">県全域</a>
+        </div>
+      </div>
+
+      <!-- ===== 概要（構造化） ===== -->
+      <div class="spec" id="spec">
+        <div class="hd">開催概要</div>
+        <dl>
+          <dt>開催日</dt>
+          <dd>2026年10月11日（日）・10月12日（月・祝）<span class="sub">予備日：10月18日（日）</span></dd>
+          <dt>会場</dt>
+          <dd>長野県フットボールセンター（◯◯市）ほか 3 会場<span class="sub">会場ごとの割り当ては要項をご確認ください</span></dd>
+          <dt>対象</dt>
+          <dd>県内 4 種登録チーム（U-12）</dd>
+          <dt>参加申込</dt>
+          <dd>2026年9月15日（月）まで<span class="sub">所属郡市協会を通じてお申し込みください</span></dd>
+          <dt>主催</dt>
+          <dd>一般社団法人 長野県サッカー協会</dd>
+        </dl>
+      </div>
+
+      <!-- ===== 添付ファイル ===== -->
+      <div class="files" id="files">
+        <div class="hd">関連書類</div>
+        <a href="#">
+          <span class="ic en">PDF</span>
+          <span class="nm">第◯回 長野県少年サッカー大会 大会要項<small>PDF／1.2MB／全 6 ページ</small></span>
+          <span class="dl">ダウンロード</span>
+        </a>
+        <a href="#">
+          <span class="ic en">XLSX</span>
+          <span class="nm">参加申込書（様式1）<small>Excel／48KB</small></span>
+          <span class="dl">ダウンロード</span>
+        </a>
+        <a href="#">
+          <span class="ic en">PDF</span>
+          <span class="nm">会場案内図・駐車場のご案内<small>PDF／860KB</small></span>
+          <span class="dl">ダウンロード</span>
+        </a>
+      </div>
+
+      <!-- ===== 本文 ===== -->
+      <div class="body" id="body">
+        <p>第◯回 長野県少年サッカー大会（4種）の日程および会場が決定しましたのでご案内いたします。参加を予定されているチームは、大会要項をご確認のうえ、期日までにお申し込みください。</p>
+
+        <div class="cap">
+          今大会より、熱中症対策として飲水タイムの運用を変更しています。詳細は要項 P.4 をご確認ください。
+        </div>
+
+        <h2>日程および会場</h2>
+        <table>
+          <tr><th>日程</th><th>ラウンド</th><th>会場</th></tr>
+          <tr><td>10月11日（日）</td><td>1回戦・2回戦</td><td>県フットボールセンター 他 3 会場</td></tr>
+          <tr><td>10月12日（月・祝）</td><td>準決勝・決勝</td><td>県フットボールセンター</td></tr>
+        </table>
+
+        <h2>参加資格</h2>
+        <ul>
+          <li>2026年度 長野県サッカー協会に第4種として登録済みのチーム</li>
+          <li>選手は当該チームに登録されていること</li>
+          <li>引率・指導は有資格者が行うこと</li>
+        </ul>
+
+        <h2>お申し込み方法</h2>
+        <p>参加申込書（様式1）に必要事項をご記入のうえ、所属する郡市サッカー協会を通じてお申し込みください。県協会への直接のお申し込みは受け付けておりません。</p>
+        <h3>提出期限</h3>
+        <p>2026年9月15日（月）必着</p>
+
+        <h2>そのほか</h2>
+        <p>荒天時の開催可否については、前日18時までに本サイトおよび協会公式SNSでお知らせいたします。判断基準については<a href="detail.html" class="inl">荒天時における大会運営の判断基準</a>をご確認ください。</p>
+      </div>
+
+      <!-- ===== 問い合わせ ===== -->
+      <div class="contact">
+        <h3>この件に関するお問い合わせ</h3>
+        <p>一般社団法人 長野県サッカー協会 事務局<br>
+        TEL ◯◯◯-◯◯◯-◯◯◯◯（平日 9:00–17:00）／ MAIL ◯◯◯@nagano-fa.or.jp</p>
+      </div>
+
+      <!-- ===== 前後 ===== -->
+      <div class="pn">
+        <a href="detail.html" class="prev"><span class="lb">前の記事</span><span class="t">4級審判員 新規取得講習会（南信会場）の開催について</span></a>
+        <a href="detail.html" class="next"><span class="lb">次の記事</span><span class="t">なでしこひろば 秋季開催のご案内 ─ 参加者を募集しています</span></a>
+      </div>
+      <div class="backList"><a href="list.html">大会情報の一覧に戻る</a></div>
+    </main>
+
+    <!-- ===== サイド ===== -->
+    <aside class="side">
+      <div class="sBox">
+        <div class="hd">この情報に関連するもの</div>
+        <ul class="rel">
+          <li><a href="detail.html"><span class="d en">2026.08.21</span><span class="t">2026年度 チーム登録の受付期間および手続き方法について</span></a></li>
+          <li><a href="detail.html"><span class="d en">2026.07.10</span><span class="t">U-12 トレセン選考会 実施要項および参加方法</span></a></li>
+          <li><a href="detail.html"><span class="d en">2026.06.28</span><span class="t">小学生年代 大会参加チームの登録変更について</span></a></li>
+        </ul>
+      </div>
+
+      <div class="sBox sTag">
+        <p class="lb">同じ条件で探す</p>
+        <div class="opts">
+          <a href="list.html">小学生（4種）</a>
+          <a href="list.html">大会情報</a>
+          <a href="list.html">県全域</a>
+        </div>
+      </div>
+
+      <div class="sAI">
+        <h3>ほかに知りたいことはありますか</h3>
+        <p>言葉のまま聞くだけで、関連する情報を探せます。</p>
+        <a href="search.html">AIに聞いて探す</a>
+      </div>
+    </aside>
+  </div>
+
+  <div class="note" style="margin-top:56px">
+    <b>詳細｜1 テンプレートで 3 種類を吸収する</b>　大会情報・お知らせ・試合結果で別デザインをつくらず、<b>ブロックの有無</b>で差を吸収する。上のスイッチで実際の出し分けを確認できる。<br>
+    ・<b>概要ブロック</b>（開催日・会場・申込期限）＝ 大会情報のみ。お知らせでは非表示<br>
+    ・<b>結果表</b>＝ 試合結果のみ。本文内の表として扱い、専用機能はつくらない<br>
+    ・<b>添付ファイル</b>＝ 全種別で共通。ファイル数 0 のときは枠ごと非表示
+  </div>
+  <div class="note">
+    <b>詳細｜PDF の扱いを変える</b>　現サイトは「詳細を PDF で見てください」で終わる記事が多く、<b>本文が実質空</b>のものが目立つ。新設計では日付・会場・申込期限を<b>概要ブロックとして必ず本文側に持つ</b>。<br>
+    ・理由は 3 つ。①スマートフォンで PDF を開かせない ②検索・AI 探索の対象になる ③一覧のプレビューに使える<br>
+    ・PDF は「詳細を読むための補足」に位置づけを下げる。廃止はしない<br>
+    ・ファイル名は原題ではなく<b>内容がわかる名前</b>で表示し、形式・容量を明示する
+  </div>
+  <div class="note">
+    <b>詳細｜表示フラグの見え方</b>　「重要」「注意喚起」はタイトルの上に帯で出す。分類タグ（青）とは<b>色も位置も分ける</b>ことで、内容の分類ではないことを見た目で示す。<br>
+    ・注意喚起＝赤、重要＝金。トップ掲載はここには出ない（TOP 側の制御のみ）<br>
+    ・フラグ 0 のときは枠ごと消える
+  </div>
+  <div class="note">
+    <b>詳細｜行き止まりをつくらない</b>　記事の末尾に、<b>一覧へ戻る／前後の記事／同じ条件で探す／AI に聞く</b>の 4 経路を置く。詳細ページは検索エンジン経由の着地点になりやすく、ここで途切れると離脱する。<br>
+    ・「同じ条件で探す」は、この記事に付いた 3 軸のタグをそのまま一覧の絞り込み条件として渡す<br>
+    ・関連記事は同じ対象軸＋同じ目的軸から自動抽出（手動選択は運用が続かない）
+  </div>
+</div>
+
+<script>
+const V = {
+  taikai:{
+    cat:'大会情報', purpose:'大会情報',
+    title:'第◯回 長野県少年サッカー大会（4種）日程および会場のご案内',
+    date:'2026.08.12', upd:'最終更新 2026.08.20',
+    flags:'<span class="flag imp">重要</span>',
+    tags:['小学生（4種）','県全域'],
+    spec:true, files:true
+  },
+  oshirase:{
+    cat:'お知らせ', purpose:'お知らせ',
+    title:'なでしこひろば 秋季開催のご案内 ─ 参加者を募集しています',
+    date:'2026.08.15', upd:'',
+    flags:'',
+    tags:['女子','中信'],
+    spec:false, files:false,
+    body:'<p>女子サッカーをはじめてみたい方に向けた体験プログラム「なでしこひろば」を、この秋も開催いたします。ボールに触れたことがない方でも参加できます。運動のできる服装でお越しください。</p>'
+       + '<div class="cap">対象は小学生から大人まで。年齢の上限はありません。用具の貸し出しがあります。</div>'
+       + '<h2>開催について</h2><p>会場・日程は決まりしだい本ページで更新いたします。参加をご希望の方は、下記お問い合わせ先までご連絡ください。</p>'
+       + '<h2>これまでの様子</h2><p>昨年度は県内 4 会場で開催し、のべ 180 名にご参加いただきました。参加者の約 6 割がサッカー未経験の方です。</p>'
+  },
+  kekka:{
+    cat:'試合結果', purpose:'試合結果',
+    title:'長野県中学校総合体育大会 サッカー競技 最終結果',
+    date:'2026.08.24', upd:'',
+    flags:'',
+    tags:['中学生（3種）','県全域'],
+    spec:false, files:true,
+    body:'<p>標記大会の全日程が終了しましたので、結果をお知らせいたします。ご参加いただいた各チーム、運営にご協力いただいた皆さまに御礼申し上げます。</p>'
+       + '<h2>最終結果</h2>'
+       + '<table><tr><th>順位</th><th>チーム</th><th>地区</th></tr>'
+       + '<tr><td>優勝</td><td>◯◯中学校</td><td>北信</td></tr>'
+       + '<tr><td>準優勝</td><td>◯◯中学校</td><td>中信</td></tr>'
+       + '<tr><td>第3位</td><td>◯◯中学校</td><td>東信</td></tr>'
+       + '<tr><td>第3位</td><td>◯◯中学校</td><td>南信</td></tr></table>'
+       + '<h2>北信越大会について</h2><p>上位 2 チームが、北信越中学校総合体育大会への出場権を獲得しました。日程は別途お知らせいたします。</p>'
+  }
+};
+const BODY_TAIKAI = document.getElementById('body').innerHTML;
+
+document.querySelectorAll('.vSwitch button').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('.vSwitch button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const v = V[b.dataset.v];
+    document.getElementById('cbCat').textContent = v.cat;
+    document.getElementById('cbTtl').textContent = v.title.slice(0,18)+'…';
+    document.getElementById('pPurpose').textContent = v.purpose;
+    document.getElementById('pDate').textContent = v.date;
+    document.getElementById('pTitle').textContent = v.title;
+    const upd = document.getElementById('pUpd');
+    upd.textContent = v.upd; upd.classList.toggle('hide', !v.upd);
+    const fl = document.getElementById('flags');
+    fl.innerHTML = v.flags; fl.classList.toggle('hide', !v.flags);
+    document.getElementById('pTags').innerHTML = v.tags.map(t=>'<a href="list.html">'+t+'</a>').join('');
+    document.getElementById('spec').classList.toggle('hide', !v.spec);
+    document.getElementById('files').classList.toggle('hide', !v.files);
+    document.getElementById('body').innerHTML = v.body || BODY_TAIKAI;
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+});
+document.getElementById('tg').onclick = ()=>document.body.classList.toggle('noNotes');
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

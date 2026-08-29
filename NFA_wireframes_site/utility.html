@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜ユーティリティ ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--paper);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{font:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+
+/* 注記 */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:#C33}
+body.noNotes .note{display:none}
+.vSwitch{display:flex;border:1px solid var(--line);margin:0 0 40px}
+.vSwitch button{flex:1;padding:14px;font-size:13px;color:var(--ink2);border-right:1px solid var(--line);transition:background .2s,color .2s}
+.vSwitch button:last-child{border-right:none}
+.vSwitch button.on{background:var(--navy);color:#fff;font-weight:500}
+body.noNotes .vSwitch{display:none}
+.todo{display:inline-block;background:#FFF3D6;border:1px solid #E0B84C;color:#8A6A16;font-size:11px;padding:4px 10px;margin-left:10px;vertical-align:middle}
+body.noNotes .todo{display:none}
+
+/* ヘッダー */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+.stage{max-width:var(--maxw);margin:0 auto;padding:40px 40px 90px}
+.view{display:none}
+.view.on{display:block}
+
+/* ========== 404 ========== */
+.nf{max-width:760px;margin:0 auto;text-align:center;padding:56px 0 20px}
+.nf .code{font-family:"Barlow";font-size:96px;font-weight:700;color:var(--pale);line-height:1;letter-spacing:.02em}
+.nf h1{font-size:26px;font-weight:700;line-height:1.7;margin:18px 0 16px;color:var(--navy)}
+.nf .ds{font-size:14.5px;color:var(--ink2);line-height:2.1;margin-bottom:44px}
+.nf .askBox{background:var(--navy);padding:34px 34px 36px;text-align:left;margin-bottom:40px}
+.nf .askBox p{font-size:13.5px;color:#AAB3D2;margin-bottom:18px}
+.nf .askIn{background:#fff;display:flex;padding:8px 8px 8px 22px;align-items:center;gap:14px}
+.nf .askIn input{flex:1;border:none;outline:none;font-size:15px;padding:13px 0}
+.nf .askIn input::placeholder{color:var(--muted)}
+.nf .askIn button{background:var(--cyan);color:#fff;font-size:13.5px;font-weight:500;padding:14px 30px;transition:background .2s}
+.nf .askIn button:hover{background:#0079A8}
+.nf .links{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);text-align:left}
+.nf .links a{background:#fff;padding:22px 24px;transition:background .2s}
+.nf .links a:hover{background:var(--pale2)}
+.nf .links .t{font-size:14px;font-weight:500;display:block;margin-bottom:6px}
+.nf .links .d{font-size:12px;color:var(--muted);line-height:1.8}
+
+/* ========== お問い合わせ ========== */
+.ctHead{margin-bottom:44px}
+.crumb{font-size:12px;color:var(--muted);margin-bottom:20px}
+.crumb a:hover{color:var(--blue)}
+.ctHead h1{font-size:30px;font-weight:700;margin-bottom:12px}
+.ctHead p{font-size:14px;color:var(--ink2);line-height:2;max-width:720px}
+.ctCols{display:grid;grid-template-columns:1fr 320px;gap:52px;align-items:start}
+
+/* ステップ */
+.fSteps{display:flex;gap:0;margin-bottom:40px;border:1px solid var(--line)}
+.fSteps div{flex:1;text-align:center;padding:15px 10px;font-size:13px;color:var(--muted);border-right:1px solid var(--line);background:var(--pale2)}
+.fSteps div:last-child{border-right:none}
+.fSteps div.on{background:var(--blue);color:#fff;font-weight:500}
+.fSteps .n{font-family:"Barlow";font-weight:600;margin-right:8px}
+
+/* フォーム */
+.fRow{margin-bottom:30px}
+.fRow label{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;margin-bottom:12px}
+.req,.opt2{font-size:10.5px;padding:3px 9px;letter-spacing:.06em}
+.req{background:var(--wire);color:#fff}
+.opt2{background:var(--pale2);color:var(--muted);border:1px solid var(--line)}
+.fRow input[type=text],.fRow input[type=email],.fRow select,.fRow textarea{
+  width:100%;border:1px solid var(--line);padding:15px 16px;font-size:14.5px;background:#fff;color:var(--ink);
+}
+.fRow textarea{min-height:170px;resize:vertical;line-height:1.9}
+.fRow .hint{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.85}
+.fRow input:focus,.fRow select:focus,.fRow textarea:focus{outline:2px solid var(--cyan);outline-offset:-1px}
+.agree{border:1px solid var(--line);background:var(--pale2);padding:24px 26px;margin:36px 0}
+.agree p{font-size:13px;color:var(--ink2);line-height:2;margin-bottom:16px}
+.agree p a{color:var(--blue);border-bottom:1px solid var(--blue)}
+.chk{display:flex;align-items:center;gap:11px;font-size:14px;cursor:pointer;user-select:none;font-weight:500}
+.chk .box{width:19px;height:19px;border:1px solid var(--line);background:#fff;flex:none;position:relative}
+.chk.on .box{background:var(--blue);border-color:var(--blue)}
+.chk.on .box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg)}
+.fActs{display:flex;gap:16px;margin-top:36px}
+.btnMain{background:var(--blue);color:#fff;font-size:15px;font-weight:500;padding:18px 52px;transition:background .2s;border:none;cursor:pointer}
+.btnMain:hover{background:var(--navy)}
+.btnMain:disabled{background:var(--line);color:var(--muted);cursor:default}
+.btnBack{border:1px solid var(--line);color:var(--ink2);font-size:14px;padding:17px 36px;transition:border-color .2s,color .2s}
+.btnBack:hover{border-color:var(--blue);color:var(--blue)}
+
+/* 確認 */
+.cfm{border:1px solid var(--line)}
+.cfm dl{display:grid;grid-template-columns:190px 1fr}
+.cfm dt{padding:20px 24px;font-size:13px;color:var(--ink2);background:var(--pale2);border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.cfm dd{padding:20px 24px;font-size:14.5px;border-bottom:1px solid var(--line);line-height:1.9}
+.cfm dl>*:nth-last-child(-n+2){border-bottom:none}
+
+/* 完了 */
+.done{max-width:680px;margin:0 auto;text-align:center;padding:60px 0}
+.done .ic{width:74px;height:74px;border:2px solid var(--cyan);border-radius:50%;margin:0 auto 30px;position:relative}
+.done .ic::after{content:"";position:absolute;left:25px;top:16px;width:18px;height:32px;border:solid var(--cyan);border-width:0 3px 3px 0;transform:rotate(42deg)}
+.done h1{font-size:25px;font-weight:700;margin-bottom:18px;color:var(--navy)}
+.done p{font-size:14.5px;color:var(--ink2);line-height:2.15;margin-bottom:14px}
+.done .num{font-family:"Barlow";font-size:15px;color:var(--blue);font-weight:600;letter-spacing:.04em}
+.done .backTop{display:inline-block;margin-top:36px;border:1px solid var(--blue);color:var(--blue);font-size:14px;padding:16px 48px;transition:background .2s,color .2s}
+.done .backTop:hover{background:var(--blue);color:#fff}
+
+/* サイド（連絡先） */
+.ctSide>*{margin-bottom:24px}
+.sBox{border:1px solid var(--line);padding:28px 26px}
+.sBox h3{font-size:14px;font-weight:700;margin-bottom:14px}
+.sBox p{font-size:13px;color:var(--ink2);line-height:2}
+.sBox .tel{font-family:"Barlow";font-size:24px;font-weight:600;color:var(--navy);margin:8px 0 4px;display:block}
+.sBox small{font-size:11.5px;color:var(--muted)}
+.sBox.ai{background:var(--navy);border-color:var(--navy)}
+.sBox.ai h3{color:#fff}
+.sBox.ai p{color:#AAB3D2}
+.sBox.ai a{display:block;text-align:center;background:var(--cyan);color:#fff;font-size:13px;padding:13px;margin-top:16px;transition:background .2s}
+.sBox.ai a:hover{background:#0079A8}
+
+/* ========== 静的文書 ========== */
+.docCols{display:grid;grid-template-columns:260px 1fr;gap:56px;align-items:start}
+.tocBox{border:1px solid var(--line);position:sticky;top:136px}
+.tocBox .hd{padding:18px 22px;border-bottom:1px solid var(--line);font-size:13px;font-weight:500}
+.tocBox ol{list-style:none;padding:10px 0}
+.tocBox li a{display:block;padding:11px 22px;font-size:13px;color:var(--ink2);border-left:2px solid transparent;transition:color .2s,border-color .2s}
+.tocBox li a:hover{color:var(--blue);border-color:var(--cyan)}
+.doc h1{font-size:29px;font-weight:700;margin-bottom:14px}
+.doc .updated{font-size:12.5px;color:var(--muted);margin-bottom:44px}
+.doc h2{font-size:19px;font-weight:700;margin:48px 0 18px;padding-left:14px;border-left:3px solid var(--blue);line-height:1.7}
+.doc p{font-size:14.5px;color:var(--ink);line-height:2.15;margin-bottom:20px}
+.doc ul{margin:0 0 20px 24px}
+.doc li{font-size:14.5px;line-height:2.05;margin-bottom:8px}
+.doc .box{background:var(--pale2);border-left:3px solid var(--cyan);padding:22px 26px;font-size:13.5px;line-height:2;margin:26px 0}
+
+@media(max-width:1000px){
+  .ctCols,.docCols{grid-template-columns:1fr}
+  .tocBox{position:static}
+  .nf .links{grid-template-columns:1fr}
+  .gnav nav{display:none}
+  .cfm dl{grid-template-columns:1fr}
+  .cfm dt{border-right:none}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .stage{padding:24px 22px 70px}
+  .vSwitch{flex-direction:column}
+  .vSwitch button{border-right:none;border-bottom:1px solid var(--line)}
+  .vSwitch button:last-child{border-bottom:none}
+  .nf{padding:32px 0 10px}
+  .nf .code{font-size:60px}
+  .nf h1{font-size:19px}
+  .nf .ds{font-size:13px;margin-bottom:30px}
+  .nf .askBox{padding:22px 20px 24px}
+  .nf .askIn{flex-direction:column;align-items:stretch;padding:10px;gap:8px}
+  .nf .askIn input{padding:10px 8px}
+  .ctHead h1{font-size:24px}
+  .fSteps div{font-size:11px;padding:11px 4px}
+  .fSteps .n{margin-right:4px}
+  .fActs{flex-direction:column}
+  .btnMain,.btnBack{width:100%;text-align:center}
+  .agree{padding:18px 18px}
+  .done{padding:36px 0}
+  .done h1{font-size:20px}
+  .doc h1{font-size:23px}
+  .doc h2{font-size:16.5px}
+  .tocBox ol{display:flex;flex-wrap:wrap;padding:12px 14px;gap:2px}
+  .tocBox li a{padding:7px 10px;border-left:none;font-size:12px;background:var(--pale2);border-radius:999px;margin:3px}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜ユーティリティ ワイヤー v1</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav><a href="about.html">NFAについて</a><a href="start.html">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html">情報を探す</a></nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="stage">
+  <div class="vSwitch">
+    <button class="on" data-v="v404">① 404（ページが見つからない）</button>
+    <button data-v="vForm">② お問い合わせ（入力 → 確認 → 完了）</button>
+    <button data-v="vDoc">③ 静的文書テンプレート</button>
+  </div>
+
+  <!-- ============ 404 ============ -->
+  <div class="view on" id="v404">
+    <div class="nf">
+      <p class="code en">404</p>
+      <h1>お探しのページが見つかりませんでした。</h1>
+      <p class="ds">ページが移動または削除されたか、URL が変更された可能性があります。<br>サイトのリニューアルに伴い、以前のアドレスは新しい場所に変わっています。</p>
+
+      <div class="askBox">
+        <p>探していたものを、言葉で聞いてみてください。</p>
+        <div class="askIn">
+          <input type="text" placeholder="例）小学生の大会日程、審判講習会の申込 など">
+          <button onclick="location.href='search.html'">探す</button>
+        </div>
+      </div>
+
+      <div class="links">
+        <a href="index.html"><span class="t">トップページへ</span><span class="d">サイトの入口から探し直す</span></a>
+        <a href="list.html"><span class="t">お知らせ・大会情報</span><span class="d">最新の情報の一覧を見る</span></a>
+        <a href="utility.html#form" onclick="showView('vForm');return false"><span class="t">お問い合わせ</span><span class="d">見つからない場合はご連絡ください</span></a>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:52px">
+      <b>404｜このページより先に決めること</b>　リニューアル時は旧 URL からの流入が大量に 404 になる。ページのデザインより、<b>リダイレクトマップの整備が本体</b>。<br>
+      ・現行 WordPress の全公開 URL を棚卸しし、新 URL への 301 対応表を作る（CSV 変換スクリプトの成果物に含める）<br>
+      ・対応先のない旧 URL（削除記事など）だけがこの 404 に落ちる設計にする<br>
+      ・公開後 3 か月は 404 のアクセスログを確認し、流入の多い旧 URL を追加でリダイレクトする
+    </div>
+    <div class="note">
+      <b>404｜AI 探索の一番の出番</b>　404 に落ちた人は「何を探していたか」を自分の言葉で持っている。検索ボックスではなく <b>AI 探索の入力欄</b>を最上位に置き、そのまま D の画面へ引き継ぐ。<br>
+      ・入力内容を持って「情報を探す」ページへ遷移し、条件抽出から始める<br>
+      ・トップへ戻る導線は 2 番手。404 でトップに戻された人の多くはそこで離脱する
+    </div>
+  </div>
+
+  <!-- ============ お問い合わせ ============ -->
+  <div class="view" id="vForm">
+    <div class="ctHead">
+      <p class="crumb"><a href="index.html">ホーム</a> ／ お問い合わせ</p>
+      <h1>お問い合わせ</h1>
+      <p>大会・登録・講習会など、用件によって回答できる部署が異なります。用件の種類をお選びいただくと、担当へ直接届きます。</p>
+    </div>
+
+    <div class="ctCols">
+      <main>
+        <div class="fSteps">
+          <div class="on" id="st1"><span class="n en">1</span>入力</div>
+          <div id="st2"><span class="n en">2</span>確認</div>
+          <div id="st3"><span class="n en">3</span>完了</div>
+        </div>
+
+        <!-- 入力 -->
+        <div id="fInput">
+          <div class="fRow">
+            <label>用件の種類<span class="req">必須</span></label>
+            <select id="inKind">
+              <option value="">お選びください</option>
+              <option>大会・試合について</option>
+              <option>チーム・選手の登録について</option>
+              <option>審判・指導者の資格、講習会について</option>
+              <option>協賛・パートナーシップについて</option>
+              <option>取材・広報について</option>
+              <option>その他</option>
+            </select>
+            <p class="hint">選択された種類に応じて、担当部署へ振り分けられます。</p>
+          </div>
+          <div class="fRow">
+            <label>お名前<span class="req">必須</span></label>
+            <input type="text" id="inName" placeholder="例）長野 太郎">
+          </div>
+          <div class="fRow">
+            <label>ご所属<span class="opt2">任意</span></label>
+            <input type="text" id="inOrg" placeholder="例）◯◯FC／◯◯株式会社（チーム・会社・学校など）">
+          </div>
+          <div class="fRow">
+            <label>メールアドレス<span class="req">必須</span></label>
+            <input type="email" id="inMail" placeholder="例）example@example.com">
+            <p class="hint">ご返信はこちらのアドレスに差し上げます。お電話での回答をご希望の場合は、お問い合わせ内容にその旨と番号をご記入ください。</p>
+          </div>
+          <div class="fRow">
+            <label>お問い合わせ内容<span class="req">必須</span></label>
+            <textarea id="inBody" placeholder="できるだけ具体的にご記入ください。大会に関するお問い合わせは、大会名と年代（4種・3種など）を添えていただくと回答が早くなります。"></textarea>
+          </div>
+
+          <div class="agree">
+            <p>ご記入いただいた個人情報は、お問い合わせへの回答のためにのみ使用します。くわしくは<a href="utility.html#doc" onclick="showView('vDoc');return false">プライバシーポリシー</a>をご確認ください。</p>
+            <button class="chk" id="agreeChk"><span class="box"></span>同意します</button>
+          </div>
+
+          <div class="fActs">
+            <button class="btnMain" id="toCfm" disabled>入力内容を確認する</button>
+          </div>
+        </div>
+
+        <!-- 確認 -->
+        <div id="fCfm" style="display:none">
+          <div class="cfm">
+            <dl>
+              <dt>用件の種類</dt><dd id="cKind">─</dd>
+              <dt>お名前</dt><dd id="cName">─</dd>
+              <dt>ご所属</dt><dd id="cOrg">─</dd>
+              <dt>メールアドレス</dt><dd id="cMail">─</dd>
+              <dt>お問い合わせ内容</dt><dd id="cBody" style="white-space:pre-wrap">─</dd>
+            </dl>
+          </div>
+          <div class="fActs">
+            <button class="btnBack" id="backIn">入力に戻る</button>
+            <button class="btnMain" id="toDone">この内容で送信する</button>
+          </div>
+        </div>
+
+        <!-- 完了 -->
+        <div id="fDone" style="display:none">
+          <div class="done">
+            <div class="ic"></div>
+            <h1>お問い合わせを受け付けました。</h1>
+            <p>受付番号：<span class="num en">C-2026-08-00123</span></p>
+            <p>確認のメールをお送りしています。届かない場合は、迷惑メールフォルダをご確認のうえ、事務局までお電話ください。<br>回答まで、通常 3 営業日ほどいただいています。</p>
+            <a href="index.html" class="backTop">トップページへ戻る</a>
+          </div>
+        </div>
+      </main>
+
+      <aside class="ctSide">
+        <div class="sBox">
+          <h3>お急ぎの場合</h3>
+          <p>大会当日の連絡など、お急ぎの場合はお電話ください。</p>
+          <span class="tel en">026-000-0000</span>
+          <small>平日 9:00–17:00（土日祝休み）</small>
+        </div>
+        <div class="sBox ai">
+          <h3>お問い合わせの前に</h3>
+          <p>大会日程・手続き方法・講習会の予定は、AI に聞くとすぐに見つかることがあります。</p>
+          <a href="search.html">AIに聞いて探す</a>
+        </div>
+        <div class="sBox">
+          <h3>チームの登録内容の変更</h3>
+          <p>チーム情報の変更は、このフォームではなく所属の郡市協会を通じてお手続きください。</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="note" style="margin-top:52px">
+      <b>フォーム｜用件で振り分ける</b>　現行は事務局に全問い合わせが集中し、担当への転送が発生している。<b>用件の種類を最初の必須項目</b>にして、送信先（通知先メール）を種類ごとに振り分ける。<br>
+      ・振り分け先の担当・メールアドレスは NFA 側で確定が必要<span class="todo">要確認</span><br>
+      ・「大会について」は大会名・年代の記入をプレースホルダで促す。これだけで往復が 1 回減る
+    </div>
+    <div class="note">
+      <b>フォーム｜項目は 5 つまで</b>　電話番号・住所・ふりがなは取らない。<b>回答に必要な情報だけ</b>を取ることが、送信率と個人情報管理の両方に効く。<br>
+      ・電話回答の希望は本文に書いてもらう方式。番号欄を設けると全員が埋めてしまう<br>
+      ・確認画面は挟む（協会宛の正式な連絡という性質上、誤送信の防止を優先）。ステップ表示で現在地を示す<br>
+      ・受付番号と自動返信メールで「届いた」ことを確実に伝える。回答目安（3 営業日）も明示
+    </div>
+    <div class="note">
+      <b>フォーム｜フォームに入れない問い合わせを減らす</b>　サイドに「AI に聞く」と「チーム変更は郡市協会へ」を置き、<b>フォームに来なくていい用件を事前に逃がす</b>。事務局の対応件数を減らすのはフォームの改善よりこちらが効く。
+    </div>
+  </div>
+
+  <!-- ============ 静的文書 ============ -->
+  <div class="view" id="vDoc">
+    <p class="crumb"><a href="index.html">ホーム</a> ／ プライバシーポリシー</p>
+    <div class="docCols">
+      <aside class="tocBox">
+        <div class="hd">目次</div>
+        <ol>
+          <li><a href="#">1. 基本方針</a></li>
+          <li><a href="#">2. 取得する情報</a></li>
+          <li><a href="#">3. 利用目的</a></li>
+          <li><a href="#">4. 第三者提供</a></li>
+          <li><a href="#">5. 写真・映像の取り扱い</a></li>
+          <li><a href="#">6. お問い合わせ窓口</a></li>
+        </ol>
+      </aside>
+      <main class="doc">
+        <h1>プライバシーポリシー</h1>
+        <p class="updated">制定：20XX年X月X日　／　最終改定：20XX年X月X日<span class="todo">文面は既存規程から要確認</span></p>
+
+        <h2>1. 基本方針</h2>
+        <p>一般社団法人長野県サッカー協会（以下「当協会」）は、選手・指導者・審判・保護者をはじめとする関係者の個人情報を適切に取り扱うことが、活動の基盤であると考えています。当協会は、個人情報の保護に関する法律および関連法令を遵守し、以下の方針に基づいて個人情報を取り扱います。</p>
+
+        <h2>2. 取得する情報</h2>
+        <p>当協会は、次の場合に個人情報を取得します。</p>
+        <ul>
+          <li>チーム・選手・指導者・審判の登録手続き</li>
+          <li>大会・講習会・イベントへの参加申込</li>
+          <li>ウェブサイトからのお問い合わせ</li>
+          <li>協賛・パートナーシップに関するご連絡</li>
+        </ul>
+
+        <h2>3. 利用目的</h2>
+        <p>取得した個人情報は、次の目的の範囲内で利用します。目的の範囲を超えて利用する場合は、あらためて同意をいただきます。</p>
+        <ul>
+          <li>登録・大会運営・講習会運営に必要な連絡と手続き</li>
+          <li>お問い合わせへの回答</li>
+          <li>協会活動に関するご案内</li>
+        </ul>
+
+        <h2>4. 第三者提供</h2>
+        <p>法令に基づく場合を除き、ご本人の同意なく個人情報を第三者に提供することはありません。大会運営上、主催・共催団体と情報を共有する場合は、参加申込時にその旨を明示します。</p>
+
+        <h2>5. 写真・映像の取り扱い</h2>
+        <p>当協会が主催する大会・イベントでは、記録および広報のために写真・映像を撮影し、ウェブサイトや広報物に使用することがあります。掲載を望まない場合は、お申し出により対応します。</p>
+        <div class="box">未成年の選手が写る写真・映像の掲載については、特に慎重に取り扱います。氏名と顔が同時に特定される掲載は行いません。</div>
+
+        <h2>6. お問い合わせ窓口</h2>
+        <p>個人情報の取り扱いに関するお問い合わせ、開示・訂正・削除のご請求は、当協会事務局までご連絡ください。</p>
+      </main>
+    </div>
+
+    <div class="note" style="margin-top:52px">
+      <b>静的文書｜このテンプレートが使い回される範囲</b>　プライバシーポリシー／サイトポリシー／規程・要項類。左に目次、右に本文の 2 カラム固定。<br>
+      ・目次は h2 から自動生成する（CMS 実装時）。手動更新にしない<br>
+      ・制定日・最終改定日を必ず先頭に置く。規程類は「いつ時点のものか」が本文と同じ重さを持つ<br>
+      ・文面は既存の規程からの転記が前提。ワイヤーの文章はレイアウト確認用のダミー
+    </div>
+    <div class="note">
+      <b>静的文書｜写真掲載の項は要検討</b>　未成年選手の写真の扱いは、サイトリニューアルで<b>掲載画像が増えることに伴って重要度が上がる</b>。現行規程に該当項がなければ、公開までに文面の整備を推奨。ウェルフェアオフィサーの担当領域とも関わるため、担当委員会の確認を挟みたい<span class="todo">要確認</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+
+/* ビュー切り替え */
+document.querySelectorAll('.vSwitch button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.vSwitch button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+    $('#'+b.dataset.v).classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+});
+
+/* フォーム：同意チェックと遷移 */
+let agreed=false;
+$('#agreeChk').onclick=function(){
+  agreed=!agreed;
+  this.classList.toggle('on',agreed);
+  validate();
+};
+['inKind','inName','inMail','inBody'].forEach(id=>{
+  $('#'+id).addEventListener('input',validate);
+  $('#'+id).addEventListener('change',validate);
+});
+function validate(){
+  const ok=agreed && $('#inKind').value && $('#inName').value.trim() && $('#inMail').value.trim() && $('#inBody').value.trim();
+  $('#toCfm').disabled=!ok;
+}
+$('#toCfm').onclick=()=>{
+  $('#cKind').textContent=$('#inKind').value;
+  $('#cName').textContent=$('#inName').value;
+  $('#cOrg').textContent=$('#inOrg').value||'（未記入）';
+  $('#cMail').textContent=$('#inMail').value;
+  $('#cBody').textContent=$('#inBody').value;
+  $('#fInput').style.display='none';
+  $('#fCfm').style.display='block';
+  $('#st1').classList.remove('on');$('#st2').classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+$('#backIn').onclick=()=>{
+  $('#fCfm').style.display='none';
+  $('#fInput').style.display='block';
+  $('#st2').classList.remove('on');$('#st1').classList.add('on');
+};
+$('#toDone').onclick=()=>{
+  $('#fCfm').style.display='none';
+  $('#fDone').style.display='block';
+  $('#st2').classList.remove('on');$('#st3').classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+$('#tg').onclick=()=>document.body.classList.toggle('noNotes');
+
+/* ハッシュで表示面を切り替え（#form / #doc / #404） */
+function showView(id){
+  document.querySelectorAll('.vSwitch button').forEach(x=>x.classList.toggle('on',x.dataset.v===id));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));
+  window.scrollTo({top:0});
+}
+(function(){
+  var h=location.hash;
+  if(h==='#form') showView('vForm');
+  else if(h==='#doc') showView('vDoc');
+})();
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

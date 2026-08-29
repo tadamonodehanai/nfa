@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜情報を探す（AI） ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA; --paper:#FFFFFF;
+  --wire:#C33; --maxw:1360px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Noto Sans JP",sans-serif;color:var(--ink);
+  background:var(--pale2);line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input{font:inherit}
+
+/* ---- ワイヤー注記 ---- */
+.noteBar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  background:var(--navy);color:#fff;display:flex;align-items:center;
+  gap:20px;padding:0 24px;height:44px;font-size:12px;
+}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{
+  border-left:2px solid var(--wire);background:#FFF6F6;
+  padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px;
+}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{
+  position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;
+  font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px;
+}
+body.noNotes .blockTag{display:none}
+
+/* ---- ヘッダー ---- */
+.gnav{position:sticky;top:44px;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.gnav .inner{max-width:var(--maxw);margin:0 auto;padding:0 40px;height:76px;display:flex;align-items:center;gap:36px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:38px;height:38px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-family:"Barlow";font-weight:600}
+.logo .txt{font-size:14px;font-weight:500;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover,.gnav nav a.on{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{background:var(--cyan);color:#fff;font-size:13px;font-weight:500;padding:12px 22px;transition:background .2s}
+.gnav .act:hover{background:#0079A8}
+
+/* ---- ページ見出し ---- */
+.pHead{background:var(--navy);color:#fff;padding:56px 0 60px;position:relative}
+.pHead .in{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+.pHead .crumb{font-size:12px;color:#8A93AD;margin-bottom:22px}
+.pHead .crumb a:hover{color:#fff}
+.pHead h1{font-size:30px;font-weight:700;line-height:1.5;margin-bottom:12px}
+.pHead p{font-size:14px;color:#AAB3D2;line-height:2}
+
+/* ---- 本体レイアウト ---- */
+.stage{max-width:var(--maxw);margin:0 auto;padding:0 40px 90px;position:relative}
+.cols{display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:start;margin-top:-26px}
+body.sideOff .cols{grid-template-columns:0px 1fr;gap:0}
+body.sideOff .side{display:none}
+
+/* ---- サイドバー ---- */
+.side{background:#fff;border:1px solid var(--line);position:sticky;top:136px}
+.sideHd{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.sideHd h2{font-size:14px;font-weight:500;letter-spacing:.04em}
+.sideHd button{font-size:11.5px;color:var(--muted)}
+.sideHd button:hover{color:var(--blue)}
+.facet{border-bottom:1px solid var(--line);padding:22px 24px 24px}
+.facet:last-child{border-bottom:none}
+.facet h3{
+  font-size:11.5px;font-weight:500;letter-spacing:.12em;color:var(--cyan);
+  margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;
+}
+.facet .axis{font-size:11px;color:var(--muted);letter-spacing:0;margin-bottom:16px;display:block}
+.facet .opts{display:flex;flex-wrap:wrap;gap:10px}
+.opt{
+  border:1px solid var(--line);background:var(--pale2);color:var(--ink);
+  font-size:12.5px;padding:9px 15px;border-radius:999px;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.opt:hover{border-color:var(--blue);background:#fff}
+.opt.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.opt.dead{opacity:.32;cursor:default;pointer-events:none}
+.opt .n{font-family:"Barlow";font-size:11px;color:var(--muted);margin-left:7px}
+.opt.on .n{color:rgba(255,255,255,.72)}
+
+/* ---- 会話エリア ---- */
+.thread{min-height:60vh}
+.condBar{
+  background:#fff;border:1px solid var(--line);padding:18px 22px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:24px;
+}
+.condBar .lb{font-size:12px;color:var(--muted);white-space:nowrap}
+.chip{
+  display:inline-flex;align-items:center;gap:9px;background:var(--pale);
+  border:1px solid #C3CDEA;color:var(--blue);font-size:12.5px;padding:8px 12px 8px 15px;
+  border-radius:999px;
+}
+.chip button{color:var(--blue);font-size:14px;line-height:1;opacity:.6;padding:0 2px}
+.chip button:hover{opacity:1}
+.condBar .hits{margin-left:auto;font-size:13px;color:var(--ink2);white-space:nowrap}
+.condBar .hits b{font-family:"Barlow";font-size:19px;font-weight:600;color:var(--blue);margin:0 3px}
+.condBar .sideTg{font-size:12px;color:var(--muted);border-left:1px solid var(--line);padding-left:14px}
+.condBar .sideTg:hover{color:var(--blue)}
+
+.turn{margin-bottom:34px}
+.bubble{
+  background:#fff;border:1px solid var(--line);
+  padding:16px 24px;font-size:14.5px;max-width:72%;
+  margin-left:auto;border-radius:2px;
+}
+.ai{display:flex;gap:16px;align-items:flex-start;margin-top:26px}
+.ai .av{
+  width:34px;height:34px;background:var(--navy);color:#fff;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Barlow";font-size:10px;font-weight:600;letter-spacing:.04em;
+}
+.ai .say{font-size:14.5px;line-height:2;padding-top:4px}
+.ai .say b{font-weight:500;color:var(--blue)}
+
+/* 結果カード */
+.results{margin:22px 0 0 50px;display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
+.res{background:#fff;padding:22px 26px;display:grid;grid-template-columns:104px 1fr auto;gap:22px;align-items:center;transition:background .18s}
+.res:hover{background:var(--pale2)}
+.res .date{font-family:"Barlow";font-size:13px;color:var(--muted)}
+.res .ttl{font-size:14.5px;line-height:1.8}
+.res .meta{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.res .meta span{font-size:11px;color:var(--ink2);background:var(--pale2);border:1px solid var(--line);padding:3px 9px}
+.res .go{font-size:12px;color:var(--blue);white-space:nowrap}
+.resMore{margin:18px 0 0 50px}
+.resMore a{display:inline-block;border:1px solid var(--blue);color:var(--blue);font-size:13px;padding:13px 34px;transition:background .2s,color .2s}
+.resMore a:hover{background:var(--blue);color:#fff}
+
+/* 次の一手 */
+.nextUp{margin:26px 0 0 50px;padding:22px 24px;background:#fff;border:1px solid var(--line)}
+.nextUp .lb{font-size:12px;color:var(--muted);margin-bottom:16px}
+.nextUp .opts{display:flex;flex-wrap:wrap;gap:11px}
+
+/* 0件レスキュー */
+.rescue{margin:22px 0 0 50px;padding:26px 28px;background:#FFF9F0;border:1px solid #E8D5B0}
+.rescue p{font-size:14px;color:#7A5A1E;line-height:2;margin-bottom:18px}
+.rescue .opts{display:flex;flex-wrap:wrap;gap:11px}
+.rescue .opt{background:#fff;border-color:#E8D5B0}
+
+/* エントリー状態 */
+.entry{padding:74px 0 30px;text-align:center;max-width:760px;margin:0 auto}
+.entry h2{font-size:26px;font-weight:700;line-height:1.6;margin-bottom:16px}
+.entry p{font-size:14px;color:var(--ink2);margin-bottom:44px;line-height:2}
+.entry .exs{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px}
+.ex{border:1px solid var(--line);background:#fff;font-size:13px;padding:12px 20px;color:var(--ink2);transition:border-color .2s,color .2s}
+.ex:hover{border-color:var(--blue);color:var(--blue)}
+
+/* 入力欄（下部固定） */
+.dock{
+  position:sticky;bottom:0;z-index:60;background:var(--pale2);
+  padding:22px 0 26px;margin-top:10px;
+}
+.dockIn{background:#fff;border:1px solid var(--line);padding:10px 10px 10px 26px;display:flex;align-items:center;gap:16px}
+.dockIn input{flex:1;border:none;outline:none;font-size:15.5px;padding:15px 0;background:transparent}
+.dockIn input::placeholder{color:var(--muted)}
+.dockIn .send{background:var(--cyan);color:#fff;padding:16px 32px;font-size:14px;font-weight:500;transition:background .2s}
+.dockIn .send:hover{background:#0079A8}
+.dockNote{font-size:11.5px;color:var(--muted);margin-top:12px;text-align:center}
+
+.hide{display:none}
+
+@media(max-width:1000px){
+  .cols{grid-template-columns:1fr}
+  .side{position:static}
+  .bubble{max-width:100%}
+  .results,.nextUp,.resMore,.rescue{margin-left:0}
+  .gnav nav{display:none}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .side .facet{display:none}
+  .side.open .facet{display:block}
+  .sideHd{cursor:pointer}
+  .sideHd h2::after{content:"　開く ▼";font-size:10.5px;color:var(--muted);font-weight:400}
+  .side.open .sideHd h2::after{content:"　閉じる ▲"}
+}
+
+@media(max-width:640px){
+  .pHead{padding:38px 0 42px}
+  .pHead .in,.stage{padding-left:22px;padding-right:22px}
+  .pHead h1{font-size:23px}
+  .cols{margin-top:18px}
+  .condBar{padding:13px 15px;gap:10px}
+  .condBar .hits{font-size:12px}
+  .condBar .hits b{font-size:16px}
+  .condBar .sideTg{display:none}
+  .entry{padding:36px 0 8px}
+  .entry h2{font-size:20px}
+  .entry .exs{gap:9px}
+  .ex{font-size:12px;padding:10px 14px}
+  .res{grid-template-columns:1fr;gap:8px;padding:16px 18px}
+  .res .go{display:none}
+  .nextUp{padding:16px 18px}
+  .dock{padding:14px 0 16px}
+  .dockIn{padding:6px 6px 6px 16px}
+  .dockIn input{font-size:14px;padding:12px 0}
+  .dockIn .send{padding:13px 20px;font-size:13px}
+  .dockNote{display:none}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span>NFA ウェブサイト｜D. 情報を探す（AI） ワイヤー v1</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo"><span class="mark en">NFA</span><span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span></a>
+    <nav>
+      <a href="about.html">NFAについて</a><a href="start.html">はじめる・つづける</a><a href="grow.html">強くなる・関わる</a><a href="partner.html">ともに創る</a><a href="search.html" class="on">情報を探す</a>
+    </nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="pHead">
+  <span class="blockTag">D ─ AI SEARCH</span>
+  <div class="in">
+    <p class="crumb"><a href="index.html">ホーム</a> ／ 情報を探す</p>
+    <h1>情報を探す</h1>
+    <p>知りたいことを言葉のまま入力するか、条件を選んでください。どの委員会の担当かを考える必要はありません。</p>
+  </div>
+</section>
+
+<div class="stage">
+  <div class="cols">
+
+    <!-- ===== サイドバー ===== -->
+    <aside class="side">
+      <div class="sideHd">
+        <h2>条件から絞り込む</h2>
+        <button id="clr">すべて解除</button>
+      </div>
+      <div id="facets"></div>
+    </aside>
+
+    <!-- ===== 会話 ===== -->
+    <main>
+      <div class="condBar hide" id="condBar">
+        <span class="lb">いまの条件</span>
+        <span id="chips"></span>
+        <span class="hits">該当 <b id="hitN">0</b> 件</span>
+        <button class="sideTg" id="sideTg">条件パネルを隠す</button>
+      </div>
+
+      <div class="thread" id="thread">
+        <div class="entry" id="entry">
+          <h2>何を知りたいですか？</h2>
+          <p>例えばこんな聞き方ができます。</p>
+          <div class="exs">
+            <button class="ex" data-q="小学生の大会っていつ？">小学生の大会っていつ？</button>
+            <button class="ex" data-q="審判の資格更新はどうすれば？">審判の資格更新はどうすれば？</button>
+            <button class="ex" data-q="女子のチームに入りたい">女子のチームに入りたい</button>
+            <button class="ex" data-q="指導者の講習会を探しています">指導者の講習会を探しています</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dock">
+        <div class="dockIn">
+          <input type="text" id="q" placeholder="知りたいことを入力してください">
+          <button class="send" id="send">探す</button>
+        </div>
+        <p class="dockNote">入力内容から条件を読み取ります。条件は左のパネルからも足せます。</p>
+      </div>
+    </main>
+  </div>
+
+  <div class="note" style="margin-top:30px">
+    <b>D｜画面の考え方</b>　左＝<b>条件（構造）</b>、右＝<b>会話（経過）</b>の二分割。会話だけだと今の条件が見えず、絞り込みだけだと何を探していたか見失うため、両方を常に画面に置く。<br>
+    ・入力欄は下部固定。TOP から遷移してきた場合は、入力済みの状態でこの画面に着地する<br>
+    ・条件が 0 のときはエントリー状態（中央・例示つき）、条件が入ると会話状態へ切り替わる
+  </div>
+  <div class="note">
+    <b>D｜絞り込みのロジック</b>　条件は <b>AND で累積</b>。足すほど件数は減り、増えることはない。スコア加算方式にすると「条件を足したのに結果が増える」という体験になり、絞っている感覚が壊れる。<br>
+    ・自然文からは<b>意図を 1 つだけ</b>抽出する。複数取ると矛盾する条件が同時に立つ<br>
+    ・0 件になった条件は、パネル上で薄く表示して押せなくする（押してから 0 件を見せない）<br>
+    ・0 件に至った場合は、直前の条件を外す提案を出す（レスキュー）
+  </div>
+  <div class="note">
+    <b>D｜軸の分離</b>　現行 45 カテゴリで混ざっていた軸を、<b>対象／目的／地域の 3 つ</b>に整理した。利用者に軸を意識させるのが目的ではなく、<b>同じ軸の中でしか迷わせない</b>ための構造。<br>
+    ・審判・指導者は「立場」ではなく<b>対象</b>に含める。1 記事に複数の立場が絡むため、立場を独立軸にすると記事側で付与しきれない<br>
+    ・担当部署は公開側に出さない（CMS 内部の管理項目として保持）<br>
+    ・「重要」「注意喚起」「トップ掲載」は表示フラグであり、この軸には出さない
+  </div>
+</div>
+
+<script>
+/* ============ データ（実装時は data.js / API に置換） ============ */
+const AXES = [
+  { key:'target', name:'対象', axis:'誰に向けた情報か', opts:[
+    '小学生（4種）','中学生（3種）','高校生（2種）','大人・社会人（1種）','女子','シニア','フットサル','障がい者サッカー','審判','指導者'] },
+  { key:'purpose', name:'目的', axis:'何をしたいか', opts:['大会日程を知る','試合結果を見る','登録・手続き','講習会に参加','お知らせを読む'] },
+  { key:'area', name:'地域', axis:'どの地区か', opts:['北信','東信','中信','南信','県全域'] }
+];
+
+const DATA = [
+  {d:'2026.08.26',t:'第◯回 長野県ユース（U-15）サッカー選手権大会 組み合わせ決定のお知らせ',target:'中学生（3種）',purpose:'大会日程を知る',area:'県全域'},
+  {d:'2026.08.24',t:'長野県中学校総合体育大会 サッカー競技 最終結果',target:'中学生（3種）',purpose:'試合結果を見る',area:'県全域'},
+  {d:'2026.08.21',t:'2026年度 チーム登録の受付期間および手続き方法について',target:'小学生（4種）',purpose:'登録・手続き',area:'県全域'},
+  {d:'2026.08.19',t:'JFA公認 D級コーチ養成講習会（北信会場）受講者募集',target:'指導者',purpose:'講習会に参加',area:'北信'},
+  {d:'2026.08.15',t:'なでしこひろば 秋季開催のご案内 ─ 参加者を募集しています',target:'女子',purpose:'お知らせを読む',area:'中信'},
+  {d:'2026.08.12',t:'第◯回 長野県少年サッカー大会（4種）日程および会場のご案内',target:'小学生（4種）',purpose:'大会日程を知る',area:'県全域'},
+  {d:'2026.08.08',t:'4級審判員 新規取得講習会（南信会場）の開催について',target:'審判',purpose:'講習会に参加',area:'南信'},
+  {d:'2026.08.05',t:'審判員登録の更新手続きについて（2026年度）',target:'審判',purpose:'登録・手続き',area:'県全域'},
+  {d:'2026.08.01',t:'長野県高等学校総合体育大会 サッカー競技 結果報告',target:'高校生（2種）',purpose:'試合結果を見る',area:'県全域'},
+  {d:'2026.07.28',t:'シニアリーグ（O-40）後期日程のお知らせ',target:'シニア',purpose:'大会日程を知る',area:'東信'},
+  {d:'2026.07.25',t:'長野県女子サッカーリーグ 第◯節 結果',target:'女子',purpose:'試合結果を見る',area:'県全域'},
+  {d:'2026.07.22',t:'キッズサッカーフェスティバル（中信）開催のご案内',target:'小学生（4種）',purpose:'お知らせを読む',area:'中信'},
+  {d:'2026.07.18',t:'フットサル選手権大会 県予選 エントリー受付開始',target:'フットサル',purpose:'登録・手続き',area:'県全域'},
+  {d:'2026.07.14',t:'障がい者サッカー交流会 参加チーム募集について',target:'障がい者サッカー',purpose:'お知らせを読む',area:'県全域'},
+  {d:'2026.07.10',t:'U-12 トレセン選考会 実施要項および参加方法',target:'小学生（4種）',purpose:'お知らせを読む',area:'県全域'},
+  {d:'2026.07.06',t:'中学生年代 リーグ戦（3種）前期 順位表を更新しました',target:'中学生（3種）',purpose:'試合結果を見る',area:'県全域'},
+  {d:'2026.07.02',t:'指導者ライセンス リフレッシュ研修会（東信）のご案内',target:'指導者',purpose:'講習会に参加',area:'東信'},
+  {d:'2026.06.28',t:'小学生年代 大会参加チームの登録変更について',target:'小学生（4種）',purpose:'登録・手続き',area:'県全域'}
+];
+
+/* 自然文 → 意図を1つだけ抽出 */
+const LEX = [
+  [/小学|4種|少年|低学年|高学年|キッズ/, 'target', '小学生（4種）'],
+  [/中学|3種|ジュニアユース/,            'target', '中学生（3種）'],
+  [/高校|2種|ユース/,                    'target', '高校生（2種）'],
+  [/社会人|1種|大人|シニア以外/,          'target', '大人・社会人（1種）'],
+  [/女子|なでしこ|girls/i,               'target', '女子'],
+  [/シニア|O-40|オーバー/,               'target', 'シニア'],
+  [/フットサル/,                         'target', 'フットサル'],
+  [/障がい|障害/,                        'target', '障がい者サッカー'],
+  [/審判|レフェリー/,                    'target', '審判'],
+  [/指導者|コーチ|監督/,                 'target', '指導者'],
+  [/大会|日程|いつ|開催|試合予定/,        'purpose','大会日程を知る'],
+  [/結果|順位|スコア|勝敗/,              'purpose','試合結果を見る'],
+  [/登録|手続き|申込|エントリー|更新/,    'purpose','登録・手続き'],
+  [/講習|研修|ライセンス|資格|養成/,      'purpose','講習会に参加'],
+  [/北信/, 'area','北信'], [/東信/, 'area','東信'], [/中信/, 'area','中信'], [/南信/, 'area','南信']
+];
+
+/* 条件 → 自然な言い回し */
+function utterance(axis, val){
+  const m = {
+    target:{ '小学生（4種）':'小学生（4種）のこと', '中学生（3種）':'中学生（3種）のこと',
+      '高校生（2種）':'高校生（2種）のこと', '大人・社会人（1種）':'大人・社会人のこと',
+      '女子':'女子サッカーのこと', 'シニア':'シニア世代のこと', 'フットサル':'フットサルのこと',
+      '障がい者サッカー':'障がい者サッカーのこと', '審判':'審判のこと', '指導者':'指導者のこと' },
+    purpose:{ '大会日程を知る':'大会の日程が知りたい', '試合結果を見る':'試合の結果が見たい',
+      '登録・手続き':'登録や手続きについて', '講習会に参加':'講習会に参加したい',
+      'お知らせを読む':'お知らせが読みたい' },
+    area:{ '北信':'北信エリアで', '東信':'東信エリアで', '中信':'中信エリアで',
+      '南信':'南信エリアで', '県全域':'県全域で' }
+  };
+  return (m[axis] && m[axis][val]) || val;
+}
+
+/* ============ 状態 ============ */
+let cond = {};   // {axisKey: value}
+const $ = s => document.querySelector(s);
+const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!==undefined)e.innerHTML=h; return e; };
+
+function match(item, c){ return Object.keys(c).every(k => item[k] === c[k]); }
+function hits(c){ return DATA.filter(i => match(i,c)); }
+
+/* ---- サイドバー描画 ---- */
+function drawFacets(){
+  const box = $('#facets'); box.innerHTML='';
+  AXES.forEach(ax => {
+    const f = el('div','facet');
+    f.appendChild(el('h3',null, ax.name));
+    f.appendChild(el('span','axis','軸：'+ax.axis));
+    const o = el('div','opts');
+    ax.opts.forEach(v => {
+      const test = Object.assign({}, cond); test[ax.key]=v;
+      const n = hits(test).length;
+      const b = el('button','opt' + (cond[ax.key]===v?' on':'') + (n===0 && cond[ax.key]!==v ?' dead':''),
+        v + '<span class="n en">'+n+'</span>');
+      b.onclick = () => { cond[ax.key]===v ? removeCond(ax.key) : addCond(ax.key, v, true); };
+      o.appendChild(b);
+    });
+    f.appendChild(o); box.appendChild(f);
+  });
+}
+
+/* ---- 条件バー ---- */
+function drawCond(){
+  const has = Object.keys(cond).length>0;
+  $('#condBar').classList.toggle('hide', !has);
+  $('#entry').classList.toggle('hide', has);
+  const c = $('#chips'); c.innerHTML='';
+  AXES.forEach(ax => {
+    if(!cond[ax.key]) return;
+    const chip = el('span','chip', cond[ax.key]+'<button aria-label="解除">×</button>');
+    chip.querySelector('button').onclick = () => removeCond(ax.key);
+    c.appendChild(chip);
+  });
+  $('#hitN').textContent = hits(cond).length;
+}
+
+/* ---- 会話ターン追加 ---- */
+function addTurn(userText, opt){
+  const t = el('div','turn');
+  if(userText) t.appendChild(el('div','bubble', userText));
+
+  const list = hits(cond);
+  const ai = el('div','ai');
+  ai.appendChild(el('div','av en','AI'));
+  const say = el('div','say');
+
+  if(list.length === 0){
+    say.innerHTML = '申し訳ありません。その条件に当てはまる情報は見つかりませんでした。';
+    ai.appendChild(say); t.appendChild(ai);
+    const r = el('div','rescue');
+    r.appendChild(el('p',null,'ひとつ条件を外すと、見つかるかもしれません。'));
+    const o = el('div','opts');
+    Object.keys(cond).forEach(k => {
+      const ax = AXES.find(a=>a.key===k);
+      const b = el('button','opt','「'+cond[k]+'」を外す');
+      b.onclick = () => removeCond(k);
+      o.appendChild(b);
+    });
+    r.appendChild(o); t.appendChild(r);
+  } else {
+    const words = AXES.filter(a=>cond[a.key]).map(a=>utterance(a.key, cond[a.key]));
+    say.innerHTML = words.join('、') + 'ですね。<b>'+list.length+'件</b>の情報があります。';
+    ai.appendChild(say); t.appendChild(ai);
+
+    const rs = el('div','results');
+    list.slice(0,5).forEach(i => {
+      const r = el('a','res');
+      r.href='detail.html';
+      r.innerHTML = '<span class="date en">'+i.d+'</span>'
+        + '<span><span class="ttl">'+i.t+'</span><span class="meta">'
+        + '<span>'+i.target+'</span><span>'+i.purpose+'</span><span>'+i.area+'</span>'
+        + '</span></span><span class="go">詳細 →</span>';
+      rs.appendChild(r);
+    });
+    t.appendChild(rs);
+    if(list.length>5){
+      const m = el('div','resMore','<a href="list.html">この条件の'+list.length+'件をすべて見る</a>');
+      t.appendChild(m);
+    }
+
+    // 次に絞れる軸を1つだけ提案
+    const nextAx = AXES.find(a => !cond[a.key] && new Set(list.map(i=>i[a.key])).size > 1);
+    if(nextAx){
+      const nu = el('div','nextUp');
+      nu.appendChild(el('p','lb','さらに絞り込むなら（'+nextAx.name+'）'));
+      const o = el('div','opts');
+      [...new Set(list.map(i=>i[nextAx.key]))].forEach(v => {
+        const b = el('button','opt', v+'<span class="n en">'+list.filter(i=>i[nextAx.key]===v).length+'</span>');
+        b.onclick = () => addCond(nextAx.key, v, true);
+        o.appendChild(b);
+      });
+      nu.appendChild(o); nu.appendChild(el('div',null,''));
+      t.appendChild(nu);
+    }
+  }
+  $('#thread').appendChild(t);
+  t.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function addCond(k, v, speak){
+  cond[k]=v;
+  drawFacets(); drawCond();
+  addTurn(speak ? utterance(k,v) : null);
+}
+function removeCond(k){
+  const was = cond[k]; delete cond[k];
+  drawFacets(); drawCond();
+  addTurn('「'+was+'」は外してください');
+}
+
+/* ---- 自然文入力 ---- */
+function ask(text){
+  if(!text.trim()) return;
+  let found = null;
+  for(const [re, axis, val] of LEX){          // 意図は1つだけ拾う
+    if(re.test(text)){ found = [axis, val]; break; }
+  }
+  if(found){
+    cond[found[0]] = found[1];
+    drawFacets(); drawCond(); addTurn(text);
+  } else {
+    cond = Object.assign({}, cond);
+    drawFacets(); drawCond();
+    const t = el('div','turn');
+    t.appendChild(el('div','bubble', text));
+    const ai = el('div','ai');
+    ai.appendChild(el('div','av en','AI'));
+    ai.appendChild(el('div','say','うまく読み取れませんでした。下の条件から選んでいただけますか。'));
+    t.appendChild(ai);
+    const nu = el('div','nextUp');
+    nu.appendChild(el('p','lb','よく選ばれている条件'));
+    const o = el('div','opts');
+    ['小学生（4種）','中学生（3種）','女子','審判','指導者'].forEach(v=>{ // すべて対象軸
+      const ax = AXES.find(a=>a.opts.includes(v));
+      const b = el('button','opt', v);
+      b.onclick = () => addCond(ax.key, v, true);
+      o.appendChild(b);
+    });
+    nu.appendChild(o); t.appendChild(nu);
+    $('#thread').appendChild(t);
+    t.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  $('#q').value='';
+}
+
+/* ---- イベント ---- */
+$('#send').onclick = () => ask($('#q').value);
+$('#q').addEventListener('keydown', e => { if(e.key==='Enter') ask($('#q').value); });
+document.querySelectorAll('.ex').forEach(b => b.onclick = () => ask(b.dataset.q));
+$('#clr').onclick = () => { cond={}; drawFacets(); drawCond(); $('#thread').innerHTML=''; location.reload(); };
+$('#sideTg').onclick = function(){
+  document.body.classList.toggle('sideOff');
+  this.textContent = document.body.classList.contains('sideOff') ? '条件パネルを表示' : '条件パネルを隠す';
+};
+$('#tg').onclick = () => document.body.classList.toggle('noNotes');
+
+drawFacets(); drawCond();
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>

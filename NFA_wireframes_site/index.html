@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA ウェブサイト｜TOPページ ワイヤー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E;
+  --blue:#1D2A8C;
+  --cyan:#0090C8;
+  --ink:#1B2340;
+  --ink2:#46507A;
+  --muted:#8A93AD;
+  --line:#DCE1F0;
+  --pale:#E6EAF6;
+  --pale2:#F3F5FA;
+  --paper:#FFFFFF;
+  --wire:#C33;
+  --maxw:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Noto Sans JP",sans-serif;
+  font-weight:400;
+  color:var(--ink);
+  background:var(--paper);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+
+/* ---------- ワイヤー注記 ---------- */
+.noteBar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--navy);color:#fff;
+  display:flex;align-items:center;gap:20px;
+  padding:0 24px;height:44px;font-size:12px;
+}
+.noteBar .ttl{font-weight:500;letter-spacing:.04em}
+.noteBar .sp{flex:1}
+.toggle{
+  display:flex;align-items:center;gap:8px;
+  border:1px solid rgba(255,255,255,.35);
+  padding:5px 14px;border-radius:2px;font-size:12px;
+  transition:background .2s;
+}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+
+.note{
+  position:relative;
+  border-left:2px solid var(--wire);
+  background:#FFF6F6;
+  padding:14px 18px;
+  font-size:12px;line-height:1.85;color:#8A2A2A;
+  margin:0 0 8px;
+}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+
+.blockTag{
+  position:absolute;top:0;left:0;z-index:20;
+  background:var(--wire);color:#fff;
+  font-family:"Barlow",sans-serif;font-weight:600;
+  font-size:12px;letter-spacing:.1em;
+  padding:5px 12px;
+}
+body.noNotes .blockTag{display:none}
+section{position:relative}
+
+/* 画像プレースホルダ */
+.ph{
+  position:relative;
+  background:
+    repeating-linear-gradient(45deg,
+      var(--pale2) 0 10px,
+      var(--pale) 10px 20px);
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+}
+.ph span{
+  font-size:12px;color:var(--ink2);letter-spacing:.06em;
+  background:rgba(255,255,255,.92);
+  padding:8px 16px;line-height:1.8;
+}
+.ph.onDark{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(255,255,255,.05) 0 10px,
+      rgba(255,255,255,.11) 10px 20px);
+  border-color:rgba(255,255,255,.22);
+}
+.ph.onDark span{background:rgba(20,28,94,.85);color:#C8CFEA}
+
+/* ---------- ヘッダー ---------- */
+.gnav{
+  position:sticky;top:44px;z-index:100;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.gnav .inner{
+  max-width:var(--maxw);margin:0 auto;padding:0 40px;
+  height:76px;display:flex;align-items:center;gap:36px;
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{
+  width:38px;height:38px;background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:10px;font-family:"Barlow";font-weight:600;
+}
+.logo .txt{font-size:14px;font-weight:500;letter-spacing:.02em;line-height:1.4}
+.logo .txt small{display:block;font-size:10px;color:var(--muted);letter-spacing:.14em}
+.gnav nav{display:flex;gap:30px;font-size:14px;margin-left:auto}
+.gnav nav a{padding:6px 0;border-bottom:2px solid transparent;transition:border-color .2s,color .2s}
+.gnav nav a:hover{border-color:var(--cyan);color:var(--blue)}
+.gnav .act{
+  background:var(--cyan);color:#fff;font-size:13px;font-weight:500;
+  padding:12px 22px;letter-spacing:.02em;transition:background .2s;
+}
+.gnav .act:hover{background:#0079A8}
+
+/* ---------- A. ファーストビュー ---------- */
+.fv{
+  background:var(--navy);color:#fff;
+  padding:0 0 96px;
+  overflow:hidden;
+}
+.fv .visual{
+  position:relative;
+  height:520px;
+  margin-bottom:-140px;
+}
+.fv .visual .ph{position:absolute;inset:0;border:none;border-bottom:1px solid rgba(255,255,255,.18)}
+.fv .visual::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(20,28,94,.35) 0%,rgba(20,28,94,.15) 45%,rgba(20,28,94,.98) 100%);
+}
+.fv .copy{position:relative;z-index:3}
+.fv .kicker{
+  font-family:"Barlow";font-size:14px;font-weight:600;
+  letter-spacing:.3em;color:var(--cyan);margin-bottom:22px;
+}
+.fv h1{
+  font-size:52px;font-weight:700;line-height:1.5;letter-spacing:.01em;
+  margin-bottom:26px;
+}
+.fv h1 em{font-style:normal;color:var(--cyan)}
+.fv .lead{
+  font-size:16px;color:#B9C2DE;line-height:2.1;max-width:640px;
+  margin-bottom:44px;
+}
+.fv .fvActs{display:flex;gap:16px;flex-wrap:wrap}
+.btnMain{
+  background:var(--cyan);color:#fff;font-size:15px;font-weight:500;
+  padding:19px 40px;letter-spacing:.02em;
+  display:inline-flex;align-items:center;gap:12px;transition:background .2s;
+}
+.btnMain:hover{background:#0079A8}
+.btnGhost{
+  border:1px solid rgba(255,255,255,.45);color:#fff;font-size:15px;
+  padding:18px 36px;display:inline-flex;align-items:center;gap:12px;
+  transition:background .2s,border-color .2s;
+}
+.btnGhost:hover{background:rgba(255,255,255,.1);border-color:#fff}
+
+/* ---------- B. コンセプト ---------- */
+.concept{padding:130px 0 140px;background:var(--paper)}
+.secHead{margin-bottom:66px}
+.secHead .no{
+  font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;
+  color:var(--cyan);display:block;margin-bottom:16px;
+}
+.secHead h2{font-size:34px;font-weight:700;line-height:1.55;letter-spacing:.01em}
+.secHead p{font-size:15px;color:var(--ink2);margin-top:18px;line-height:2.05;max-width:660px}
+
+.cycle{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.cycle .cell{
+  background:#fff;padding:44px 34px 48px;position:relative;
+  transition:background .25s;
+}
+.cycle .cell:hover{background:var(--pale2)}
+.cycle .cell .idx{
+  font-family:"Barlow";font-size:12px;font-weight:600;
+  letter-spacing:.2em;color:var(--muted);margin-bottom:26px;
+}
+.cycle .cell h3{
+  font-size:32px;font-weight:700;color:var(--blue);
+  line-height:1.3;margin-bottom:20px;letter-spacing:.06em;
+}
+.cycle .cell p{font-size:13.5px;color:var(--ink2);line-height:2.05}
+.cycle .cell::after{
+  content:"";position:absolute;top:56px;right:-1px;width:1px;height:0;
+}
+.cycle .cell:not(:last-child) .arw{
+  position:absolute;top:50%;right:-9px;transform:translateY(-50%);
+  width:18px;height:18px;background:var(--cyan);z-index:5;
+  clip-path:polygon(0 0,100% 50%,0 100%);
+}
+.conceptFoot{
+  margin-top:56px;padding:34px 40px;background:var(--pale2);
+  display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap;
+}
+.conceptFoot p{font-size:14.5px;color:var(--ink);line-height:2}
+.linkArw{
+  font-size:14px;color:var(--blue);font-weight:500;white-space:nowrap;
+  border-bottom:1px solid var(--blue);padding-bottom:4px;
+}
+
+/* ---------- C. 3つの入口 ---------- */
+.gates{padding:130px 0 140px;background:var(--pale2)}
+.gateGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.gate{
+  background:#fff;border:1px solid var(--line);
+  display:flex;flex-direction:column;
+  transition:border-color .25s,transform .25s;
+}
+.gate:hover{border-color:var(--blue);transform:translateY(-3px)}
+.gate .ph{height:184px;border:none;border-bottom:1px solid var(--line)}
+.gate .body{padding:38px 34px 40px;flex:1;display:flex;flex-direction:column}
+.gate .cat{
+  font-size:11.5px;letter-spacing:.16em;color:var(--cyan);
+  font-weight:500;margin-bottom:16px;
+}
+.gate h3{font-size:24px;font-weight:700;line-height:1.6;margin-bottom:20px;letter-spacing:.01em}
+.gate .who{
+  font-size:13px;color:var(--ink2);line-height:2.1;
+  padding-bottom:26px;margin-bottom:26px;border-bottom:1px solid var(--line);
+}
+.gate ul{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:30px}
+.gate ul li{
+  font-size:13.5px;color:var(--ink);padding-left:20px;position:relative;line-height:1.8;
+}
+.gate ul li::before{
+  content:"";position:absolute;left:0;top:9px;
+  width:7px;height:7px;background:var(--pale);border:1px solid var(--blue);
+}
+.gate .go{
+  margin-top:auto;font-size:13.5px;font-weight:500;color:var(--blue);
+  display:flex;align-items:center;gap:10px;
+}
+.gate .go::after{
+  content:"";width:22px;height:1px;background:var(--blue);transition:width .25s;
+}
+.gate:hover .go::after{width:38px}
+
+/* ---------- D. 情報を探す（AI） ---------- */
+.search{padding:130px 0 140px;background:var(--navy);color:#fff}
+.search .secHead h2{color:#fff}
+.search .secHead p{color:#AAB3D2}
+.searchBox{
+  background:#fff;padding:14px 14px 14px 30px;
+  display:flex;align-items:center;gap:20px;margin-bottom:38px;
+}
+.searchBox input{
+  flex:1;border:none;outline:none;font-family:inherit;
+  font-size:17px;color:var(--ink);padding:16px 0;background:transparent;
+}
+.searchBox input::placeholder{color:var(--muted)}
+.searchBox .send{
+  background:var(--cyan);color:#fff;padding:18px 34px;
+  font-size:14.5px;font-weight:500;white-space:nowrap;transition:background .2s;
+}
+.searchBox .send:hover{background:#0079A8}
+.tagLead{font-size:13px;color:#AAB3D2;letter-spacing:.06em;margin-bottom:22px}
+.tags{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:56px}
+.tag{
+  border:1px solid rgba(255,255,255,.34);color:#fff;
+  padding:13px 26px;font-size:13.5px;border-radius:999px;
+  transition:background .2s,border-color .2s;
+}
+.tag:hover{background:rgba(255,255,255,.14);border-color:#fff}
+.searchFeat{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.2);
+}
+.searchFeat div{background:var(--navy);padding:34px 30px 38px}
+.searchFeat h4{
+  font-size:16px;font-weight:500;margin-bottom:14px;color:#fff;line-height:1.7;
+}
+.searchFeat p{font-size:13px;color:#AAB3D2;line-height:2}
+
+/* ---------- E. 最新のうごき ---------- */
+.news{padding:130px 0 140px}
+.newsTop{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-bottom:48px;flex-wrap:wrap}
+.newsTabs{display:flex;gap:34px;border-bottom:1px solid var(--line);margin-bottom:0}
+.newsTabs button{
+  font-size:14.5px;color:var(--muted);padding:0 2px 16px;
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;
+}
+.newsTabs button.on{color:var(--blue);border-color:var(--blue);font-weight:500}
+.newsTabs button:hover{color:var(--blue)}
+
+.alert{
+  border:1px solid var(--wire);background:#FFF6F6;
+  padding:22px 28px;display:flex;align-items:center;gap:22px;margin-bottom:38px;
+}
+.alert .lb{
+  background:var(--wire);color:#fff;font-size:11.5px;font-weight:500;
+  padding:6px 14px;white-space:nowrap;letter-spacing:.06em;
+}
+.alert p{font-size:14px;color:#8A2A2A;line-height:1.8}
+
+.newsList{border-top:1px solid var(--line)}
+.newsList a{
+  display:grid;grid-template-columns:126px 132px 1fr;
+  gap:26px;align-items:center;
+  padding:26px 8px;border-bottom:1px solid var(--line);
+  transition:background .2s;
+}
+.newsList a:hover{background:var(--pale2)}
+.newsList .date{font-family:"Barlow";font-size:14px;color:var(--muted);letter-spacing:.05em}
+.newsList .cat{
+  font-size:11.5px;color:var(--blue);border:1px solid var(--pale);
+  background:var(--pale2);text-align:center;padding:6px 8px;letter-spacing:.04em;
+}
+.newsList .ttl{font-size:15px;line-height:1.8}
+.newsMore{margin-top:44px;text-align:center}
+.newsMore a{
+  display:inline-block;border:1px solid var(--blue);color:var(--blue);
+  font-size:14px;padding:17px 56px;transition:background .2s,color .2s;
+}
+.newsMore a:hover{background:var(--blue);color:#fff}
+
+/* ---------- F. ともに創る ---------- */
+.spons{padding:130px 0 140px;background:var(--pale2)}
+.sponsIn{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+.sponsIn .ph{height:340px}
+.spons h2{font-size:34px;font-weight:700;line-height:1.55;margin-bottom:24px}
+.spons .no{
+  font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;
+  color:var(--cyan);display:block;margin-bottom:16px;
+}
+.spons .lead{font-size:15px;color:var(--ink2);line-height:2.1;margin-bottom:38px}
+.promise{list-style:none;margin-bottom:42px}
+.promise li{
+  display:flex;gap:18px;align-items:flex-start;
+  padding:17px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.85;
+}
+.promise li span{
+  font-family:"Barlow";font-size:12px;font-weight:600;color:var(--cyan);
+  padding-top:4px;letter-spacing:.08em;
+}
+.sponsActs{display:flex;gap:16px;flex-wrap:wrap}
+.btnNavy{
+  background:var(--navy);color:#fff;font-size:15px;font-weight:500;
+  padding:19px 38px;transition:background .2s;
+}
+.btnNavy:hover{background:var(--blue)}
+.btnLine{
+  border:1px solid var(--navy);color:var(--navy);font-size:15px;
+  padding:18px 34px;transition:background .2s,color .2s;
+}
+.btnLine:hover{background:var(--navy);color:#fff}
+
+/* ---------- フッター ---------- */
+footer{background:var(--navy);color:#fff;padding:88px 0 44px}
+.fCols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:50px;padding-bottom:60px;border-bottom:1px solid rgba(255,255,255,.18)}
+.fCols h5{font-size:13px;font-weight:500;color:var(--cyan);letter-spacing:.1em;margin-bottom:22px}
+.fCols ul{list-style:none;display:flex;flex-direction:column;gap:13px}
+.fCols ul a{font-size:13px;color:#AAB3D2;transition:color .2s}
+.fCols ul a:hover{color:#fff}
+.fBrand .logo .mark{background:rgba(255,255,255,.14)}
+.fBrand .logo .txt{color:#fff}
+.fBrand p{font-size:12.5px;color:#8A93AD;line-height:2;margin-top:22px}
+.fBot{padding-top:34px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.fBot p,.fBot a{font-size:11.5px;color:#8A93AD}
+.fBot .links{display:flex;gap:26px}
+
+@media(max-width:1000px){
+  .cycle,.gateGrid,.searchFeat{grid-template-columns:1fr 1fr}
+  .sponsIn{grid-template-columns:1fr;gap:44px}
+  .fCols{grid-template-columns:1fr 1fr}
+  .gnav nav{display:none}
+  .fv h1{font-size:38px}
+}
+@media(max-width:640px){
+  .wrap,.gnav .inner{padding:0 22px}
+  .cycle,.gateGrid,.searchFeat{grid-template-columns:1fr}
+  .newsList a{grid-template-columns:1fr;gap:10px}
+  .newsList .cat{justify-self:start;padding:6px 16px}
+  .fv h1{font-size:30px}
+  .secHead h2,.spons h2{font-size:26px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .fv .visual{height:280px;margin-bottom:-88px}
+  .fv{padding-bottom:64px}
+  .fv .kicker{margin-bottom:14px}
+  .fv .lead{font-size:13.5px;margin-bottom:32px}
+  .fv .fvActs{flex-direction:column}
+  .btnMain,.btnGhost{width:100%;justify-content:center;text-align:center}
+  .concept,.gates,.search,.news,.spons{padding:72px 0 78px}
+  .secHead{margin-bottom:38px}
+  .secHead h2{font-size:24px}
+  .cycle .cell{padding:32px 26px 36px}
+  .cycle .cell:not(:last-child) .arw{top:auto;bottom:-9px;right:calc(50% - 9px);transform:rotate(90deg)}
+  .conceptFoot{padding:24px 22px;flex-direction:column;align-items:flex-start}
+  .gate .ph{height:150px}
+  .searchBox{flex-direction:column;align-items:stretch;padding:12px;gap:8px}
+  .searchBox input{padding:12px 8px}
+  .searchBox .send{padding:15px}
+  .searchFeat div{padding:26px 24px 30px}
+  .newsTabs{gap:22px;overflow-x:auto}
+  .newsTabs button{white-space:nowrap}
+  .alert{flex-direction:column;align-items:flex-start;gap:12px;padding:18px 20px}
+  .sponsIn .ph{height:220px}
+  .sponsActs{flex-direction:column}
+  .btnNavy,.btnLine{width:100%;text-align:center}
+  .fCols{grid-template-columns:1fr;gap:32px;padding-bottom:44px}
+  footer{padding:64px 0 36px}
+}
+
+</style>
+</head>
+<body>
+
+<div class="noteBar">
+  <span class="ttl">NFA ウェブサイト｜TOPページ ワイヤー v1</span>
+  <span class="sp"></span>
+  <button class="toggle" id="tg"><span class="dot"></span>設計メモの表示</button>
+</div>
+
+<!-- ================= ヘッダー ================= -->
+<header class="gnav">
+  <div class="inner">
+    <a href="index.html" class="logo">
+      <span class="mark">NFA</span>
+      <span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span>
+    </a>
+    <nav>
+      <a href="about.html">NFAについて</a>
+      <a href="start.html">はじめる・つづける</a>
+      <a href="grow.html">強くなる・関わる</a>
+      <a href="partner.html">ともに創る</a>
+      <a href="search.html">情報を探す</a>
+    </nav>
+    <a href="partner.html" class="act">協賛について</a>
+    <button class="menuBtn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ================= A. ファーストビュー ================= -->
+<section class="fv">
+  <span class="blockTag">A ─ FIRST VIEW</span>
+  <div class="visual">
+    <div class="ph"><span>グラフィック／ムービー<br>長野の風景と、世代の広がり（16:9 ループ再生）</span></div>
+  </div>
+  <div class="wrap">
+    <div class="copy">
+      <p class="kicker en">LIFE + 1</p>
+      <h1>サッカーが、<br>人生に<em>ひとつ</em>を足していく。</h1>
+      <p class="lead">長野県サッカー協会は、勝つためだけの場所ではありません。夢を持ち、挑戦し、成長し、そして誰かに貢献する。その循環をこの県のすみずみに広げていくために、私たちは活動しています。</p>
+      <div class="fvActs">
+        <a href="about.html" class="btnMain">Life+1 とは<span class="en">→</span></a>
+        <a href="start.html" class="btnGhost">はじめての方へ<span class="en">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note" style="margin-top:26px">
+    <b>A｜ファーストビュー</b>　映像は「協会の紹介」ではなく<b>コンセプトの体験</b>として置く。B の4語（夢・挑戦・成長・貢献）と同じ順序でシーンを構成し、映像とスクロール後の文章が二重に同じことを言う設計。<br>
+    ・映像は音声なし自動ループ、下部にグラデーションを重ねて文字の可読性を確保<br>
+    ・キャッチは仮。決定稿はグラフィック制作と同時に詰める（PHASE 2）<br>
+    ・軽量化のため、モバイルでは静止画1枚に差し替える想定
+  </div>
+</div>
+
+<!-- ================= B. コンセプト ================= -->
+<section class="concept">
+  <span class="blockTag">B ─ CONCEPT</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">01 / CONCEPT</span>
+      <h2>夢を持ち、挑戦し、成長し、貢献する。</h2>
+      <p>NFA のビジョンに書かれている 4 つの言葉です。この循環を生み出すことが、私たちの目指すかたちそのものです。</p>
+    </div>
+
+    <div class="cycle">
+      <div class="cell">
+        <p class="idx en">01</p>
+        <h3>夢</h3>
+        <p>ボールに触れたその日から、なりたい自分が生まれる。年齢も経験も問わず、はじめられる場所をつくります。</p>
+        <span class="arw"></span>
+      </div>
+      <div class="cell">
+        <p class="idx en">02</p>
+        <h3>挑戦</h3>
+        <p>県大会、全国、その先へ。うまくいかない日も含めて、挑み続けられる環境を整えます。</p>
+        <span class="arw"></span>
+      </div>
+      <div class="cell">
+        <p class="idx en">03</p>
+        <h3>成長</h3>
+        <p>技術だけでなく、人として育つ。指導者・審判・運営に関わる人も、同じように成長していきます。</p>
+        <span class="arw"></span>
+      </div>
+      <div class="cell">
+        <p class="idx en">04</p>
+        <h3>貢献</h3>
+        <p>受け取ったものを、次の世代へ返していく。サッカーが地域に還っていく循環をつくります。</p>
+      </div>
+    </div>
+
+    <div class="conceptFoot">
+      <p>この理念は、JFA の掲げる考え方を県協会として受け継いだものです。2020 年宣言と 2030 アクションプランに、具体的な約束として書かれています。</p>
+      <a href="about.html" class="linkArw">NFA について、くわしく</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note">
+    <b>B｜コンセプト</b>　4語を<b>横一列・等幅</b>で置き、矢印で循環を示す。縦積みにすると「4つの項目」に見えて循環が伝わらないため、PC では必ず 4 カラムを維持。<br>
+    ・各セルからは詳細ページへ遷移させず、まとめて「NFA について」へ集約（入口を増やしすぎない）<br>
+    ・タブレット以下は 2×2、モバイルは縦 1 列＋下向き矢印に切り替え
+  </div>
+</div>
+
+<!-- ================= C. 3つの入口 ================= -->
+<section class="gates">
+  <span class="blockTag">C ─ GATEWAY</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">02 / FOR YOU</span>
+      <h2>あなたは、どの立場でサッカーに関わっていますか。</h2>
+      <p>中期計画の 3 本柱に沿って、入口を分けています。ご自身に近いものからお進みください。</p>
+    </div>
+
+    <div class="gateGrid">
+      <a href="grow.html" class="gate">
+        <div class="ph"><span>写真｜育成年代の練習風景</span></div>
+        <div class="body">
+          <p class="cat">育成強化</p>
+          <h3>うちの子に、<br>何ができるだろう。</h3>
+          <p class="who">小中学生の保護者／選手本人／指導者・審判の方へ</p>
+          <ul>
+            <li>長野スタイル（育成の考え方）</li>
+            <li>トレセン・選抜の仕組み</li>
+            <li>指導者・審判のライセンス講習</li>
+          </ul>
+          <span class="go">育成・強化について</span>
+        </div>
+      </a>
+
+      <a href="start.html" class="gate">
+        <div class="ph"><span>写真｜フェスティバルの様子</span></div>
+        <div class="body">
+          <p class="cat">普及活動</p>
+          <h3>はじめて<br>みたいけれど。</h3>
+          <p class="who">未経験の子どもとご家族／女子・シニア世代／障がい者サッカー関係の方へ</p>
+          <ul>
+            <li>はじめての方へ（体験・教室）</li>
+            <li>なでしこひろば・シニアの活動</li>
+            <li>障がい者サッカーの取り組み</li>
+          </ul>
+          <span class="go">普及活動について</span>
+        </div>
+      </a>
+
+      <a href="partner.html" class="gate">
+        <div class="ph"><span>写真｜地域の大会・自治体連携</span></div>
+        <div class="body">
+          <p class="cat">地域活動</p>
+          <h3>一緒に、<br>何ができるだろう。</h3>
+          <p class="who">自治体職員／企業・スポンサー候補／地域クラブ・郡市協会の方へ</p>
+          <ul>
+            <li>フットボールセンター整備</li>
+            <li>大会の招致・共催</li>
+            <li>協賛・パートナーシップ</li>
+          </ul>
+          <span class="go">地域活動について</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note">
+    <b>C｜3つの入口</b>　見出しを「育成強化」ではなく<b>相手の言葉</b>にしているのが要点。協会側の区分名は上のラベルに小さく置き、大きく出すのは訪問者自身の問い。<br>
+    ・3 枚は必ず同じ高さで揃える（下端の導線位置を合わせるため Flex で固定）<br>
+    ・リスト項目は各 3 つまで。増やすと選べなくなる
+  </div>
+</div>
+
+<!-- ================= D. 情報を探す ================= -->
+<section class="search">
+  <span class="blockTag">D ─ AI SEARCH</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">03 / SEARCH</span>
+      <h2>探しているものを、<br>そのまま聞いてください。</h2>
+      <p>どの委員会の担当かを考える必要はありません。知りたいことを言葉のまま入力すると、必要な情報にたどり着けます。</p>
+    </div>
+
+    <div class="searchBox">
+      <input type="text" placeholder="例）小学生の大会っていつ？　審判の更新はどうすれば？">
+      <button class="send">探す</button>
+    </div>
+
+    <p class="tagLead">よく見られている条件</p>
+    <div class="tags">
+      <a href="search.html" class="tag">小学生（4種）</a>
+      <a href="search.html" class="tag">中学生（3種）</a>
+      <a href="search.html" class="tag">高校生（2種）</a>
+      <a href="search.html" class="tag">大人・社会人（1種）</a>
+      <a href="search.html" class="tag">女子</a>
+      <a href="search.html" class="tag">シニア</a>
+      <a href="search.html" class="tag">審判</a>
+      <a href="search.html" class="tag">指導者</a>
+      <a href="search.html" class="tag">フットサル</a>
+    </div>
+
+    <div class="searchFeat">
+      <div>
+        <h4>質問から答えへ</h4>
+        <p>話し言葉のまま入力できます。カテゴリを選び直す必要はありません。</p>
+      </div>
+      <div>
+        <h4>条件を重ねて絞る</h4>
+        <p>タグを選ぶほど候補が絞られます。逆に増えることはありません。</p>
+      </div>
+      <div>
+        <h4>段階的に育てる</h4>
+        <p>公開時はルールベースで稼働し、運用しながら精度を上げていきます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note">
+    <b>D｜情報を探す（AI）</b>　TOP では<b>入口だけ</b>を置き、対話そのものは専用ページで行う。TOP に会話画面を埋め込むと、共感層の流れが途中で切れるため。<br>
+    ・入力または タグクリックで、対話ページへ遷移して結果を表示（試作済みプロトタイプの画面へ接続）<br>
+    ・背景をネイビーにして「ここから機能が変わる」ことを面で示す<br>
+    ・タグは 9 個まで。全件は遷移先に置く
+  </div>
+</div>
+
+<!-- ================= E. 最新のうごき ================= -->
+<section class="news">
+  <span class="blockTag">E ─ NEWS</span>
+  <div class="wrap">
+    <div class="secHead" style="margin-bottom:38px">
+      <span class="no en">04 / NEWS</span>
+      <h2>最新のうごき</h2>
+    </div>
+
+    <div class="alert">
+      <span class="lb">重要なお知らせ</span>
+      <p>【注意喚起】協会名を騙る不審な連絡についてのご報告と、ご確認のお願い</p>
+    </div>
+
+    <div class="newsTop">
+      <div class="newsTabs">
+        <button class="on">すべて</button>
+        <button>お知らせ</button>
+        <button>大会情報</button>
+        <button>試合結果</button>
+        <button>登録・手続き</button>
+      </div>
+    </div>
+
+    <div class="newsList">
+      <a href="detail.html">
+        <span class="date en">2026.08.26</span>
+        <span class="cat">大会情報</span>
+        <span class="ttl">第◯回 長野県ユース（U-15）サッカー選手権大会 組み合わせ決定のお知らせ</span>
+      </a>
+      <a href="detail.html">
+        <span class="date en">2026.08.24</span>
+        <span class="cat">試合結果</span>
+        <span class="ttl">長野県中学校総合体育大会 サッカー競技 最終結果</span>
+      </a>
+      <a href="detail.html">
+        <span class="date en">2026.08.21</span>
+        <span class="cat">登録・手続き</span>
+        <span class="ttl">2026年度 チーム登録の受付期間および手続き方法について</span>
+      </a>
+      <a href="detail.html">
+        <span class="date en">2026.08.19</span>
+        <span class="cat">お知らせ</span>
+        <span class="ttl">JFA公認 D級コーチ養成講習会（北信会場）の開催と受講者募集について</span>
+      </a>
+      <a href="detail.html">
+        <span class="date en">2026.08.15</span>
+        <span class="cat">お知らせ</span>
+        <span class="ttl">なでしこひろば 秋季開催のご案内 ─ 参加者を募集しています</span>
+      </a>
+    </div>
+
+    <div class="newsMore"><a href="list.html">お知らせ・大会情報をすべて見る</a></div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note">
+    <b>E｜最新のうごき</b>　現サイトの速報性はそのまま維持する領域。<b>「重要なお知らせ」は表示フラグとして本文リストの外に出す</b>のが構造上の要点（現行 CMS ではタグに混在している）。<br>
+    ・タブは 4 つの軸を混ぜない。ここに置くのは<b>掲載目的</b>の軸のみ<br>
+    ・対象年代（4種・3種など）による絞り込みは D の AI 探索側の役割<br>
+    ・重要なお知らせが 0 件のときは、この帯ごと非表示
+  </div>
+</div>
+
+<!-- ================= F. ともに創る ================= -->
+<section class="spons">
+  <span class="blockTag">F ─ PARTNERSHIP</span>
+  <div class="wrap">
+    <div class="sponsIn">
+      <div>
+        <span class="no en">05 / PARTNERSHIP</span>
+        <h2>その支援が、<br>どこに届くのか。</h2>
+        <p class="lead">私たちは 2020 年宣言として、5 つの約束を掲げています。いただいた協賛は、この約束を実現するための活動に使われます。使いみちが見えるかたちで、企業のみなさまとご一緒したいと考えています。</p>
+        <ul class="promise">
+          <li><span class="en">01</span>県民の 10 人に 1 人がサッカーファミリーに</li>
+          <li><span class="en">02</span>県内 4 地区にフットボールセンターを整備</li>
+          <li><span class="en">03</span>代表チームが全国大会で上位進出</li>
+          <li><span class="en">04</span>大会・チームにウェルフェアオフィサーを配置</li>
+          <li><span class="en">05</span>2027 国民スポーツ大会で開催成功と優勝</li>
+        </ul>
+        <div class="sponsActs">
+          <a href="partner.html" class="btnNavy">協賛について</a>
+          <a href="partner.html" class="btnLine">活動レポートを見る</a>
+        </div>
+      </div>
+      <div class="ph"><span>写真｜協賛企業ロゴ一覧<br>または支援が活きている現場の様子</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="note">
+    <b>F｜ともに創る</b>　「ご支援ください」ではなく<b>「支援が向かう先」</b>を主語にする。5 つの約束を投資先として並べることで、協賛が寄付ではなく事業への参加として読める。<br>
+    ・現行は 3 階層の奥。TOP から独立導線を張るのはここが目的<br>
+    ・掲載する数字（協賛社数・リーチなど）は理事会の確認後に追加<br>
+    ・右カラムは協賛企業ロゴ一覧か現場写真か、C（協賛メニューの整理）の結論で決定
+  </div>
+</div>
+
+<!-- ================= フッター ================= -->
+<footer>
+  <div class="wrap">
+    <div class="fCols">
+      <div class="fBrand">
+        <div class="logo">
+          <span class="mark en">NFA</span>
+          <span class="txt">長野県サッカー協会<small class="en">NAGANO FOOTBALL ASSOCIATION</small></span>
+        </div>
+        <p>〒◯◯◯-◯◯◯◯　長野県◯◯市◯◯<br>TEL ◯◯◯-◯◯◯-◯◯◯◯（平日 9:00–17:00）</p>
+      </div>
+      <div>
+        <h5>NFA について</h5>
+        <ul>
+          <li><a href="about.html">Life+1 コンセプト</a></li>
+          <li><a href="about.html">2020年宣言／2030計画</a></li>
+          <li><a href="about.html">協会概要・組織</a></li>
+          <li><a href="about.html">事業報告・決算</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>目的から探す</h5>
+        <ul>
+          <li><a href="start.html">はじめる・つづける</a></li>
+          <li><a href="grow.html">強くなる・関わる</a></li>
+          <li><a href="partner.html">ともに創る</a></li>
+          <li><a href="search.html">情報を探す（AI）</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>関連リンク</h5>
+        <ul>
+          <li><a href="#">日本サッカー協会（JFA）</a></li>
+          <li><a href="#">北信越サッカー協会</a></li>
+          <li><a href="#">郡市サッカー協会</a></li>
+          <li><a href="utility.html#form">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fBot">
+      <p class="en">© Nagano Football Association</p>
+      <div class="links">
+        <a href="utility.html#doc">プライバシーポリシー</a>
+        <a href="#">サイトマップ</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('tg').addEventListener('click', function(){
+    document.body.classList.toggle('noNotes');
+  });
+  document.querySelectorAll('.newsTabs button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.newsTabs button').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on');
+    });
+  });
+</script>
+
+<div class="spMenu" id="spMenu">
+  <a href="about.html"><small>ABOUT</small>NFAについて</a>
+  <a href="start.html"><small>GET STARTED</small>はじめる・つづける</a>
+  <a href="grow.html"><small>DEVELOPMENT</small>強くなる・関わる</a>
+  <a href="partner.html"><small>PARTNERSHIP</small>ともに創る</a>
+  <a href="search.html"><small>AI SEARCH</small>情報を探す</a>
+  <a href="partner.html" class="cta">協賛について</a>
+</div>
+
+<script>
+(function(){
+  var b=document.getElementById('menuBtn');
+  if(b){b.addEventListener('click',function(){document.body.classList.toggle('menuOpen');});}
+  /* 絞り込みサイドバーを SP では開閉式にする */
+  var hd=document.querySelector('.sideHd h2');
+  if(hd){hd.addEventListener('click',function(){
+    if(window.matchMedia('(max-width:640px)').matches){
+      document.querySelector('.side').classList.toggle('open');
+    }
+  });}
+})();
+</script>
+
+</body>
+</html>
