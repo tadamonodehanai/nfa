@@ -82,6 +82,43 @@ a{color:inherit;text-decoration:none}
   .cap,.gal,.notes{padding-left:24px;padding-right:24px}
   .grid{grid-template-columns:1fr 1fr}
 }
+
+/* ========== コンテ（シナリオ＋カット説明） ========== */
+.story{max-width:1200px;margin:0 auto;padding:44px 48px 8px}
+.story .box{background:#fff;border-left:3px solid var(--cyan);padding:28px 32px;font-size:14px;line-height:2.15;color:var(--ink2)}
+.story .box b{color:var(--navy);font-weight:700}
+.tl{display:flex;align-items:stretch;margin-top:20px;border:1px solid var(--line);background:#fff}
+.tl .seg{flex:1;padding:13px 8px;text-align:center;border-right:1px solid var(--line);font-size:12px;color:var(--ink)}
+.tl .seg b{display:block;font-family:"Barlow";font-size:9.5px;font-weight:600;letter-spacing:.18em;color:var(--cyan);margin-bottom:2px}
+.tl .seg small{display:block;font-size:10px;color:var(--muted)}
+.tl .loop{display:flex;align-items:center;padding:0 18px;background:var(--navy);color:#fff;font-size:11px;white-space:nowrap}
+.boardTtl{max-width:1200px;margin:0 auto;padding:40px 48px 0;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.boardTtl h3{font-size:17px;font-weight:700;color:var(--navy)}
+.boardTtl p{font-size:12.5px;color:var(--ink2)}
+.cuts{max-width:1200px;margin:0 auto;padding:18px 48px 8px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.cut{background:#fff;border:1px solid var(--line);position:relative;display:flex;flex-direction:column}
+.cut:not(:last-child)::after{
+  content:"→";position:absolute;top:66px;right:-18px;z-index:5;
+  color:var(--cyan);font-size:15px;font-weight:700;
+}
+.cut img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;cursor:pointer;transition:opacity .2s}
+.cut img:hover{opacity:.85}
+.cut.on{border-color:var(--cyan);border-width:2px}
+.cut .bd{padding:18px 20px 20px;flex:1;display:flex;flex-direction:column}
+.cut .no{font-family:"Barlow";font-size:10.5px;font-weight:600;letter-spacing:.2em;color:var(--cyan)}
+.cut h4{font-size:16.5px;font-weight:700;margin:5px 0 2px}
+.cut .time{font-size:11px;color:var(--muted);margin-bottom:13px}
+.cut .tx{font-size:12.5px;color:var(--ink2);line-height:1.95;padding-top:13px;border-top:1px solid var(--line);margin-bottom:13px}
+.cut .mv{background:var(--pale2);padding:13px 15px;font-size:12px;line-height:1.9;color:var(--ink);margin-top:auto}
+.cut .mv b{font-family:"Barlow";font-size:9.5px;font-weight:600;letter-spacing:.2em;color:var(--cyan);display:block;margin-bottom:5px}
+@media(max-width:900px){
+  .story,.boardTtl,.cuts{padding-left:24px;padding-right:24px}
+  .cuts{grid-template-columns:1fr}
+  .cut:not(:last-child)::after{content:"↓";top:auto;bottom:-19px;right:calc(50% - 8px)}
+  .tl{flex-wrap:wrap}
+  .tl .seg{flex:1 1 40%;border-bottom:1px solid var(--line)}
+  .tl .loop{flex:1 1 100%;justify-content:center;padding:10px}
+}
 </style>
 </head>
 <body>
@@ -122,17 +159,28 @@ a{color:inherit;text-decoration:none}
   <p id="capDs">朝霧のグラウンド。子どもがボールに歩み寄る、世界が始まる直前の静けさ。ムービーはここから始まります。</p>
 </div>
 
-<!-- ギャラリー -->
-<div class="gal">
-  <h3>A案｜実写ドキュメンタリー調「一日の光」</h3>
-  <div class="grid" id="gridA"></div>
-  <h3>B案｜イラストレーション調「青の一日」</h3>
-  <div class="grid" id="gridB"></div>
+<!-- シナリオ（全体構造） -->
+<div class="story">
+  <div class="box">
+    <b>ムービーの構造｜一日の光に、Life+1 の循環を重ねる。</b><br>
+    夜明けに<b>夢</b>が生まれ、昼に<b>挑戦</b>し、夕暮れに<b>成長</b>を確かめ、宵に次の世代へ<b>貢献</b>としてボールを手渡す。手渡した先に、また夜明けが来る──。映像は約16〜20秒でループ再生され、<b>終わりが始まりに繋がる構造そのものが「貢献が次の夢を生む」というコンセプトを語ります。</b>音声はありません（自動ループ・ミュート再生）。
+  </div>
+  <div class="tl">
+    <div class="seg"><b>CUT 01</b>夢<small>夜明け｜約4〜5秒</small></div>
+    <div class="seg"><b>CUT 02</b>挑戦<small>昼｜約4〜5秒</small></div>
+    <div class="seg"><b>CUT 03</b>成長<small>夕｜約4〜5秒</small></div>
+    <div class="seg"><b>CUT 04</b>貢献<small>宵｜約4〜5秒</small></div>
+    <div class="loop">⟲ CUT 01 の夜明けへ</div>
+  </div>
 </div>
 
-<div class="notes">
-  <div class="note"><b>見かた</b>　上のバーで案と章を切り替えると、実際のトップページのファーストビューに画像がはまった状態で確認できます。文字の可読性・世界観との一体感を含めてご判断ください。下のサムネイルをクリックしても切り替わります。</div>
-  <div class="note"><b>これは静止画（キーフレーム）です</b>　採用案が決まりしだい、この絵をもとに各章8秒の映像を生成し、16〜20秒のループムービーに仕上げます。4章の最後は1章の夜明けへ繋がる循環構造です。</div>
+<!-- コンテ -->
+<div class="boardTtl"><h3 id="boardName">A案コンテ｜一日の光（実写ドキュメンタリー調）</h3><p id="boardDs">長野の「山のある日常」の中にサッカーがある。劇的にせず、光の変化で一日を語る。</p></div>
+<div class="cuts" id="cuts"></div>
+
+<div class="notes" style="padding-top:26px">
+  <div class="note"><b>見かた</b>　上のバーで案と章を切り替えると、実際のトップページのファーストビューに画像がはまった状態で確認できます。コンテの画像をクリックしても切り替わります。各カットの「動き」は、この静止画をもとに生成する映像の内容です。</div>
+  <div class="note"><b>これは静止画（キーフレーム）です</b>　採用案が決まりしだい、この絵をもとに各章8秒の映像を生成し、編集で16〜20秒のループムービーに仕上げます。</div>
   <div class="note"><b>A案をお選びの場合</b>　実写のように見えますが、実際の活動写真ではなくAIによる生成映像です。サイト上でその旨を注記するかどうか、あわせてご判断ください。</div>
   <div class="note"><b>B案をお選びの場合</b>　同じ絵柄のイラストを、ムービー以外のページの画像にも展開できます（写真素材が揃うまでの代替としても機能します）。</div>
 </div>
@@ -144,6 +192,43 @@ const CAPS = {
   3:{no:'03 / GROWTH', t:'成長 ─ 夕', d:'練習後の帰り道。指導する人と育つ人が、並んで歩く。'},
   4:{no:'04 / CONTRIBUTION', t:'貢献 ─ 宵、そして夜明けへ', d:'手から手へ、ボールが渡る。空が白み始め、映像は1章の夜明けへ戻ります。'}
 };
+const BOARD = {
+  A:{name:'A案コンテ｜一日の光（実写ドキュメンタリー調）',
+     ds:'長野の「山のある日常」の中にサッカーがある。劇的にせず、光の変化で一日を語る。'},
+  B:{name:'B案コンテ｜青の一日（イラストレーション調）',
+     ds:'Life+1 の紺をそのまま世界の色に。紙の質感を持つ、静かで詩的なアニメーション。'}
+};
+const CUTS = {
+  A:{
+    1:{t:'夢',time:'夜明け｜約4〜5秒',
+       tx:'朝霧の河川敷。子どもがひとり、置かれたボールに歩み寄る。世界が始まる直前の静けさ。',
+       mv:'固定ワイド。子どもがゆっくりボールへ歩く。霧が流れ、空がわずかに明るくなっていく。'},
+    2:{t:'挑戦',time:'昼｜約4〜5秒',
+       tx:'試合の熱。ボールを追う足元と土埃。顔は写さず、動きだけで挑む時間を描く。',
+       mv:'地面すれすれの高速横移動。足とボールが画面を駆け抜け、土埃が舞う。ボールがフレームアウトして次カットへ。'},
+    3:{t:'成長',time:'夕〜宵｜約4〜5秒',
+       tx:'練習後の帰り道。コーンとボールネットを提げて、指導する人と育つ人が並んで歩く。言葉のいらない距離感。',
+       mv:'背後からゆっくり追う。ふたりが歩き去り、地平線の残照が少しずつ薄れていく。'},
+    4:{t:'貢献',time:'宵 → 夜明け｜約4〜5秒',
+       tx:'ナイター照明の下、大人の手から子どもの手へボールが渡る。世代の受け渡しを手元だけで。',
+       mv:'手元のクローズアップから、カメラがゆっくり空へティルトアップ。地平線が白み始め、CUT 01 の夜明けへ戻る（ループ）。'}
+  },
+  B:{
+    1:{t:'夢',time:'夜明け｜約4〜5秒',
+       tx:'紺色の夜が明けていく谷。小さな人影が、朝の光を受けるボールを見つける。',
+       mv:'ゆっくり横パン。子どもは画面右のエリア内で奥のボールへ歩く（左の余白は見出しの領域として空けておく）。空が徐々に明るく。'},
+    2:{t:'挑戦',time:'昼｜約4〜5秒',
+       tx:'走る群像。フラットな色面のシルエットが、風のラインとともに駆け抜ける。',
+       mv:'高速の横トラッキング。風のラインが流れ、ボールが長い弧を描いて画面を横切る。'},
+    3:{t:'成長',time:'夕｜約4〜5秒',
+       tx:'夕陽に向かって歩き去るふたつのシルエット。長い影が手前へ伸びる。',
+       mv:'背後からゆっくり追う。影が静かに揺れ、地平線のオレンジの帯が少しずつ細くなっていく。'},
+    4:{t:'貢献',time:'宵 → 夜明け｜約4〜5秒',
+       tx:'山並みを背に、手から手へボールが渡る。渡した先に、次の朝が待っている。',
+       mv:'手渡しの瞬間をゆっくり寄りで。背景の空が明るみ、CUT 01 と同じ夜明けのグラデーションへ繋がる（ループ）。'}
+  }
+};
+
 let plan='A', ch=1;
 const $=s=>document.querySelector(s);
 
@@ -155,22 +240,31 @@ function draw(){
   $('#capNo').textContent=c.no; $('#capTtl').textContent=c.t; $('#capDs').textContent=c.d;
   document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.plan===plan));
   document.querySelectorAll('.chap button').forEach(b=>b.classList.toggle('on',+b.dataset.ch===ch));
-  document.querySelectorAll('.grid figure').forEach(f=>f.classList.toggle('on',f.dataset.key===key));
+  $('#boardName').textContent=BOARD[plan].name;
+  $('#boardDs').textContent=BOARD[plan].ds;
+  drawCuts();
 }
-document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{plan=b.dataset.plan;draw();window.scrollTo({top:0,behavior:'smooth'});});
-document.querySelectorAll('.chap button').forEach(b=>b.onclick=()=>{ch=+b.dataset.ch;draw();window.scrollTo({top:0,behavior:'smooth'});});
-
-const NAMES={1:'夢（夜明け）',2:'挑戦（昼）',3:'成長（夕）',4:'貢献（宵）'};
-['A','B'].forEach(p=>{
-  const g=$('#grid'+p);
+function drawCuts(){
+  const box=$('#cuts'); box.innerHTML='';
   for(let i=1;i<=4;i++){
-    const f=document.createElement('figure');
-    f.dataset.key=p+i;
-    f.innerHTML='<img src="img/'+p+i+'.jpg" loading="lazy" alt=""><figcaption><b class="en">'+p+'-'+i+'</b>'+NAMES[i]+'</figcaption>';
-    f.onclick=()=>{plan=p;ch=i;draw();window.scrollTo({top:0,behavior:'smooth'});};
-    g.appendChild(f);
+    const c=CUTS[plan][i];
+    const d=document.createElement('div');
+    d.className='cut'+(i===ch?' on':'');
+    d.innerHTML=
+      '<img src="img/'+plan+i+'.jpg" loading="lazy" alt="">'+
+      '<div class="bd">'+
+        '<p class="no en">CUT 0'+i+'</p>'+
+        '<h4>'+c.t+'</h4>'+
+        '<p class="time">'+c.time+'</p>'+
+        '<p class="tx">'+c.tx+'</p>'+
+        '<div class="mv"><b>MOTION ─ 動き</b>'+c.mv+'</div>'+
+      '</div>';
+    d.querySelector('img').onclick=()=>{ch=i;draw();window.scrollTo({top:0,behavior:'smooth'});};
+    box.appendChild(d);
   }
-});
+}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{plan=b.dataset.plan;draw();});
+document.querySelectorAll('.chap button').forEach(b=>b.onclick=()=>{ch=+b.dataset.ch;draw();window.scrollTo({top:0,behavior:'smooth'});});
 draw();
 </script>
 </body>
