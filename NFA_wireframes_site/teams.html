@@ -68,7 +68,8 @@ body.noNotes .todo{display:none}
 .cols{display:grid;grid-template-columns:280px 1fr;gap:44px;align-items:start}
 
 /* サイド */
-.side{border:1px solid var(--line);position:sticky;top:136px}
+.cols>aside{position:sticky;top:136px;align-self:start}
+.side{border:1px solid var(--line)}
 .sideHd{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
 .sideHd h2{font-size:13.5px;font-weight:500}
 .sideHd button{font-size:11.5px;color:var(--muted)}
@@ -143,6 +144,7 @@ body.noNotes .todo{display:none}
 
 @media(max-width:1000px){
   .cols{grid-template-columns:1fr}
+  .cols>aside{position:static}
   .side{position:static}
   .tRow{grid-template-columns:1fr 110px;row-gap:8px}
   .tRow .city,.tRow .visit,.tRow .lk{grid-column:1 / -1;text-align:left}
