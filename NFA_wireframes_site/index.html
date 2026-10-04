@@ -156,7 +156,7 @@ section{position:relative}
   font-size:52px;font-weight:700;line-height:1.5;letter-spacing:.01em;
   margin-bottom:26px;
 }
-.fv h1 em{font-style:normal;color:var(--cyan)}
+.fv h1 em{font-style:normal;color:#fff}
 .fv .lead{
   font-size:16px;color:#B9C2DE;line-height:2.1;max-width:640px;
   margin-bottom:44px;
@@ -513,6 +513,36 @@ body.menuOpen{overflow:hidden}
   .jzGrid.club{grid-template-columns:1fr}
   .jzCell{min-height:72px}
 }
+
+/* ---- FV内トピックス ---- */
+.fvTopics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:52px}
+.fvT{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);padding:14px 16px;transition:background .2s}
+.fvT:hover{background:rgba(255,255,255,.14)}
+.fvT .thumb{width:54px;height:54px;flex:none;background:repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 8px,rgba(255,255,255,.13) 8px 16px);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:9px;color:#8A93AD}
+.fvT .bd{min-width:0}
+.fvT .lb{font-size:10px;letter-spacing:.1em;color:var(--cyan);display:block;margin-bottom:4px;font-weight:500}
+.fvT .t{font-size:12.5px;color:#fff;line-height:1.65;display:block}
+.fvT .d{font-family:"Barlow";font-size:10.5px;color:#8A93AD;margin-top:4px;display:block}
+/* ---- コラム ---- */
+.column{padding:120px 0 128px;border-top:1px solid var(--line)}
+.colGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.colCard{border:1px solid var(--line);background:#fff;transition:border-color .25s,transform .25s;display:flex;flex-direction:column}
+.colCard:hover{border-color:var(--blue);transform:translateY(-3px)}
+.colCard .ph{height:180px;border:none;border-bottom:1px solid var(--line)}
+.colCard .bd{padding:24px 26px 28px;flex:1;display:flex;flex-direction:column}
+.colCard .cat{font-size:11px;letter-spacing:.1em;color:var(--cyan);font-weight:500;margin-bottom:12px}
+.colCard h3{font-size:16.5px;font-weight:700;line-height:1.75;margin-bottom:14px;flex:1}
+.colCard .d{font-family:"Barlow";font-size:12px;color:var(--muted)}
+.colMore{margin-top:44px;text-align:center}
+.colMore a{display:inline-block;border:1px solid var(--blue);color:var(--blue);font-size:14px;padding:16px 48px;transition:background .2s,color .2s}
+.colMore a:hover{background:var(--blue);color:#fff}
+@media(max-width:640px){
+  .fvTopics{grid-template-columns:1fr;gap:8px;margin-top:36px}
+  .column{padding:72px 0 78px}
+  .colGrid{grid-template-columns:1fr}
+  .colMore a{width:100%}
+}
+
 </style>
 </head>
 <body>
@@ -557,6 +587,32 @@ body.menuOpen{overflow:hidden}
         <a href="about.html" class="btnMain">Life+1 とは<span class="en">→</span></a>
         <a href="start.html" class="btnGhost">はじめての方へ<span class="en">→</span></a>
       </div>
+      <div class="fvTopics">
+        <a href="detail.html" class="fvT">
+          <span class="thumb">写真</span>
+          <span class="bd">
+            <span class="lb">イベント</span>
+            <span class="t">キッズサッカーフェスティバル（中信）参加受付中</span>
+            <span class="d en">9.23 TUE ─ 松本市</span>
+          </span>
+        </a>
+        <a href="detail.html" class="fvT">
+          <span class="thumb">写真</span>
+          <span class="bd">
+            <span class="lb">セミナー</span>
+            <span class="t">指導者リフレッシュ研修会（東信会場）申込受付</span>
+            <span class="d en">10.4 SUN ─ 上田市</span>
+          </span>
+        </a>
+        <a href="detail.html" class="fvT">
+          <span class="thumb">写真</span>
+          <span class="bd">
+            <span class="lb">イベント</span>
+            <span class="t">なでしこひろば 秋季開催のご案内</span>
+            <span class="d en">10.12 MON ─ 県内各地</span>
+          </span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -566,7 +622,8 @@ body.menuOpen{overflow:hidden}
     <b>A｜ファーストビュー</b>　映像は「協会の紹介」ではなく<b>コンセプトの体験</b>として置く。B の4語（夢・挑戦・成長・貢献）と同じ順序でシーンを構成し、映像とスクロール後の文章が二重に同じことを言う設計。<br>
     ・映像は音声なし自動ループ、下部にグラデーションを重ねて文字の可読性を確保<br>
     ・キャッチは仮。決定稿はグラフィック制作と同時に詰める（PHASE 2）<br>
-    ・軽量化のため、モバイルでは静止画1枚に差し替える想定
+    ・軽量化のため、モバイルでは静止画1枚に差し替える想定<br>
+    ・<b>下部のトピックス（最大3件）</b>＝掲載目的「イベント・セミナー」の記事のうち、トップ掲載フラグが立っているもの。CMS で自動表示し、<b>0 件のときは枠ごと非表示</b>（FV の高さは変えない）。日付が過ぎた記事は自動で外れる
   </div>
 </div>
 
@@ -607,7 +664,7 @@ body.menuOpen{overflow:hidden}
     </div>
 
     <div class="conceptFoot">
-      <p>この理念は、JFA の掲げる考え方を県協会として受け継いだものです。2020 年宣言と 2030 アクションプランに、具体的な約束として書かれています。</p>
+      <p>この理念は、JFA の掲げる考え方を県協会として受け継いだものです。中期経営計画（2027–2031）に、具体的な計画として書かれています。</p>
       <a href="about.html" class="linkArw">NFA について、くわしく</a>
     </div>
   </div>
@@ -762,11 +819,17 @@ body.menuOpen{overflow:hidden}
         <button>お知らせ</button>
         <button>大会情報</button>
         <button>試合結果</button>
+        <button>イベント・セミナー</button>
         <button>登録・手続き</button>
       </div>
     </div>
 
     <div class="newsList">
+      <a href="detail.html">
+        <span class="date en">2026.08.27</span>
+        <span class="cat">イベント・セミナー</span>
+        <span class="ttl">キッズサッカーフェスティバル（中信会場）参加チーム受付を開始しました</span>
+      </a>
       <a href="detail.html">
         <span class="date en">2026.08.26</span>
         <span class="cat">大会情報</span>
@@ -808,6 +871,51 @@ body.menuOpen{overflow:hidden}
 </div>
 
 <!-- ================= F. ともに創る ================= -->
+<!-- ================= コラム ================= -->
+<section class="column">
+  <span class="blockTag">COLUMN / REPORT</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">COLUMN / REPORT</span>
+      <h2>コラム・レポート</h2>
+      <p>支援の使いみち、活動の結果報告、私たちが考えていること。お知らせには収まらない話を、コラムとして残しています。</p>
+    </div>
+    <div class="colGrid">
+      <a href="#" class="colCard">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">使いみち報告</p>
+          <h3>協賛金はどこへ行くのか ─ 2026年度・4種の大会運営の内訳</h3>
+          <span class="d en">2026.08.10</span>
+        </div>
+      </a>
+      <a href="#" class="colCard">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">活動レポート</p>
+          <h3>信州国スポまであと2年。トレセンの現場で起きていること</h3>
+          <span class="d en">2026.07.28</span>
+        </div>
+      </a>
+      <a href="#" class="colCard">
+        <div class="ph"><span>写真</span></div>
+        <div class="bd">
+          <p class="cat">協会の考え</p>
+          <h3>「勝つこと」と「続けること」のあいだで ─ 育成年代の指導方針について</h3>
+          <span class="d en">2026.07.15</span>
+        </div>
+      </a>
+    </div>
+    <div class="colMore"><a href="#">コラム・レポートをすべて見る</a></div>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>コラム・レポート｜置き場所は E（最新のうごき）と F（ともに創る）の間</b>　内容が「支援の使いみち・結果報告・考えていること」＝<b>F の協賛の説得材料そのもの</b>なので、F の直前に置いて読み物→協賛の流れをつくる。<br>
+  ・カードは最新 3 件。インデックスページ（一覧）と詳細ページは今後ワイヤー化する。一覧は記事一覧テンプレートの派生（カード型）、詳細は記事詳細テンプレートに「読み物」表示種別を足す想定<br>
+  ・NEWS とコラム・レポートは CMS 上も別の投稿タイプにする。お知らせ（事務連絡）と読み物が混ざると、どちらの信頼性も下がる
+</div></div>
+
 <section class="spons">
   <span class="blockTag">F ─ PARTNERSHIP</span>
   <div class="wrap">

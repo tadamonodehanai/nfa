@@ -97,39 +97,6 @@ section{position:relative}
 .cell:not(:last-child) .arw{position:absolute;top:74px;right:-9px;width:18px;height:18px;background:var(--cyan);z-index:5;clip-path:polygon(0 0,100% 50%,0 100%)}
 .cycleFoot{margin-top:52px;padding:36px 40px;background:var(--pale2);font-size:15px;line-height:2.1;color:var(--ink)}
 
-/* ---- 系譜 ---- */
-.lineage{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
-.ln{border:1px solid var(--line);padding:32px 26px 36px;background:#fff;position:relative}
-.ln.me{background:var(--blue);border-color:var(--blue);color:#fff}
-.ln .st{font-family:"Barlow";font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--muted);margin-bottom:18px}
-.ln.me .st{color:#B6C0EA}
-.ln h3{font-size:17px;font-weight:700;line-height:1.6;margin-bottom:16px}
-.ln p{font-size:12.5px;line-height:1.95;color:var(--ink2)}
-.ln.me p{color:#C6CDEC}
-.ln:not(:last-child)::after{
-  content:"";position:absolute;top:50%;right:-14px;transform:translateY(-50%);
-  width:10px;height:10px;background:var(--cyan);clip-path:polygon(0 0,100% 50%,0 100%);z-index:5;
-}
-
-/* ---- 5つの約束 ---- */
-.vows{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.2)}
-.vow{background:var(--navy);padding:36px 34px 40px;display:flex;gap:22px;align-items:flex-start}
-.vow .n{font-family:"Barlow";font-size:15px;font-weight:600;color:var(--cyan);padding-top:5px;flex:none}
-.vow .tx{font-size:16px;font-weight:500;line-height:1.9;color:#fff}
-.vow .tx small{display:block;font-size:12.5px;color:#AAB3D2;font-weight:400;margin-top:10px;line-height:1.95}
-.vow.last{grid-column:1 / -1}
-
-/* ---- 2030 ---- */
-.plan2030{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
-.goal{border:1px solid var(--line);margin-bottom:20px;padding:28px 30px}
-.goal .lb{font-size:12px;color:var(--cyan);letter-spacing:.08em;margin-bottom:12px;font-weight:500}
-.goal .tx{font-size:19px;font-weight:700;line-height:1.75;color:var(--navy)}
-.goal p{font-size:13.5px;color:var(--ink2);line-height:2;margin-top:12px}
-.acts2030{list-style:none}
-.acts2030 li{border-bottom:1px solid var(--line);padding:20px 0;font-size:14px;line-height:1.9;display:flex;gap:18px}
-.acts2030 li:first-child{border-top:1px solid var(--line)}
-.acts2030 .dp{font-size:12px;color:var(--cyan);white-space:nowrap;padding-top:3px;min-width:66px}
-
 /* ---- 導線 ---- */
 .gates{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
 .gate{border:1px solid var(--line);background:#fff;padding:38px 32px 40px;transition:border-color .25s,transform .25s}
@@ -149,9 +116,8 @@ section{position:relative}
 .subs .d{font-size:12.5px;color:var(--muted);line-height:1.9}
 
 @media(max-width:1000px){
-  .mission,.plan2030{grid-template-columns:1fr;gap:44px}
-  .cycle,.lineage,.gates,.subs{grid-template-columns:1fr 1fr}
-  .vows{grid-template-columns:1fr}
+  .mission{grid-template-columns:1fr;gap:44px}
+  .cycle,.gates,.subs{grid-template-columns:1fr 1fr}
   .vow.last{grid-column:auto}
   .ln:not(:last-child)::after{display:none}
   .gnav nav{display:none}
@@ -204,8 +170,6 @@ body.menuOpen{overflow:hidden}
   .cycle{grid-template-columns:1fr}
   .cell:not(:last-child) .arw{top:auto;bottom:-9px;right:calc(50% - 9px);transform:rotate(90deg)}
   .cycleFoot{padding:24px 22px}
-  .lineage{grid-template-columns:1fr;gap:14px}
-  .plan2030{gap:30px}
   .goal .tx{font-size:17px}
   .gates,.subs{grid-template-columns:1fr}
   .vow{padding:26px 24px 30px}
@@ -244,6 +208,63 @@ body.menuOpen{overflow:hidden}
   .sbCell.gold{grid-column:span 2}
   .sbFoot{padding:14px 18px}
   .sbMore{width:100%}
+}
+/* ---- VALUE ---- */
+.vals{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.2)}
+.val{background:var(--navy);padding:38px 32px 42px}
+.val .en-t{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.22em;color:var(--cyan);margin-bottom:12px}
+.val h3{font-size:27px;font-weight:700;color:#fff;line-height:1.5;margin-bottom:10px}
+.val .sub2{font-size:14px;font-weight:500;color:#C6CDEC;line-height:1.8;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.18)}
+.val p{font-size:13px;color:#AAB3D2;line-height:2.05}
+
+/* ---- ACTION PLAN ---- */
+.apLead{border:1px solid var(--line);background:#fff;padding:40px 44px;margin-bottom:26px}
+.apLead .en-lb{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.22em;color:var(--cyan);margin-bottom:14px}
+.apLead h3{font-size:26px;font-weight:700;line-height:1.7;color:var(--navy);margin-bottom:12px}
+.apLead p{font-size:14px;color:var(--ink2);line-height:2.05}
+.pillars3{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:26px}
+.pil3{background:#fff;display:grid;grid-template-columns:64px 1fr;gap:0}
+.pil3 .n{display:flex;align-items:flex-start;justify-content:center;padding-top:34px;font-family:"Barlow";font-size:17px;font-weight:600;color:var(--cyan);border-right:1px solid var(--line)}
+.pil3 .bd{padding:32px 36px 34px}
+.pil3 h3{font-size:18.5px;font-weight:700;line-height:1.7;margin-bottom:8px}
+.pil3 h3 small{display:block;font-size:13px;font-weight:400;color:var(--ink2);margin-top:4px}
+.pil3 .kw{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pil3 .kw span{font-size:11.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);padding:5px 12px}
+.dlBox{border:1px solid var(--navy);background:#fff;display:flex;align-items:center;gap:22px;padding:24px 28px;transition:background .2s}
+.dlBox:hover{background:var(--pale2)}
+.dlBox .ic{width:50px;height:50px;flex:none;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"Barlow";font-size:11px;font-weight:600}
+.dlBox .nm{flex:1;font-size:14.5px;font-weight:500;line-height:1.75}
+.dlBox .nm small{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:4px}
+.dlBox .dl{font-size:13px;color:var(--blue);white-space:nowrap;border-bottom:1px solid var(--blue);padding-bottom:2px}
+
+/* ---- 組織図 ---- */
+.org{border:1px solid var(--line);background:#fff;padding:40px 40px 44px}
+.orgTop{display:flex;justify-content:center;gap:14px;margin-bottom:14px}
+.orgBox{border:1px solid var(--line);background:var(--pale2);padding:13px 30px;font-size:14px;font-weight:500;text-align:center}
+.orgBox.head{background:var(--navy);color:#fff;border-color:var(--navy)}
+.orgBox.sub{background:#fff;font-size:12.5px;padding:11px 20px}
+.orgLine{width:1px;height:22px;background:var(--line);margin:0 auto}
+.orgRow2{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:30px}
+.orgGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.orgCol{background:#fff;padding:0}
+.orgCol .hd{background:var(--pale2);border-bottom:1px solid var(--line);padding:13px 18px;font-size:13px;font-weight:700;color:var(--navy)}
+.orgCol ul{list-style:none;padding:14px 18px 18px}
+.orgCol li{font-size:12.5px;color:var(--ink2);padding:6px 0 6px 16px;position:relative;line-height:1.7}
+.orgCol li::before{content:"";position:absolute;left:0;top:13px;width:7px;height:1px;background:var(--muted)}
+.orgFoot{margin-top:26px}
+@media(max-width:1000px){
+  .vals{grid-template-columns:1fr}
+  .orgGrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .apLead{padding:26px 24px}
+  .apLead h3{font-size:20px}
+  .pil3{grid-template-columns:1fr}
+  .pil3 .n{border-right:none;border-bottom:1px solid var(--line);padding:14px 0 12px;justify-content:flex-start;padding-left:24px}
+  .pil3 .bd{padding:22px 24px 26px}
+  .dlBox{flex-wrap:wrap}
+  .org{padding:24px 20px 28px}
+  .orgGrid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -284,39 +305,35 @@ body.menuOpen{overflow:hidden}
   ・見出しはミッション本文をそのまま使う。言い換えない
 </div></div>
 
-<!-- ===== ミッション・ビジョン ===== -->
+<!-- ===== ミッション ===== -->
 <section class="sec">
   <span class="blockTag">MISSION</span>
   <div class="wrap">
     <div class="secHead">
-      <span class="no en">01 / MISSION &amp; VISION</span>
-      <h2>私たちが掲げているもの</h2>
+      <span class="no en">01 / MISSION</span>
+      <h2>私たちの使命</h2>
     </div>
     <div class="mission">
       <div>
         <div class="mvBox">
           <p class="lb en">MISSION</p>
-          <p class="tx">サッカーを通じて、<br>人生を豊かにする。</p>
+          <p class="tx">Life＋1</p>
         </div>
-        <div class="mvBox">
-          <p class="lb en">VISION</p>
-          <p class="tx">長野県から全国、<br>そして世界へ。</p>
-        </div>
-        <p class="ds">サッカーは、勝敗を競うだけのものではありません。仲間と過ごした時間、うまくいかなかった経験、支えてくれた人への感謝。そのすべてが、人生に「＋1」を足していきます。<br>私たちは、県内のすべての世代に、その機会が行き渡る状態をつくろうとしています。</p>
+        <p class="ds">サッカーを通じて人々の人生をより豊かに、より輝かせたいと願っています。日々の生活に喜びや感動、健康、そして人とのつながりをプラスする。サッカーを単なるスポーツではなく、<b>人生を豊かにするツール</b>として捉え、無限の可能性を追求します。</p>
       </div>
       <div class="ph"><span>写真｜世代の広がりが伝わるもの<br>（キッズ・育成年代・シニアの並置）</span></div>
     </div>
   </div>
 </section>
 
-<!-- ===== 夢・挑戦・成長・貢献 ===== -->
+<!-- ===== ビジョン（4語の循環を統合） ===== -->
 <section class="sec pale">
-  <span class="blockTag">CYCLE</span>
+  <span class="blockTag">VISION</span>
   <div class="wrap">
     <div class="secHead">
-      <span class="no en">02 / CYCLE</span>
-      <h2>夢を持ち、挑戦し、成長し、貢献する。</h2>
-      <p>ビジョンに書かれている 4 つの言葉です。この循環が回り続けることが、私たちの目指すかたちそのものです。</p>
+      <span class="no en">02 / VISION</span>
+      <h2>ピッチの夢と地域への貢献が、<br>好循環で結ばれる信州。</h2>
+      <p>私たちは、サッカーに情熱を燃やす一人ひとりの「夢」を育み、「挑戦」を支え、たくましい「成長」へと導きます。そうして育った人材が、やがて地域社会に「貢献」し、信州の未来を切り拓く力となる──。このビジョンを、4 つの言葉の循環で表しています。</p>
     </div>
     <div class="cycle">
       <div class="cell">
@@ -325,7 +342,7 @@ body.menuOpen{overflow:hidden}
           <p class="idx en">01</p>
           <p class="sub en">DREAM</p>
           <h3>夢</h3>
-          <p>ボールに触れたその日から、なりたい自分が生まれます。年齢も経験も問わず、はじめられる場所をつくります。</p>
+          <p>一人ひとりの「夢」を育む。ボールに触れたその日から、なりたい自分が生まれる場所をつくります。</p>
         </div>
         <span class="arw"></span>
       </div>
@@ -335,7 +352,7 @@ body.menuOpen{overflow:hidden}
           <p class="idx en">02</p>
           <p class="sub en">CHALLENGE</p>
           <h3>挑戦</h3>
-          <p>県大会、全国、その先へ。うまくいかない日も含めて、挑み続けられる環境を整えます。</p>
+          <p>「挑戦」を支える。県大会、全国、その先へ。うまくいかない日も含めて、挑み続けられる環境を整えます。</p>
         </div>
         <span class="arw"></span>
       </div>
@@ -345,7 +362,7 @@ body.menuOpen{overflow:hidden}
           <p class="idx en">03</p>
           <p class="sub en">GROWTH</p>
           <h3>成長</h3>
-          <p>技術だけでなく、人として育つ。選手だけでなく、指導者・審判・運営に関わる人も、同じように成長していきます。</p>
+          <p>たくましい「成長」へ導く。技術だけでなく、人として。指導者・審判・運営に関わる人も、同じように育ちます。</p>
         </div>
         <span class="arw"></span>
       </div>
@@ -355,141 +372,159 @@ body.menuOpen{overflow:hidden}
           <p class="idx en">04</p>
           <p class="sub en">CONTRIBUTION</p>
           <h3>貢献</h3>
-          <p>受け取ったものを、次の世代へ返していく。サッカーが地域に還っていく循環をつくります。</p>
+          <p>育った人材が地域社会に「貢献」し、信州の未来を切り拓く力になります。</p>
         </div>
       </div>
     </div>
     <div class="cycleFoot">
-      この 4 つは、順番に並んでいるだけではありません。貢献した人がまた新しい夢を持ち、次の誰かの挑戦を支える。<b>循環し続けること</b>が、Life+1 の意味するところです。
+      この循環は、一方通行ではありません。豊かになった信州が、また次の世代の夢を育む。<b>「終わらない好循環」が機能している状態</b>を、私たちは目指しています。
     </div>
   </div>
 </section>
 
 <div class="wrap"><div class="note">
-  <b>4 語｜TOP との役割分担</b>　TOP では 4 語を<b>短く見せる</b>だけ。このページで写真つきの詳細版を置く。同じ内容を 2 か所に持つことになるが、TOP は「わかる」、ここは「納得する」ためのもので目的が違う。<br>
+  <b>VISION｜中期経営計画（2026年度策定）の文言に統一</b>　見出し・本文・4 語の説明とも中経の Vision ページから採録。旧「CYCLE」セクションはこの VISION に統合した（4 語はビジョン本文の中の言葉なので、独立させず延長線上で図解する）。<br>
   ・写真 4 枚はグラフィック制作と同時に選定する（PHASE 2）<br>
-  ・末尾の一文で<b>循環</b>であることを明示する。並列の 4 項目に見えると意味が伝わらない
+  ・末尾の「終わらない好循環」はビジョン原文の言葉。並列 4 項目ではなく<b>循環</b>であることをここで固定する
 </div></div>
 
-<!-- ===== 系譜 ===== -->
-<section class="sec">
-  <span class="blockTag">LINEAGE</span>
-  <div class="wrap">
-    <div class="secHead">
-      <span class="no en">03 / LINEAGE</span>
-      <h2>この理念は、受け継がれてきたものです。</h2>
-      <p>日本サッカー協会の掲げる考え方を、長野県協会として受け継ぎ、この地域のかたちにしています。</p>
-    </div>
-    <div class="lineage">
-      <div class="ln">
-        <p class="st en">JFA</p>
-        <h3>日本サッカー協会 理念</h3>
-        <p>サッカーを通じて、豊かなスポーツ文化を創造する。</p>
-      </div>
-      <div class="ln">
-        <p class="st en">JAPAN'S WAY</p>
-        <h3>目指すべき道すじ</h3>
-        <p>個の育成・指導者・環境を一体で考え、将来のありたい姿から逆算する。</p>
-      </div>
-      <div class="ln me">
-        <p class="st en">NFA MISSION</p>
-        <h3>Life+1</h3>
-        <p>サッカーを通じて、人生を豊かにする。長野県協会としての言葉。</p>
-      </div>
-      <div class="ln">
-        <p class="st en">NFA VISION</p>
-        <h3>長野県から全国、<br>そして世界へ</h3>
-        <p>夢・挑戦・成長・貢献の好循環を、県内に広げていく。</p>
-      </div>
-      <div class="ln">
-        <p class="st en">ACTION</p>
-        <h3>2020年宣言<br>2030アクションプラン</h3>
-        <p>理念を実行に移すための、具体的な約束と達成目標。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== 5つの約束 ===== -->
+<!-- ===== バリュー ===== -->
 <section class="sec dark">
-  <span class="blockTag">VOWS</span>
+  <span class="blockTag">VALUE</span>
   <div class="wrap">
     <div class="secHead">
-      <span class="no en">04 / 2020 DECLARATION</span>
-      <h2>5 つの約束</h2>
-      <p>2020年宣言として掲げた、県協会が果たすべき目標です。</p>
+      <span class="no en">03 / VALUE</span>
+      <h2>私たちの行動基準</h2>
+      <p>「強さ」と「楽しさ」を支える、揺るぎない品格。3 つの言葉で表しています。</p>
     </div>
-    <div class="vows">
-      <div class="vow">
-        <span class="n en">01</span>
-        <p class="tx">県民の 10 人に 1 人が<br>サッカーファミリーに
-          <small>プレーする人だけでなく、応援する人・支える人を含めて。</small></p>
+    <div class="vals">
+      <div class="val">
+        <p class="en-t">RESPECT</p>
+        <h3>リスペクト</h3>
+        <p class="sub2">互いを「大切に思う」こと</p>
+        <p>サッカーに関わる仲間、対戦相手、審判、そして支えてくれる家族や地域の人々。私たちは多様性を認め合い、すべての人に対して感謝と敬意を持ち、安心・安全な環境を築きます。</p>
       </div>
-      <div class="vow">
-        <span class="n en">02</span>
-        <p class="tx">県内 4 地区に<br>フットボールセンターを整備
-          <small>北信・東信・中信・南信、それぞれの拠点として。</small></p>
+      <div class="val">
+        <p class="en-t">FAIR PLAY</p>
+        <h3>フェアプレー</h3>
+        <p class="sub2">誠実で「高潔な」振る舞い</p>
+        <p>ピッチ上のルールを守ることはもちろん、ピッチ外の事業活動や組織運営においても高い倫理観（インテグリティ）を持ち、暴力・暴言・差別のない、社会から信頼されるフェアな組織であり続けます。</p>
       </div>
-      <div class="vow">
-        <span class="n en">03</span>
-        <p class="tx">代表チームが<br>全国大会で上位進出
-          <small>各年代の県代表が、全国の舞台で結果を残す。</small></p>
-      </div>
-      <div class="vow">
-        <span class="n en">04</span>
-        <p class="tx">各種大会・チームに<br>ウェルフェアオフィサーを配置
-          <small>誰もが安全に、安心してプレーできる環境を守る。</small></p>
-      </div>
-      <div class="vow last">
-        <span class="n en">05</span>
-        <p class="tx">2027 国民スポーツ大会で、開催成功と優勝
-          <small>長野県で開催される大会を成功に導き、そして勝つ。</small></p>
+      <div class="val">
+        <p class="en-t">SUSTAINABLE</p>
+        <h3>サステナブル</h3>
+        <p class="sub2">次世代へ「つなぐ」責任</p>
+        <p>サッカーの力を使って、地域の社会課題（健康、教育、環境など）の解決に挑戦します。豊かな自然環境や健全な組織基盤を維持し、今より良い状態のサッカー環境を未来の子どもたちへつなぎます。</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== 2030 ===== -->
-<section class="sec">
-  <span class="blockTag">2030 PLAN</span>
+<!-- ===== アクションプラン ===== -->
+<section class="sec pale">
+  <span class="blockTag">ACTION PLAN</span>
   <div class="wrap">
     <div class="secHead">
-      <span class="no en">05 / 2030 ACTION PLAN</span>
-      <h2>2030 年に向けて、進めていること</h2>
-      <p>約束を実行に移すための行動計画です。各委員会がそれぞれの領域で取り組んでいます。</p>
+      <span class="no en">04 / ACTION PLAN</span>
+      <h2>中期経営計画（2027–2031）</h2>
+      <p>2026年度に策定した中期経営計画です。2031年に在りたい姿へ向けて、3 つの柱で取り組みます。</p>
     </div>
-    <div class="plan2030">
-      <div>
-        <div class="goal">
-          <p class="lb">達成目標</p>
-          <p class="tx">JFA 全国都道府県チャート 5 位以内<span class="todo">最新の順位を要確認</span></p>
-          <p>登録者数、指導者・審判の育成、普及活動など複数の指標から算出される全国順位です。県協会の総合的な活動水準を示します。</p>
-        </div>
-        <div class="goal">
-          <p class="lb">位置づけ</p>
-          <p class="tx">今回のサイトリニューアルも、<br>この計画に含まれています</p>
-          <p>事務局の実施事項として「ホームページのリニューアル」「理念・ビジョンの理解による協賛企業の獲得」が明記されています。</p>
+    <div class="apLead">
+      <p class="en-lb">VISION 2031</p>
+      <h3>長野県の未来に「Life+1」を届ける</h3>
+      <p>2028 信州国スポを契機とした、地域共創型 FA（サッカー協会）への進化を目指します。</p>
+    </div>
+    <div class="pillars3">
+      <div class="pil3">
+        <span class="n">1</span>
+        <div class="bd">
+          <h3>強化と育成<small>「Life＋1 フットボール」の体現</small></h3>
+          <div class="kw"><span>中長期育成プランの確立</span><span>2028 信州国スポ 上位入賞</span><span>地域共創による良質な環境整備</span><span>指導者・審判の育成と共創パートナー化</span></div>
         </div>
       </div>
-      <div>
-        <ul class="acts2030">
-          <li><span class="dp">技術委員会</span><span>各年代の一貫指導、トレセン制度の充実</span></li>
-          <li><span class="dp">普及委員会</span><span>キッズ・グラスルーツ活動の拡大、巡回指導</span></li>
-          <li><span class="dp">女子委員会</span><span>なでしこひろばの開催、女子チームの増加</span></li>
-          <li><span class="dp">審判委員会</span><span>審判員の確保と育成、若手審判の登用</span></li>
-          <li><span class="dp">指導者養成</span><span>ライセンス講習会の開催、リフレッシュ研修</span></li>
-          <li><span class="dp">施設委員会</span><span>4 地区フットボールセンターの整備</span></li>
-          <li><span class="dp">事務局</span><span>ホームページのリニューアル、協賛企業の獲得</span></li>
-        </ul>
+      <div class="pil3">
+        <span class="n">2</span>
+        <div class="bd">
+          <h3>地域共創と社会課題解決への挑戦<small>長野県の「公共財」としての進化</small></h3>
+          <div class="kw"><span>サッカーを通じた地方創生</span><span>自律的収益確保への新規事業</span></div>
+        </div>
+      </div>
+      <div class="pil3">
+        <span class="n">3</span>
+        <div class="bd">
+          <h3>組織基盤の変革<small>内部課題の克服と「持続可能な組織」構築</small></h3>
+          <div class="kw"><span>DX 推進と効率化</span><span>組織設計と人材開発</span><span>ガバナンス強化と透明性確保</span><span>財務基盤の安定化</span></div>
+        </div>
+      </div>
+    </div>
+    <a class="dlBox" href="docs/NFA_actionplan_2027-2031.pdf" target="_blank" rel="noopener">
+      <span class="ic en">PDF</span>
+      <span class="nm">アクションプラン 詳細<small>重点目標・2031年の目指す姿・KPI（全3ページ）</small></span>
+      <span class="dl">PDFを開く</span>
+    </a>
+  </div>
+</section>
+
+<div class="wrap"><div class="note">
+  <b>ACTION PLAN｜掲載の考え方</b>　ページ上には<b>3 本柱と重点目標のラベルだけ</b>を載せ、詳細（2031年の目指す姿・KPI）は PDF ダウンロードにする。柱のラベル・重点目標の文言はすべて中経資料からの抜粋。<br>
+  ・DL 用 PDF は中経資料の 9〜11 ページ（アクションプラン 3 枚）のみを抽出したもの。環境分析（PEST・SWOT）や内部課題への言及は含めない<br>
+  ・KPI の数値（●●％ 等）が未確定のまま含まれるため、<b>公開前に確定版へ差し替えるか、当該欄を削るかの判断が必要</b><span class="todo">要確認</span>
+</div></div>
+
+<!-- ===== 組織・体制 ===== -->
+<section class="sec">
+  <span class="blockTag">ORGANIZATION</span>
+  <div class="wrap">
+    <div class="secHead">
+      <span class="no en">05 / ORGANIZATION</span>
+      <h2>組織・体制（2026年度）</h2>
+    </div>
+    <div class="org">
+      <div class="orgTop">
+        <span class="orgBox head">会長</span>
+        <span class="orgBox sub">監事</span>
+      </div>
+      <div class="orgLine"></div>
+      <div class="orgRow2">
+        <span class="orgBox">専務理事</span>
+        <span class="orgBox sub">副会長</span>
+        <span class="orgBox sub">副会長</span>
+        <span class="orgBox sub">副会長</span>
+        <span class="orgBox sub">副会長</span>
+      </div>
+      <div class="orgGrid">
+        <div class="orgCol">
+          <p class="hd">事務局</p>
+          <ul><li>財務・会計</li><li>選手登録管理</li><li>渉外活動</li></ul>
+        </div>
+        <div class="orgCol">
+          <p class="hd">経営企画室</p>
+          <ul><li>方針・事業計画策定</li><li>ブランディング</li><li>マーケティング</li><li>ＤＸ</li><li>普及</li><li>グラスルーツ</li></ul>
+        </div>
+        <div class="orgCol">
+          <p class="hd">ガバナンス</p>
+          <ul><li>ガバナンス</li><li>コンプライアンス</li><li>規律・フェアプレー</li><li>医学</li></ul>
+        </div>
+        <div class="orgCol">
+          <p class="hd">委員会</p>
+          <ul><li>1種〜4種 委員会</li><li>女子委員会</li><li>シニア委員会</li><li>フットサル委員会</li><li>技術委員会</li><li>審判委員会</li></ul>
+        </div>
+      </div>
+      <div class="orgFoot">
+        <a class="dlBox" href="#">
+          <span class="ic en">PDF</span>
+          <span class="nm">事業報告・決算<small>定時総会資料・決算報告書（年度ごとの PDF 一覧）</small></span>
+          <span class="dl">一覧を見る</span>
+        </a>
       </div>
     </div>
   </div>
 </section>
 
 <div class="wrap"><div class="note">
-  <b>2030｜サイトリニューアルを計画の中に置く</b>　このページ自体が「計画の実行結果」であることを明示する。理事会で示した論理を、そのまま公開側にも置くかたち。<br>
-  ・委員会別の一覧は、この <b>1 か所にだけ</b>置く。ここ以外では委員会名を情報の分類に使わない<br>
-  ・全国チャートの順位は最新値の確認が必要
+  <b>ORGANIZATION｜中経 12 ページの組織図を掲載</b>　役職名・部門名は中経資料から採録。4 カラムのグルーピング（事務局／経営企画室／ガバナンス／委員会）は<b>ワイヤー上の整理</b>で、正式な系統線・所属は実装時に原図に従って確定する<span class="todo">系統の確認</span><br>
+  ・氏名は掲載しない（役職のみ）。人事異動のたびの更新を避ける<br>
+  ・事業報告・決算は<b>年度ごとの PDF 一覧</b>を想定。CMS ではファイルアップロードのみで追加できる構造にする
 </div></div>
 
 <!-- ===== 導線 ===== -->
@@ -533,8 +568,8 @@ body.menuOpen{overflow:hidden}
     </div>
     <div class="subs">
       <a href="#"><span class="t">協会概要</span><span class="d">名称・所在地・設立・役員構成</span></a>
-      <a href="#"><span class="t">組織・委員会</span><span class="d">各委員会の役割と担当領域</span></a>
-      <a href="#"><span class="t">事業報告・決算</span><span class="d">年度ごとの活動実績と会計報告</span></a>
+      <a href="#"><span class="t">事業報告・決算</span><span class="d">年度ごとの PDF ダウンロード一覧</span></a>
+      <a href="#"><span class="t">規程・様式</span><span class="d">各種規程と申請書式のダウンロード</span></a>
       <a href="#"><span class="t">郡市サッカー協会</span><span class="d">県内各地区の協会一覧</span></a>
     </div>
   </div>
@@ -548,10 +583,11 @@ body.menuOpen{overflow:hidden}
   </div>
   <div class="note">
     <b>ページ全体｜NFA 側にご確認いただくもの</b><br>
-    ・ミッション／ビジョンの文言（現行サイトからの転記のため、最新版かどうか）<br>
-    ・JFA 全国都道府県チャートの最新順位<br>
-    ・委員会一覧が現在の組織と一致しているか<br>
-    ・4 語に添える写真の選定（グラフィック制作と同時進行）
+    ・Mission／Vision／Value／アクションプランの文言は<b>中期経営計画（2026年度策定）から採録済み</b>。理事会承認版と相違がないか最終確認<br>
+    ・アクションプラン PDF 内の KPI 未確定値（●●％ 等）の扱い（確定版差し替え or 当該欄の削除）<br>
+    ・組織図の正式な系統線と、事業報告・決算 PDF の初回掲載分の用意<br>
+    ・4 語に添える写真の選定（グラフィック制作と同時進行）<br>
+    ・「ともに創る」ページの「5 つの約束」は 2020年宣言ベースのまま。中経との整合を別途判断
   </div>
 </div>
 
