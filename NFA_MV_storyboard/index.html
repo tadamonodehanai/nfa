@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFA MV 絵コンテ｜17カット・20秒</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#141C5E; --blue:#1D2A8C; --cyan:#0090C8;
+  --ink:#1B2340; --ink2:#46507A; --muted:#8A93AD;
+  --line:#DCE1F0; --pale:#E6EAF6; --pale2:#F3F5FA;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans JP",sans-serif;color:var(--ink);background:var(--pale2);line-height:1.75;-webkit-font-smoothing:antialiased}
+.en{font-family:"Barlow","Noto Sans JP",sans-serif}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+img{display:block}
+
+/* ===== バー ===== */
+.bar{position:sticky;top:0;z-index:100;background:var(--navy);color:#fff;display:flex;align-items:center;gap:22px;padding:0 26px;height:58px}
+.bar .t{font-size:13.5px;font-weight:500;letter-spacing:.04em}
+.bar .sp{flex:1}
+.seg{display:flex;border:1px solid rgba(255,255,255,.35)}
+.seg button{padding:8px 22px;font-size:13px;color:#B9C2DE;transition:background .2s,color .2s}
+.seg button.on{background:var(--cyan);color:#fff;font-weight:500}
+.bar .len{font-size:12px;color:#8A93AD}
+.bar .len b{font-family:"Barlow";font-size:15px;color:#fff;font-weight:600;margin:0 3px}
+
+/* ===== シナリオ ===== */
+.story{max-width:1160px;margin:0 auto;padding:40px 40px 6px}
+.story .box{background:#fff;border-left:3px solid var(--cyan);padding:28px 32px;font-size:14px;line-height:2.15;color:var(--ink2)}
+.story .box b{color:var(--navy);font-weight:700}
+
+/* タイムライン（尺に比例） */
+.tlWrap{max-width:1160px;margin:0 auto;padding:18px 40px 0}
+.tl{display:flex;height:64px;border:1px solid var(--line);background:#fff}
+.tl a{position:relative;display:flex;flex-direction:column;justify-content:center;padding:0 10px;border-right:1px solid var(--line);overflow:hidden;transition:background .2s;min-width:0}
+.tl a:last-child{border-right:none}
+.tl a:hover{background:var(--pale2)}
+.tl .nm{font-size:12.5px;font-weight:700;color:var(--navy);white-space:nowrap}
+.tl .tm{font-family:"Barlow";font-size:10px;color:var(--muted);white-space:nowrap}
+.tl a.hinge{background:var(--pale)}
+.tlLoop{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:8px 2px 0;font-size:11.5px;color:var(--ink2)}
+.tlLoop .en{color:var(--cyan);font-weight:600}
+
+/* ===== コンテ本体 ===== */
+.board{max-width:1160px;margin:0 auto;padding:26px 40px 40px}
+.chap{margin-top:38px}
+.chap:first-child{margin-top:0}
+.chapHd{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+.chapHd h2{font-size:20px;font-weight:700;color:var(--navy)}
+.chapHd .rng{font-family:"Barlow";font-size:12.5px;color:var(--muted)}
+.chapHd .ds{font-size:12.5px;color:var(--ink2);flex:1;min-width:200px}
+.chapHd::after{content:"";flex-basis:100%;height:0}
+
+.cut{
+  background:#fff;border:1px solid var(--line);margin-bottom:14px;
+  display:grid;grid-template-columns:420px 1fr;align-items:stretch;
+}
+.cut.cont{margin-top:-15px;border-top:none;position:relative}
+.cut.cont::before{
+  content:"↓ 連続カット";position:absolute;top:-1px;left:420px;transform:translateX(20px);
+  background:var(--pale);color:var(--blue);font-size:10px;letter-spacing:.08em;
+  padding:2px 10px;z-index:5;
+}
+.cut .frame{position:relative;border-right:1px solid var(--line);background:var(--navy)}
+.cut .frame img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.cut .no{
+  position:absolute;top:0;left:0;background:var(--navy);color:#fff;
+  font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.1em;padding:5px 12px;
+}
+.cut .ab{position:absolute;bottom:0;left:0;background:rgba(20,28,94,.82);color:#C8CFEA;font-size:10px;letter-spacing:.08em;padding:3px 10px}
+.cmp{display:grid;grid-template-columns:1fr 1fr}
+.cmp>div{position:relative}
+.cmp>div:first-child{border-right:1px solid rgba(255,255,255,.25)}
+.cut .bd{padding:18px 24px 18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cut .l1{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.cut .chip{font-size:10.5px;letter-spacing:.1em;color:var(--cyan);border:1px solid var(--pale);background:var(--pale2);padding:3px 10px;font-weight:500}
+.cut h3{font-size:16.5px;font-weight:700;line-height:1.65}
+.cut .tm{font-family:"Barlow";font-size:12px;color:var(--muted)}
+.cut .tm b{font-weight:600;color:var(--blue)}
+.cut .note{font-size:13px;color:var(--ink2);line-height:1.95;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+.cut .note .lb{font-family:"Barlow";font-size:9.5px;font-weight:600;letter-spacing:.2em;color:var(--cyan);display:block;margin-bottom:3px}
+
+/* ===== 注記 ===== */
+.notes{max-width:1160px;margin:0 auto;padding:4px 40px 90px}
+.note{border-left:2px solid var(--blue);background:#fff;padding:18px 24px;font-size:13px;line-height:2;color:var(--ink2);margin-bottom:10px}
+.note b{color:var(--navy);font-weight:700}
+
+@media(max-width:900px){
+  .bar{flex-wrap:wrap;height:auto;padding:10px 14px;gap:10px}
+  .story,.tlWrap,.board,.notes{padding-left:18px;padding-right:18px}
+  .tl{height:auto;flex-wrap:wrap}
+  .tl a{flex:1 1 32%;padding:8px 10px;border-bottom:1px solid var(--line)}
+  .cut{grid-template-columns:1fr}
+  .cut .frame{border-right:none;border-bottom:1px solid var(--line)}
+  .cut.cont::before{left:50%;transform:translateX(-50%)}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="t">NFA MV 絵コンテ｜17カット</span>
+  <div class="seg">
+    <button class="on" data-mode="A">A案 実写</button>
+    <button data-mode="B">B案 イラスト</button>
+    <button data-mode="C">並べて比較</button>
+  </div>
+  <span class="sp"></span>
+  <span class="len">総尺 <b class="en">20.0</b>s ─ ループ</span>
+</div>
+
+<!-- シナリオ -->
+<div class="story">
+  <div class="box">
+    <b>ムービーの構造｜ひとりの主人公の 20 秒で、Life+1 の循環を描く。</b><br>
+    ボールを追いかけた子どもが、失敗し、仲間に支えられて挑戦を重ね、試合で練習の成果を出し、同じ受球を境に大人の選手へ──。そしてゴールの歓喜のあと、指導者として次の世代へ球を返し、走り出した子どもの背中が冒頭の一枚に重なります。<b>全編を貫くモチーフは「渡して、返ってくる」パス交換</b>。挑戦では仲間が球を止めて返し、成長では練習したワンツーが試合で決まり、貢献では指導者の足元から次の世代へ球が渡ります。最終カットは冒頭と同一の原画で、<b>終わりが始まりに繋がるループ</b>です。音声はありません（自動ループ・ミュート再生）。
+  </div>
+</div>
+
+<!-- タイムライン -->
+<div class="tlWrap">
+  <div class="tl" id="tlBar"></div>
+  <div class="tlLoop"><span class="en">⟲ LOOP</span>CUT 17B は CUT 01 と同一原画 ─ そのまま冒頭へ戻る</div>
+</div>
+
+<!-- コンテ -->
+<div class="board" id="board"></div>
+
+<!-- 注記 -->
+<div class="notes">
+  <div class="note"><b>見かた</b>　上のバーで実写（A案）とイラスト（B案）を切り替えられます。「並べて比較」で同一カットの両案を左右に並べて確認できます。カット番号・尺・ト書きは両案共通（CUT 14 の白抜け表現のみ案ごとに異なります）。</div>
+  <div class="note"><b>年代の切り替え（CUT 10A → 10B）</b>　球・足・白線の位置を合わせた同ポジのハードカットで、子どもから大人へ切り替えます。身体をモーフィングで溶かして成長させる表現はしません。CUT 17A の河川敷への転換も同様に、走る方向を合わせた編集で繋ぎ、背景のモーフィングはしません。</div>
+  <div class="note"><b>CUT 14「変調」だけ、案ごとに表現が異なります</b>　A案（実写）＝光学的な白抜けを編集で挟んで年代を進める。B案（イラスト）＝歓喜の動きを筆跡に受け渡して白へ抜く。どちらも「白」を経由して貢献パートへ渡る構造は同じです。</div>
+  <div class="note"><b>これは静止画（キーフレーム）です</b>　採用案決定後、この 21 枚を起点に各カットを動画生成し、タイムライン通り約 20 秒のループに編集します。走り周期・速度の整合（CUT 17B → 01）は動画段階で検証します。</div>
+</div>
+
+<script>
+const DATA = [
+{id:"01",s:0,e:1.2,ch:"夢",t:"ボールを追う",note:"子どもの走りに寄り添い、足元へ視線をつなぐ。"},
+{id:"02",s:1.2,e:2,ch:"夢",t:"ファーストタッチ",note:"触れてから球が動く。足と球の接触を見せる。"},
+{id:"03",s:2,e:3,ch:"挑戦",t:"ひとりで繰り返す",note:"切り返しで球が足から離れる。次の転倒につながる失敗。"},
+{id:"04",s:3,e:3.7,ch:"挑戦",t:"転ぶ",note:"子どもは止まり、球だけ先へ転がる。"},
+{id:"05",s:3.7,e:4.6,ch:"挑戦",t:"仲間が球を止めてくれる",note:"仲間が球を止め、立ち上がった主人公へ蹴り返す。"},
+{id:"06",s:4.6,e:5.7,ch:"挑戦",t:"受け損ねても、仲間は待つ",note:"土の練習場へ。受球でもたつく主人公と、待ってくれる仲間。"},
+{id:"07",s:5.7,e:6.7,ch:"挑戦",t:"練習を重ね、返せるようになる",note:"06と同じ画角で上達を省略表現。返球し、互いに身体と頭で応える。"},
+{id:"08",s:6.7,e:7.6,ch:"成長",t:"子どもの試合、仲間が呼ぶ",note:"同じ世代の試合。空いた場所へ走る味方の腕の合図に気づく。"},
+{id:"09",s:7.6,e:8.8,ch:"成長",t:"練習したワンツーを試合で",note:"主人公が出して走り、味方が返す。返球を10の足元へ。"},
+{id:"10A",s:8.8,e:9.4,ch:"成長",t:"子どもが返球を受ける",note:"球への接触を年代切替の基準にする。"},
+{id:"10B",s:9.4,e:10,ch:"成長",t:"同じ受球から、大人の試合へ",note:"球・足・白線の位置を合わせたハードカット。身体を溶かして成長させない。"},
+{id:"11A",s:10,e:10.7,ch:"成長",t:"大人のシュート・接触",note:"持ち出しから踏み込む。左支持足、右足と球の接触、両腕の開き。"},
+{id:"11B",s:10.7,e:11.4,ch:"成長",t:"振り抜き",note:"右足は前・上、左腕は前、右腕は後ろ。"},
+{id:"12",s:11.4,e:12.2,ch:"成長",t:"ゴール隅へ決まる",note:"GKは球の方向へ飛ぶが届かない。ネットは破れない。"},
+{id:"13",s:12.2,e:13.5,ch:"成長",t:"仲間と分かち合う歓喜",note:"パスをつないだチームが駆け寄る。ひとりだけの成功にしない。"},
+{id:"14",s:13.5,e:14.2,ch:"変調",t:"光から白へ",note:"",
+  byPlan:{A:{t:"光から白へ",note:"光学的な白抜けを編集で挟み、年代を進める。背景や人物をモーフィングさせない。"},
+          B:{t:"筆跡から白へ",note:"歓喜の動きを筆跡へ受け渡し、白へ抜いて時間を進める。"}}},
+{id:"15",s:14.2,e:16,ch:"貢献",t:"指導者の足元へ球が戻る",note:"白から復帰。大人は手前右に留まり、子どもは奥。"},
+{id:"16A",s:16,e:17,ch:"貢献",t:"子どもが球を取りに来る",note:"手渡しではなく足元の球を受け取り、向きを変える。"},
+{id:"16B",s:17,e:18.2,ch:"貢献",t:"次の世代が走り出す",note:"指導者はその場で見送り、子どもが球と奥へ走る。"},
+{id:"17A",s:18.2,e:19.5,ch:"循環",t:"球を追う背中へ",note:"走りの方向で河川敷へ編集。背景のモーフィングはしない。"},
+{id:"17B",s:19.5,e:20,ch:"循環",t:"冒頭と同じ原画へ",note:"01と同一画像。走り周期と速度は動画段階で検証する。"}
+];
+const CHAP_DS = {
+  "夢":"はじまり。ボールと出会う。",
+  "挑戦":"失敗と、支えてくれる仲間。",
+  "成長":"練習が試合で実り、同じ受球を境に大人へ。",
+  "変調":"白を経由して、時間を進める。",
+  "貢献":"指導者として、次の世代へ球を返す。",
+  "循環":"走り出した背中が、冒頭の一枚に重なる。"
+};
+const TOTAL = 20;
+let mode = 'A';
+const $ = s => document.querySelector(s);
+const el = (t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e;};
+const fmt = n => n.toFixed(1);
+
+/* 章の集計 */
+const CHAPS = [];
+DATA.forEach(d=>{
+  let c = CHAPS[CHAPS.length-1];
+  if(!c || c.name!==d.ch){ c={name:d.ch, s:d.s, e:d.e, cuts:[]}; CHAPS.push(c); }
+  c.e = d.e; c.cuts.push(d);
+});
+
+/* タイムライン */
+(function(){
+  const bar = $('#tlBar');
+  CHAPS.forEach(c=>{
+    const a = el('a', c.name==='変調'?'hinge':'');
+    a.href = '#ch-'+c.name;
+    a.style.width = ((c.e-c.s)/TOTAL*100)+'%';
+    a.innerHTML = '<span class="nm">'+c.name+'</span><span class="tm en">'+fmt(c.s)+'–'+fmt(c.e)+'s</span>';
+    bar.appendChild(a);
+  });
+})();
+
+/* コンテ描画 */
+function planOf(d, p){
+  if(d.byPlan && d.byPlan[p]) return d.byPlan[p];
+  return d;
+}
+function frameHTML(d){
+  const f = 'CUT'+d.id;
+  if(mode!=='C'){
+    const dir = mode==='A' ? 'A' : 'B';
+    const lb = mode==='A' ? '実写' : 'イラスト';
+    return '<img src="img/'+dir+'/'+f+'.jpg" loading="lazy" alt=""><span class="no en">CUT '+d.id+'</span><span class="ab">'+lb+'</span>';
+  }
+  return '<div class="cmp">'+
+    '<div><img src="img/A/'+f+'.jpg" loading="lazy" alt=""><span class="ab">実写</span></div>'+
+    '<div><img src="img/B/'+f+'.jpg" loading="lazy" alt=""><span class="ab">イラスト</span></div>'+
+    '</div><span class="no en">CUT '+d.id+'</span>';
+}
+function draw(){
+  const bd = $('#board'); bd.innerHTML='';
+  CHAPS.forEach(c=>{
+    const sec = el('div','chap');
+    sec.id = 'ch-'+c.name;
+    sec.appendChild(el('div','chapHd',
+      '<h2>'+c.name+'</h2><span class="rng en">'+fmt(c.s)+' – '+fmt(c.e)+' s（'+fmt(c.e-c.s)+'s）</span><span class="ds">'+(CHAP_DS[c.name]||'')+'</span>'));
+    let prevNum = null;
+    c.cuts.forEach(d=>{
+      const num = d.id.replace(/[AB]$/,'');
+      const cont = prevNum===num;
+      prevNum = num;
+      const p = mode==='C' ? planOf(d,'A') : planOf(d, mode);
+      let noteHtml = '';
+      if(mode==='C' && d.byPlan){
+        noteHtml = '<span class="lb">ACTION ─ ト書き</span>'+
+          'A案：'+d.byPlan.A.note+'<br>B案：'+d.byPlan.B.note;
+      } else {
+        noteHtml = '<span class="lb">ACTION ─ ト書き</span>'+p.note;
+      }
+      const title = (mode==='C' && d.byPlan) ? d.byPlan.A.t+'（A）／ '+d.byPlan.B.t+'（B）' : p.t;
+      const row = el('div','cut'+(cont?' cont':''));
+      row.innerHTML =
+        '<div class="frame">'+frameHTML(d)+'</div>'+
+        '<div class="bd">'+
+          '<div class="l1"><span class="chip">'+d.ch+'</span>'+
+          '<span class="tm en"><b>'+fmt(d.s)+' – '+fmt(d.e)+' s</b>（'+fmt(d.e-d.s)+'s）</span></div>'+
+          '<h3>'+title+'</h3>'+
+          '<p class="note">'+noteHtml+'</p>'+
+        '</div>';
+      sec.appendChild(row);
+    });
+    bd.appendChild(sec);
+  });
+}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+  mode=b.dataset.mode;
+  document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));
+  draw();
+});
+draw();
+</script>
+</body>
+</html>
