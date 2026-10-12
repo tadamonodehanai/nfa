@@ -1,0 +1,244 @@
+<?php
+/**
+ * 管理画面（設定 → AI検索）。設定・辞書・検索ログ・状態の4タブ。
+ *
+ * @package NFA_AI_Search
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+class NFA_AIS_Admin {
+
+	const SLUG = 'nfa-ai-search';
+
+	public static function init() {
+		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
+		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
+		add_action( 'admin_post_nfa_ais_save_dictionary', array( __CLASS__, 'save_dictionary' ) );
+	}
+
+	public static function menu() {
+		add_options_page( 'AI検索', 'AI検索', 'manage_options', self::SLUG, array( __CLASS__, 'page' ) );
+	}
+
+	public static function register_settings() {
+		register_setting(
+			'nfa_ais',
+			NFA_AIS_Settings::OPTION,
+			array( 'sanitize_callback' => array( 'NFA_AIS_Settings', 'sanitize' ) )
+		);
+	}
+
+	private static function url( $tab, $extra = array() ) {
+		return add_query_arg( array_merge( array( 'page' => self::SLUG, 'tab' => $tab ), $extra ), admin_url( 'options-general.php' ) );
+	}
+
+	public static function page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$tabs = array( 'settings' => '設定', 'dictionary' => '言い換え辞書', 'log' => '検索ログ', 'status' => '状態' );
+		$tab  = isset( $_GET['tab'] ) && isset( $tabs[ $_GET['tab'] ] ) ? sanitize_key( $_GET['tab'] ) : 'settings'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		echo '<div class="wrap"><h1>AI検索</h1><nav class="nav-tab-wrapper">';
+		foreach ( $tabs as $k => $label ) {
+			printf( '<a href="%s" class="nav-tab %s">%s</a>', esc_url( self::url( $k ) ), $k === $tab ? 'nav-tab-active' : '', esc_html( $label ) );
+		}
+		echo '</nav>';
+		call_user_func( array( __CLASS__, 'tab_' . $tab ) );
+		echo '</div>';
+	}
+
+	private static function tab_settings() {
+		$s     = NFA_AIS_Settings::get();
+		$name  = NFA_AIS_Settings::OPTION;
+		$types = get_post_types( array( 'public' => true ), 'objects' );
+		?>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'nfa_ais' ); ?>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row">検索対象の投稿タイプ</th>
+					<td>
+						<?php foreach ( $types as $type ) : ?>
+							<?php if ( in_array( $type->name, NFA_AIS_Eligibility::NEVER_TYPES, true ) ) { continue; } ?>
+							<label style="display:block"><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[post_types][]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, $s['post_types'], true ) ); ?>> <?php echo esc_html( $type->labels->name . '（' . $type->name . '）' ); ?></label>
+						<?php endforeach; ?>
+						<p class="description">チェックした種類の「公開済み・パスワードなし」の投稿だけが検索対象です（許可リスト方式）。お問い合わせ（Contact Form 7 / Flamingo）、メディア、下書き・非公開は対象になりません。</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="nfa-excluded">個別に除外するID</label></th>
+					<td>
+						<input id="nfa-excluded" class="regular-text" type="text" name="<?php echo esc_attr( $name ); ?>[excluded_ids]" value="<?php echo esc_attr( implode( ', ', $s['excluded_ids'] ) ); ?>">
+						<p class="description">投稿・固定ページのIDをカンマ区切りで。各投稿の編集画面にある「AI検索の対象外にする」でも除外できます。お問い合わせフォームを含むページと探索画面のページは自動で除外されます。</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="nfa-meta">検索対象のカスタムフィールド</label></th>
+					<td>
+						<input id="nfa-meta" class="regular-text" type="text" name="<?php echo esc_attr( $name ); ?>[meta_keys]" value="<?php echo esc_attr( implode( ', ', $s['meta_keys'] ) ); ?>">
+						<p class="description">許可するキーをカンマ区切りで（例：venue, tournament）。段階2の本文取り込みで使います。</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">AIによる解釈</th>
+					<td>
+						<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[ai_enabled]" value="1" <?php checked( $s['ai_enabled'] ); ?>> 入力文の解釈に Claude を使う</label>
+						<p class="description">
+							<?php echo NFA_AIS_Settings::has_api_key() ? 'APIキー：設定済み（wp-config.php）' : 'APIキー：未設定。wp-config.php に <code>define( \'NFA_ANTHROPIC_API_KEY\', \'…\' );</code> を追加すると有効になります。未設定のあいだは辞書によるルールで解釈します。'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="nfa-cap">AI呼び出しの上限（1日）</label></th>
+					<td><input id="nfa-cap" type="number" min="0" name="<?php echo esc_attr( $name ); ?>[daily_ai_cap]" value="<?php echo esc_attr( $s['daily_ai_cap'] ); ?>"> 回 <p class="description">超えた日は、AIを使わない解釈に自動で切り替えます。</p></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="nfa-rate">回数制限（1分・IPごと）</label></th>
+					<td><input id="nfa-rate" type="number" min="1" name="<?php echo esc_attr( $name ); ?>[rate_per_min]" value="<?php echo esc_attr( $s['rate_per_min'] ); ?>"> 回</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="nfa-days">検索ログの保存日数</label></th>
+					<td><input id="nfa-days" type="number" min="1" max="365" name="<?php echo esc_attr( $name ); ?>[log_days]" value="<?php echo esc_attr( $s['log_days'] ); ?>"> 日</td>
+				</tr>
+			</table>
+			<?php submit_button(); ?>
+		</form>
+		<?php
+	}
+
+	private static function tab_dictionary() {
+		$dict  = NFA_AIS_Dictionary::get();
+		$saved = is_array( get_option( NFA_AIS_Dictionary::OPTION ) );
+		$err   = get_transient( 'nfa_ais_dict_error' );
+		$json  = get_transient( 'nfa_ais_dict_draft' );
+		delete_transient( 'nfa_ais_dict_error' );
+		delete_transient( 'nfa_ais_dict_draft' );
+		if ( $err ) {
+			printf( '<div class="notice notice-error"><p>%s</p></div>', esc_html( $err ) );
+		} elseif ( isset( $_GET['saved'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			echo '<div class="notice notice-success"><p>辞書を保存しました。</p></div>';
+		}
+		$json = $json ? $json : wp_json_encode( $dict, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		?>
+		<p>探索画面の3軸（対象・目的・地域）の選択肢と、入力文を条件に読み替えるための言い換えです。<?php echo $saved ? '（編集済み）' : '（初期値）'; ?></p>
+		<p class="description">
+			各選択肢の <code>value</code> と同じ名前のタクソノミー用語が付いた記事が該当します（別名の用語も含めるときは <code>terms</code>）。
+			<code>pattern</code> は入力文から選択肢を読み取る正規表現、<code>say</code> は会話での言い回しです。
+			検索ログの「0件だった入力」を見て、<code>pattern</code> に言い換えを足していってください。選択肢を増やしたら、同名の用語も作られます。
+		</p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="nfa_ais_save_dictionary">
+			<?php wp_nonce_field( 'nfa_ais_dictionary' ); ?>
+			<textarea name="dictionary" rows="30" class="large-text code" spellcheck="false"><?php echo esc_textarea( $json ); ?></textarea>
+			<p>
+				<?php submit_button( '辞書を保存', 'primary', 'submit', false ); ?>
+				<?php submit_button( '初期値に戻す', 'secondary', 'reset', false, array( 'onclick' => "return confirm('辞書を初期値に戻しますか？')" ) ); ?>
+			</p>
+		</form>
+		<?php
+	}
+
+	public static function save_dictionary() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '権限がありません。' );
+		}
+		check_admin_referer( 'nfa_ais_dictionary' );
+		if ( isset( $_POST['reset'] ) ) {
+			delete_option( NFA_AIS_Dictionary::OPTION );
+			NFA_AIS_Index::bump();
+			wp_safe_redirect( self::url( 'dictionary', array( 'saved' => 1 ) ) );
+			exit;
+		}
+		$raw  = isset( $_POST['dictionary'] ) ? wp_unslash( $_POST['dictionary'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$dict = json_decode( $raw, true );
+		$ok   = null === $dict ? new WP_Error( 'json', 'JSON として読み取れません：' . json_last_error_msg() ) : NFA_AIS_Dictionary::validate( $dict );
+		if ( is_wp_error( $ok ) ) {
+			set_transient( 'nfa_ais_dict_error', $ok->get_error_message(), 60 );
+			set_transient( 'nfa_ais_dict_draft', $raw, 60 );
+			wp_safe_redirect( self::url( 'dictionary' ) );
+			exit;
+		}
+		$txt   = fn( $a ) => array_values( array_filter( array_map( 'sanitize_text_field', (array) $a ), 'strlen' ) );
+		$clean = array(
+			'axes'     => array_map(
+				fn( $ax ) => array(
+					'key'     => sanitize_key( $ax['key'] ),
+					'name'    => sanitize_text_field( $ax['name'] ),
+					'axis'    => sanitize_text_field( $ax['axis'] ?? '' ),
+					'options' => array_map(
+						fn( $o ) => array(
+							'value'   => sanitize_text_field( $o['value'] ),
+							'terms'   => $txt( $o['terms'] ?? array() ),
+							'pattern' => (string) ( $o['pattern'] ?? '' ), // validate() で正規表現として検査済み
+							'say'     => sanitize_text_field( $o['say'] ?? $o['value'] ),
+						),
+						$ax['options']
+					),
+				),
+				$dict['axes']
+			),
+			'examples' => $txt( $dict['examples'] ?? array() ),
+			'popular'  => $txt( $dict['popular'] ?? array() ),
+		);
+		update_option( NFA_AIS_Dictionary::OPTION, $clean, false );
+		NFA_AIS_Dictionary::reset_cache();
+		NFA_AIS_Taxonomies::seed_terms();
+		NFA_AIS_Index::bump();
+		wp_safe_redirect( self::url( 'dictionary', array( 'saved' => 1 ) ) );
+		exit;
+	}
+
+	private static function tab_log() {
+		$days = (int) NFA_AIS_Settings::value( 'log_days' );
+		echo '<p>入力された文章の記録です（メールアドレス・電話番号は伏せ字、IPアドレスは保存しません。保存期間 ' . esc_html( $days ) . ' 日）。</p>';
+		echo '<h2>0件だった入力（直近30日・多い順）</h2>';
+		$rows = NFA_AIS_Log::zero_hits();
+		if ( ! $rows ) {
+			echo '<p>まだありません。</p>';
+		} else {
+			echo '<table class="widefat striped"><thead><tr><th>入力</th><th>回数</th><th>最後</th></tr></thead><tbody>';
+			foreach ( $rows as $r ) {
+				printf( '<tr><td>%s</td><td>%d</td><td>%s</td></tr>', esc_html( $r->query ), (int) $r->times, esc_html( get_date_from_gmt( $r->last_at, 'Y-m-d H:i' ) ) );
+			}
+			echo '</tbody></table>';
+		}
+		echo '<h2>最近の入力</h2>';
+		$rows = NFA_AIS_Log::recent();
+		if ( ! $rows ) {
+			echo '<p>まだありません。</p>';
+			return;
+		}
+		echo '<table class="widefat striped"><thead><tr><th>日時</th><th>入力</th><th>条件</th><th>件数</th><th>解釈</th></tr></thead><tbody>';
+		foreach ( $rows as $r ) {
+			printf(
+				'<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>',
+				esc_html( get_date_from_gmt( $r->created_at, 'Y-m-d H:i' ) ),
+				esc_html( $r->query ),
+				esc_html( $r->conds ),
+				(int) $r->total,
+				esc_html( 'claude' === $r->parser ? 'AI' : '辞書' )
+			);
+		}
+		echo '</tbody></table>';
+	}
+
+	private static function tab_status() {
+		$u    = get_option( NFA_AIS_Claude::USAGE_OPTION, array() );
+		$rows = array(
+			'検索対象の件数'     => count( NFA_AIS_Eligibility::eligible_ids() ) . ' 件',
+			'探索画面のページ'   => NFA_AIS_Frontend::search_page_url() ? NFA_AIS_Frontend::search_page_url() : '未設定（固定ページに [nfa_ai_search] を置いてください）',
+			'APIキー'          => NFA_AIS_Settings::has_api_key() ? '設定済み' : '未設定（辞書によるルールで動作中）',
+			'モデル'           => NFA_AIS_Claude::model(),
+			'今日のAI呼び出し'  => NFA_AIS_Claude::today_count() . ' 回' . ( ! empty( $u['date'] ) && $u['date'] === wp_date( 'Y-m-d' ) ? sprintf( '（入力 %s / 出力 %s トークン）', number_format( $u['input_tokens'] ), number_format( $u['output_tokens'] ) ) : '' ),
+			'索引のバージョン'   => NFA_AIS_Index::version(),
+			'プラグイン'        => NFA_AIS_VERSION,
+		);
+		echo '<table class="widefat striped" style="max-width:820px"><tbody>';
+		foreach ( $rows as $k => $v ) {
+			printf( '<tr><th style="width:220px">%s</th><td>%s</td></tr>', esc_html( $k ), esc_html( $v ) );
+		}
+		echo '</tbody></table>';
+		echo '<p class="description">WP-CLI：<code>wp nfa status</code> / <code>wp nfa search "小学生の大会っていつ？"</code> / <code>wp nfa flush</code></p>';
+	}
+}

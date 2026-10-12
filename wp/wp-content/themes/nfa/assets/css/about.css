@@ -1,0 +1,201 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/* ---- 注記 ---- */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+.todo{display:inline-block;background:#FFF3D6;border:1px solid #E0B84C;color:#8A6A16;font-size:11px;padding:4px 10px;margin-left:10px;vertical-align:middle}
+body.noNotes .todo{display:none}
+section{position:relative}
+.ph{position:relative;background:repeating-linear-gradient(45deg,var(--pale2) 0 10px,var(--pale) 10px 20px);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center}
+.ph span{font-size:12px;color:var(--ink2);background:rgba(255,255,255,.92);padding:8px 16px;line-height:1.8}
+.ph.onDark{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,rgba(255,255,255,.11) 10px 20px);border-color:rgba(255,255,255,.22)}
+.ph.onDark span{background:rgba(20,28,94,.85);color:#C8CFEA}
+
+/* ---- ヒーロー ---- */
+.hero{background:var(--navy);color:#fff;padding:96px 0px;overflow:hidden}
+.hero .visual{position:relative;height:420px;margin-bottom:-130px}
+.hero .visual .ph{position:absolute;inset:0;border:none}
+.hero .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,28,94,.35) 0%,rgba(20,28,94,.15) 40%,rgba(20,28,94,.98) 100%)}
+.hero .copy{position:relative;z-index:3}
+.hero .crumb{font-size:12px;color:#8A93AD;margin-bottom:26px}
+.hero .crumb a:hover{color:#fff}
+.hero .mark{font-family:"Barlow";font-size:64px;font-weight:700;letter-spacing:.02em;color:var(--cyan);line-height:1;margin-bottom:28px}
+.hero h1{font-size:38px;font-weight:700;line-height:1.6;margin-bottom:26px}
+.hero .lead{font-size:16px;color:#B9C2DE;line-height:2.15;max-width:700px}
+
+/* ---- 共通 ---- */
+.sec{padding:120px 0 130px}
+.sec.pale{background:var(--pale2)}
+.sec.dark{background:var(--navy);color:#fff}
+.secHead{margin-bottom:60px}
+.secHead .no{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;color:var(--cyan);display:block;margin-bottom:16px}
+.secHead h2{font-size:32px;font-weight:700;line-height:1.6}
+.secHead p{font-size:15px;color:var(--ink2);margin-top:20px;line-height:2.1;max-width:700px}
+.sec.dark .secHead h2{color:#fff}
+.sec.dark .secHead p{color:#AAB3D2}
+
+/* ---- ミッション ---- */
+.mission{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.mission .ph{height:400px}
+.mvBox{border-left:3px solid var(--blue);padding-left:32px;margin-bottom:44px}
+.mvBox .lb{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--cyan);margin-bottom:14px}
+.mvBox .tx{font-size:21px;font-weight:500;line-height:2;color:var(--navy)}
+.mission p.ds{font-size:15px;color:var(--ink2);line-height:2.15}
+
+/* ---- 4語 ---- */
+.cycle{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.cell{background:#fff;padding:0;position:relative;display:flex;flex-direction:column}
+.cell .ph{height:150px;border:none;border-bottom:1px solid var(--line)}
+.cell .bd{padding:36px 30px 42px;flex:1}
+.cell .idx{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--muted);margin-bottom:20px}
+.cell h3{font-size:36px;font-weight:700;color:var(--blue);letter-spacing:.08em;line-height:1.25;margin-bottom:20px}
+.cell .sub{font-size:12.5px;color:var(--cyan);letter-spacing:.06em;margin-bottom:18px;font-family:"Barlow";font-weight:600}
+.cell p{font-size:13.5px;color:var(--ink2);line-height:2.05}
+.cell:not(:last-child) .arw{position:absolute;top:74px;right:-9px;width:18px;height:18px;background:var(--cyan);z-index:5;clip-path:polygon(0 0,100% 50%,0 100%)}
+.cycleFoot{margin-top:52px;padding:36px 40px;background:var(--pale2);font-size:15px;line-height:2.1;color:var(--ink)}
+
+/* ---- 導線 ---- */
+.gates{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.gate{border:1px solid var(--line);background:#fff;padding:38px 32px 40px;transition:border-color .25s,transform .25s}
+.gate:hover{border-color:var(--blue);transform:translateY(-3px)}
+.gate .cat{font-size:11.5px;letter-spacing:.14em;color:var(--cyan);font-weight:500;margin-bottom:14px}
+.gate h3{font-size:21px;font-weight:700;line-height:1.65;margin-bottom:16px}
+.gate p{font-size:13.5px;color:var(--ink2);line-height:2;margin-bottom:26px}
+.gate .go{font-size:13.5px;font-weight:500;color:var(--blue);display:flex;align-items:center;gap:10px}
+.gate .go::after{content:"";width:22px;height:1px;background:var(--blue);transition:width .25s}
+.gate:hover .go::after{width:38px}
+
+/* ---- 下層リンク ---- */
+.subs{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.subs a{background:#fff;padding:30px 26px;transition:background .2s}
+.subs a:hover{background:var(--pale2)}
+.subs .t{font-size:15px;font-weight:500;line-height:1.7;margin-bottom:10px;display:block}
+.subs .d{font-size:12.5px;color:var(--muted);line-height:1.9}
+
+@media(max-width:1000px){
+  .mission{grid-template-columns:1fr;gap:44px}
+  .cycle,.gates,.subs{grid-template-columns:1fr 1fr}
+  .vow.last{grid-column:auto}
+  .ln:not(:last-child)::after{display:none}
+  .gnav nav{display:none}
+  .hero h1{font-size:28px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .hero .visual{height:230px;margin-bottom:-80px}
+  .hero{padding-bottom:64px}
+  .hero .mark{font-size:42px;margin-bottom:18px}
+  .hero h1{font-size:24px}
+  .hero .lead{font-size:13.5px}
+  .sec{padding:72px 0 78px}
+  .secHead h2{font-size:24px}
+  .secHead{margin-bottom:38px}
+  .mission .ph{height:230px}
+  .mvBox{padding-left:22px;margin-bottom:30px}
+  .mvBox .tx{font-size:18px}
+  .cycle{grid-template-columns:1fr}
+  .cell:not(:last-child) .arw{top:auto;bottom:-9px;right:calc(50% - 9px);transform:rotate(90deg)}
+  .cycleFoot{padding:24px 22px}
+  .goal .tx{font-size:17px}
+  .gates,.subs{grid-template-columns:1fr}
+  .vow{padding:26px 24px 30px}
+}
+
+/* ---- VALUE ---- */
+.vals{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.2)}
+.val{background:var(--navy);padding:38px 32px 42px}
+.val .en-t{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.22em;color:var(--cyan);margin-bottom:12px}
+.val h3{font-size:27px;font-weight:700;color:#fff;line-height:1.5;margin-bottom:10px}
+.val .sub2{font-size:14px;font-weight:500;color:#C6CDEC;line-height:1.8;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.18)}
+.val p{font-size:13px;color:#AAB3D2;line-height:2.05}
+
+/* ---- ACTION PLAN ---- */
+.apLead{border:1px solid var(--line);background:#fff;padding:40px 44px;margin-bottom:26px}
+.apLead .en-lb{font-family:"Barlow";font-size:12px;font-weight:600;letter-spacing:.22em;color:var(--cyan);margin-bottom:14px}
+.apLead h3{font-size:26px;font-weight:700;line-height:1.7;color:var(--navy);margin-bottom:12px}
+.apLead p{font-size:14px;color:var(--ink2);line-height:2.05}
+.pillars3{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:26px}
+.pil3{background:#fff;display:grid;grid-template-columns:64px 1fr;gap:0}
+.pil3 .n{display:flex;align-items:flex-start;justify-content:center;padding-top:34px;font-family:"Barlow";font-size:17px;font-weight:600;color:var(--cyan);border-right:1px solid var(--line)}
+.pil3 .bd{padding:32px 36px 34px}
+.pil3 h3{font-size:18.5px;font-weight:700;line-height:1.7;margin-bottom:8px}
+.pil3 h3 small{display:block;font-size:13px;font-weight:400;color:var(--ink2);margin-top:4px}
+.pil3 .kw{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pil3 .kw span{font-size:11.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);padding:5px 12px}
+.dlBox{border:1px solid var(--navy);background:#fff;display:flex;align-items:center;gap:22px;padding:24px 28px;transition:background .2s}
+.dlBox:hover{background:var(--pale2)}
+.dlBox .ic{width:50px;height:50px;flex:none;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"Barlow";font-size:11px;font-weight:600}
+.dlBox .nm{flex:1;font-size:14.5px;font-weight:500;line-height:1.75}
+.dlBox .nm small{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:4px}
+.dlBox .dl{font-size:13px;color:var(--blue);white-space:nowrap;border-bottom:1px solid var(--blue);padding-bottom:2px}
+
+/* ---- 組織図 ---- */
+.org{border:1px solid var(--line);background:#fff;padding:40px 40px 44px}
+.orgTop{display:flex;justify-content:center;gap:14px;margin-bottom:14px}
+.orgBox{border:1px solid var(--line);background:var(--pale2);padding:13px 30px;font-size:14px;font-weight:500;text-align:center}
+.orgBox.head{background:var(--navy);color:#fff;border-color:var(--navy)}
+.orgBox.sub{background:#fff;font-size:12.5px;padding:11px 20px}
+.orgLine{width:1px;height:22px;background:var(--line);margin:0 auto}
+.orgRow2{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:30px}
+.orgGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.orgCol{background:#fff;padding:0}
+.orgCol .hd{background:var(--pale2);border-bottom:1px solid var(--line);padding:13px 18px;font-size:13px;font-weight:700;color:var(--navy)}
+.orgCol ul{list-style:none;padding:14px 18px 18px}
+.orgCol li{font-size:12.5px;color:var(--ink2);padding:6px 0 6px 16px;position:relative;line-height:1.7}
+.orgCol li::before{content:"";position:absolute;left:0;top:13px;width:7px;height:1px;background:var(--muted)}
+.orgFoot{margin-top:26px}
+@media(max-width:1000px){
+  .vals{grid-template-columns:1fr}
+  .orgGrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .apLead{padding:26px 24px}
+  .apLead h3{font-size:20px}
+  .pil3{grid-template-columns:1fr}
+  .pil3 .n{border-right:none;border-bottom:1px solid var(--line);padding:14px 0 12px;justify-content:flex-start;padding-left:24px}
+  .pil3 .bd{padding:22px 24px 26px}
+  .dlBox{flex-wrap:wrap}
+  .org{padding:24px 20px 28px}
+  .orgGrid{grid-template-columns:1fr}
+}

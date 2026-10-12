@@ -1,0 +1,198 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/* 注記 */
+.noteBar{position:fixed;top:0;left:0;right:0;z-index:300;background:var(--navy);color:#fff;display:flex;align-items:center;gap:20px;padding:0 24px;height:44px;font-size:12px}
+.noteBar .sp{flex:1}
+.toggle{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.35);padding:5px 14px;font-size:12px;transition:background .2s}
+.toggle:hover{background:rgba(255,255,255,.12)}
+.toggle .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+body.noNotes .toggle .dot{background:rgba(255,255,255,.3)}
+.note{border-left:2px solid var(--wire);background:#FFF6F6;padding:14px 18px;font-size:12px;line-height:1.85;color:#8A2A2A;margin:0 0 8px}
+.note b{font-weight:500;color:var(--wire)}
+body.noNotes .note{display:none}
+.blockTag{position:absolute;top:0;left:0;z-index:20;background:var(--wire);color:#fff;font-family:"Barlow";font-weight:600;font-size:12px;letter-spacing:.1em;padding:5px 12px}
+body.noNotes .blockTag{display:none}
+section{position:relative}
+.ph{position:relative;background:repeating-linear-gradient(45deg,var(--pale2) 0 10px,var(--pale) 10px 20px);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center}
+.ph span{font-size:12px;color:var(--ink2);background:rgba(255,255,255,.92);padding:8px 16px;line-height:1.8}
+.ph.onDark{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,rgba(255,255,255,.11) 10px 20px);border-color:rgba(255,255,255,.22)}
+.ph.onDark span{background:rgba(20,28,94,.85);color:#C8CFEA}
+
+
+/* ヒーロー */
+.hero{background:var(--navy);color:#fff;padding:0 0 88px;overflow:hidden}
+.hero .visual{position:relative;height:380px;margin-bottom:-120px}
+.hero .visual .ph{position:absolute;inset:0;border:none}
+.hero .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,28,94,.4) 0%,rgba(20,28,94,.2) 40%,rgba(20,28,94,.98) 100%)}
+.hero .copy{position:relative;z-index:3}
+.hero .crumb{font-size:12px;color:#8A93AD;margin-bottom:26px}
+.hero .crumb a:hover{color:#fff}
+.hero .kicker{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.28em;color:var(--cyan);margin-bottom:20px}
+.hero h1{font-size:42px;font-weight:700;line-height:1.55;margin-bottom:24px}
+.hero .lead{font-size:16px;color:#B9C2DE;line-height:2.15;max-width:660px}
+
+/* セクション */
+.sec{padding:118px 0 126px}
+.sec.pale{background:var(--pale2)}
+.sec.dark{background:var(--navy);color:#fff}
+.secHead{margin-bottom:56px}
+.secHead .no{font-family:"Barlow";font-size:13px;font-weight:600;letter-spacing:.24em;color:var(--cyan);display:block;margin-bottom:16px}
+.secHead h2{font-size:31px;font-weight:700;line-height:1.6}
+.secHead p{font-size:15px;color:var(--ink2);margin-top:20px;line-height:2.1;max-width:700px}
+.sec.dark .secHead h2{color:#fff}
+.sec.dark .secHead p{color:#AAB3D2}
+
+/* 分岐 */
+.who{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.whoCard{border:1px solid var(--line);background:#fff;padding:32px 26px 34px;transition:border-color .25s,transform .25s;display:flex;flex-direction:column}
+.whoCard:hover{border-color:var(--blue);transform:translateY(-3px)}
+.whoCard .ic{font-family:"Barlow";font-size:11.5px;font-weight:600;letter-spacing:.16em;color:var(--cyan);margin-bottom:16px}
+.whoCard h3{font-size:19px;font-weight:700;line-height:1.65;margin-bottom:14px}
+.whoCard p{font-size:13px;color:var(--ink2);line-height:2;margin-bottom:22px;flex:1}
+.whoCard .go{font-size:13px;font-weight:500;color:var(--blue);display:flex;align-items:center;gap:9px}
+.whoCard .go::after{content:"";width:20px;height:1px;background:var(--blue);transition:width .25s}
+.whoCard:hover .go::after{width:34px}
+
+/* 長野スタイル */
+.styleIn{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.styleIn .ph{height:380px}
+.pillars{display:flex;flex-direction:column;gap:26px;margin-top:34px}
+.pil{border-left:3px solid var(--blue);padding-left:26px}
+.pil h4{font-size:17px;font-weight:700;margin-bottom:10px;line-height:1.7}
+.pil p{font-size:13.5px;color:var(--ink2);line-height:2}
+
+/* 階段（トレセン・ライセンス） */
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.rung{background:#fff;padding:0;display:flex;flex-direction:column;position:relative}
+.rung .hd{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--pale2)}
+.rung .hd .lv{font-family:"Barlow";font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--cyan);margin-bottom:8px}
+.rung .hd h3{font-size:18px;font-weight:700;line-height:1.5}
+.rung .bd{padding:24px;flex:1}
+.rung .bd p{font-size:13px;color:var(--ink2);line-height:2}
+.rung .bd .req{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.9}
+.rung .bd .req b{display:block;color:var(--ink);font-weight:500;margin-bottom:4px}
+.rung:not(:last-child)::after{
+  content:"";position:absolute;top:34px;right:-9px;width:18px;height:18px;
+  background:var(--cyan);clip-path:polygon(0 0,100% 50%,0 100%);z-index:5;
+}
+.ladderNote{margin-top:34px;font-size:13.5px;color:var(--ink2);line-height:2.05}
+.ladderNote a{color:var(--blue);border-bottom:1px solid var(--blue)}
+
+/* 領域一覧 */
+.acts{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
+.actRow{background:#fff;display:grid;grid-template-columns:270px 1fr 190px;align-items:stretch;transition:background .2s}
+.actRow:hover{background:var(--pale2)}
+.actRow .ph{border:none;border-right:1px solid var(--line);min-height:170px}
+.actRow .bd{padding:32px 34px}
+.actRow .cat{font-size:11.5px;letter-spacing:.12em;color:var(--cyan);font-weight:500;margin-bottom:12px}
+.actRow h3{font-size:21px;font-weight:700;margin-bottom:14px;line-height:1.6}
+.actRow p{font-size:13.5px;color:var(--ink2);line-height:2}
+.actRow .side{border-left:1px solid var(--line);padding:32px 26px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.actRow .side .mt{font-size:12px;color:var(--muted);line-height:1.85}
+.actRow .side .mt b{display:block;color:var(--ink);font-weight:500;font-size:13px;margin-bottom:3px}
+.actRow .side .go{font-size:13px;color:var(--blue);font-weight:500}
+
+/* 安全 */
+.safe{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.2)}
+.safe > div{background:var(--navy);padding:34px 30px 38px}
+.safe h4{font-size:17px;font-weight:500;color:#fff;margin-bottom:14px;line-height:1.7}
+.safe p{font-size:13px;color:#AAB3D2;line-height:2}
+.safeFoot{margin-top:34px;font-size:14px;color:#AAB3D2;line-height:2.1}
+.safeFoot a{color:var(--cyan);border-bottom:1px solid var(--cyan)}
+
+/* FAQ */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{padding:26px 40px 26px 4px;font-size:15px;font-weight:500;cursor:pointer;list-style:none;position:relative;line-height:1.8}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"＋";position:absolute;right:8px;top:26px;color:var(--blue);font-size:15px}
+.faq details[open] summary::after{content:"−"}
+.faq .a{padding:0 40px 28px 4px;font-size:14px;color:var(--ink2);line-height:2.1}
+
+/* 関連 */
+.rel{border-top:1px solid var(--line)}
+.rel a{display:grid;grid-template-columns:110px 126px 1fr;gap:24px;align-items:center;padding:24px 8px;border-bottom:1px solid var(--line);transition:background .2s}
+.rel a:hover{background:var(--pale2)}
+.rel .d{font-family:"Barlow";font-size:13.5px;color:var(--muted)}
+.rel .c{font-size:11.5px;color:var(--blue);background:var(--pale2);border:1px solid var(--pale);text-align:center;padding:6px 8px}
+.rel .t{font-size:14.5px;line-height:1.8}
+.relMore{margin-top:38px;text-align:center}
+.relMore a{display:inline-block;border:1px solid var(--blue);color:var(--blue);font-size:14px;padding:16px 48px;transition:background .2s,color .2s}
+.relMore a:hover{background:var(--blue);color:#fff}
+
+/* CTA */
+.cta{background:var(--pale2);padding:88px 0 92px;text-align:center;border-top:1px solid var(--line)}
+.cta h2{font-size:28px;font-weight:700;line-height:1.65;margin-bottom:18px}
+.cta p{font-size:15px;color:var(--ink2);line-height:2.1;margin-bottom:40px;max-width:620px;margin-left:auto;margin-right:auto}
+.cta .acts2{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.btnMain{background:var(--blue);color:#fff;font-size:15px;font-weight:500;padding:19px 44px;transition:background .2s}
+.btnMain:hover{background:var(--navy)}
+.btnLine{border:1px solid var(--blue);color:var(--blue);font-size:15px;padding:18px 38px;transition:background .2s,color .2s}
+.btnLine:hover{background:var(--blue);color:#fff}
+
+@media(max-width:1000px){
+  .who,.ladder,.safe{grid-template-columns:1fr 1fr}
+  .styleIn{grid-template-columns:1fr;gap:40px}
+  .actRow{grid-template-columns:1fr}
+  .actRow .ph{border-right:none;border-bottom:1px solid var(--line)}
+  .actRow .side{border-left:none;border-top:1px solid var(--line)}
+  .rung:not(:last-child)::after{display:none}
+  .gnav nav{display:none}
+  .hero h1{font-size:30px}
+}
+
+/* ========== SP共通 ========== */
+.menuBtn{display:none;width:44px;height:44px;margin-left:auto;flex:none;
+  flex-direction:column;justify-content:center;align-items:center;gap:5px}
+.menuBtn span{display:block;width:22px;height:2px;background:var(--navy);
+  transition:transform .25s,opacity .25s}
+body.menuOpen .menuBtn span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+body.menuOpen .menuBtn span:nth-child(2){opacity:0}
+body.menuOpen .menuBtn span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.spMenu{position:fixed;left:0;right:0;top:104px;bottom:0;background:var(--navy);
+  z-index:150;display:none;flex-direction:column;padding:30px 26px;overflow:auto}
+body.menuOpen .spMenu{display:flex}
+body.menuOpen{overflow:hidden}
+.spMenu a{color:#fff;font-size:16.5px;font-weight:500;padding:17px 4px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.spMenu a small{font-family:"Barlow";font-size:10.5px;color:#8A93AD;
+  letter-spacing:.14em;display:block;margin-bottom:3px;font-weight:600}
+.spMenu .cta{margin-top:28px;background:var(--cyan);text-align:center;
+  border:none;padding:17px;font-size:15px}
+@media(max-width:640px){
+  .noteBar{font-size:10.5px;gap:10px;padding:0 14px}
+  .noteBar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{padding:5px 10px;white-space:nowrap}
+  .gnav .inner{height:60px;gap:14px;padding:0 18px}
+  .gnav .act{display:none}
+  .menuBtn{display:flex}
+  .logo .txt small{display:none}
+  .logo .txt{font-size:13px}
+  .logo .mark{width:34px;height:34px}
+  .note{font-size:11.5px;padding:12px 14px}
+}
+
+@media(max-width:640px){
+  .hero .visual{height:230px;margin-bottom:-80px}
+  .hero{padding-bottom:64px}
+  .hero h1{font-size:26px}
+  .hero .lead{font-size:13.5px}
+  .sec{padding:72px 0 78px}
+  .secHead h2{font-size:24px}
+  .secHead{margin-bottom:38px}
+  .who{grid-template-columns:1fr}
+  .styleIn .ph{height:210px}
+  .ladder{grid-template-columns:1fr}
+  .rung:not(:last-child)::after{display:block;top:auto;bottom:-9px;right:calc(50% - 9px);transform:rotate(90deg)}
+  .actRow .bd{padding:24px 22px}
+  .actRow .side{padding:22px}
+  .safe{grid-template-columns:1fr}
+  .safe>div{padding:26px 24px 30px}
+  .rel a{grid-template-columns:1fr;gap:8px;padding:20px 4px}
+  .rel .c{justify-self:start;padding:6px 16px}
+  .cta{padding:64px 0 70px}
+  .cta h2{font-size:22px}
+  .cta .acts2{flex-direction:column;padding:0 4px}
+  .btnMain,.btnLine{width:100%;text-align:center}
+}
