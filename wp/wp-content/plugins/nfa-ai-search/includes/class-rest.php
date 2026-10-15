@@ -5,6 +5,12 @@
  *   GET /wp-json/nfa/v1/search?q=...&via=text|set&cond[target]=...&cond[purpose]=...&cond[area]=...   1ターン分の探索結果
  *   GET /wp-json/nfa/v1/nonce                                        ページキャッシュで古くなった nonce の取り直し
  *
+ *   管理者用（取り込み）：
+ *   GET  /wp-json/nfa/v1/ingest?counts=1   進み具合（counts=1 で差分の件数も）
+ *   POST /wp-json/nfa/v1/ingest/start      mode=diff（差分）| all（全件を作り直す）
+ *   POST /wp-json/nfa/v1/ingest/step       待ち行列を少し進める（管理画面が開いている間に呼ぶ）
+ *   POST /wp-json/nfa/v1/ingest/cancel     中止
+ *
  * 段階3で POST /wp-json/nfa/v1/answer（出典付きの案内文）を追加する。
  *
  * @package NFA_AI_Search
@@ -57,6 +63,72 @@ class NFA_AIS_Rest {
 				'permission_callback' => '__return_true',
 			)
 		);
+		$admin = fn() => current_user_can( 'manage_options' );
+		register_rest_route(
+			self::NS,
+			'/ingest',
+			array(
+				'methods'             => 'GET',
+				'callback'            => fn( WP_REST_Request $r ) => self::no_cache( new WP_REST_Response( self::ingest_status( (bool) $r->get_param( 'counts' ) ) ) ),
+				'permission_callback' => $admin,
+			)
+		);
+		register_rest_route(
+			self::NS,
+			'/ingest/start',
+			array(
+				'methods'             => 'POST',
+				'callback'            => function ( WP_REST_Request $r ) {
+					NFA_AIS_Ingest::start( 'all' === $r->get_param( 'mode' ) ? 'all' : 'diff' );
+					return self::no_cache( new WP_REST_Response( self::ingest_status( false ) ) );
+				},
+				'permission_callback' => $admin,
+			)
+		);
+		register_rest_route(
+			self::NS,
+			'/ingest/step',
+			array(
+				'methods'             => 'POST',
+				'callback'            => function () {
+					NFA_AIS_Ingest::step();
+					return self::no_cache( new WP_REST_Response( self::ingest_status( false ) ) );
+				},
+				'permission_callback' => $admin,
+			)
+		);
+		register_rest_route(
+			self::NS,
+			'/ingest/cancel',
+			array(
+				'methods'             => 'POST',
+				'callback'            => function () {
+					NFA_AIS_Ingest::cancel();
+					return self::no_cache( new WP_REST_Response( self::ingest_status( false ) ) );
+				},
+				'permission_callback' => $admin,
+			)
+		);
+	}
+
+	public static function ingest_status( $with_counts ) {
+		$out = array(
+			'job'   => NFA_AIS_Ingest::job(),
+			'queue' => NFA_AIS_Ingest::queue_size(),
+		);
+		if ( $with_counts ) {
+			$scan          = NFA_AIS_Ingest::scan();
+			$out['counts'] = array(
+				'eligible'     => $scan['eligible'],
+				'indexed'      => $scan['indexed'],
+				'new'          => count( $scan['new'] ),
+				'changed'      => count( $scan['changed'] ) - $scan['errors'],
+				'errors'       => $scan['errors'],
+				'removed'      => count( $scan['removed'] ),
+				'unclassified' => count( NFA_AIS_Ingest::unclassified() ),
+			);
+		}
+		return $out;
 	}
 
 	/**

@@ -116,11 +116,12 @@ class NFA_AIS_Eligibility {
 	/**
 	 * 検索対象の投稿IDの一覧（索引のバージョンごとにキャッシュ）。
 	 *
+	 * @param bool $fresh キャッシュを使わずに数え直す（取り込みの差分判定用）
 	 * @return int[]
 	 */
-	public static function eligible_ids() {
+	public static function eligible_ids( $fresh = false ) {
 		$ck  = NFA_AIS_Index::cache_key( 'eligible' );
-		$ids = get_transient( $ck );
+		$ids = $fresh ? false : get_transient( $ck );
 		if ( is_array( $ids ) ) {
 			return $ids;
 		}

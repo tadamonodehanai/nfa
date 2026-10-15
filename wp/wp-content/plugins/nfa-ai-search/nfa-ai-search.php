@@ -30,6 +30,7 @@ require_once NFA_AIS_DIR . 'includes/class-settings.php';
 require_once NFA_AIS_DIR . 'includes/class-eligibility.php';
 require_once NFA_AIS_DIR . 'includes/class-text.php';
 require_once NFA_AIS_DIR . 'includes/class-index.php';
+require_once NFA_AIS_DIR . 'includes/class-ingest.php';
 require_once NFA_AIS_DIR . 'includes/class-claude.php';
 require_once NFA_AIS_DIR . 'includes/class-query-parser.php';
 require_once NFA_AIS_DIR . 'includes/class-search.php';
@@ -46,6 +47,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 NFA_AIS_Taxonomies::init();
 NFA_AIS_Eligibility::init();
 NFA_AIS_Index::init();
+NFA_AIS_Ingest::init();
 NFA_AIS_Rest::init();
 NFA_AIS_Frontend::init();
 NFA_AIS_Admin::init();
@@ -61,10 +63,13 @@ function nfa_ais_activate() {
 	NFA_AIS_Taxonomies::register();
 	NFA_AIS_Taxonomies::seed_terms();
 	NFA_AIS_Log::install();
+	NFA_AIS_Ingest::install();
 	NFA_AIS_Index::bump();
 	flush_rewrite_rules();
 }
 
 function nfa_ais_deactivate() {
 	wp_clear_scheduled_hook( NFA_AIS_Log::CRON_HOOK );
+	wp_clear_scheduled_hook( NFA_AIS_Ingest::CRON_STEP );
+	wp_clear_scheduled_hook( NFA_AIS_Ingest::CRON_SCAN );
 }

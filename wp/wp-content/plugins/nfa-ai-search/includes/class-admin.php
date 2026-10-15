@@ -37,7 +37,7 @@ class NFA_AIS_Admin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		$tabs = array( 'settings' => '設定', 'dictionary' => '言い換え辞書', 'log' => '検索ログ', 'status' => '状態' );
+		$tabs = array( 'settings' => '設定', 'ingest' => '取り込み', 'dictionary' => '言い換え辞書', 'log' => '検索ログ', 'status' => '状態' );
 		$tab  = isset( $_GET['tab'] ) && isset( $tabs[ $_GET['tab'] ] ) ? sanitize_key( $_GET['tab'] ) : 'settings'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		echo '<div class="wrap"><h1>AI検索</h1><nav class="nav-tab-wrapper">';
 		foreach ( $tabs as $k => $label ) {
@@ -187,6 +187,107 @@ class NFA_AIS_Admin {
 		NFA_AIS_Index::bump();
 		wp_safe_redirect( self::url( 'dictionary', array( 'saved' => 1 ) ) );
 		exit;
+	}
+
+	private static function tab_ingest() {
+		$unclassified = NFA_AIS_Ingest::unclassified();
+		?>
+		<p>検索対象の記事を取り込みます。記事を公開・更新したときは自動で取り込まれます。
+		移行のあとや、まとめて記事を入れたあとは「差分を取り込む」を押してください。SSH は不要です（少しずつ処理し、この画面を閉じても WP-Cron が続きを進めます）。</p>
+
+		<table class="widefat striped" style="max-width:640px" id="nfa-ingest-counts">
+			<tbody>
+				<tr><th style="width:260px">検索対象の記事</th><td data-k="eligible">…</td></tr>
+				<tr><th>取り込み済み</th><td data-k="indexed">…</td></tr>
+				<tr><th>未取り込み（新しい記事）</th><td data-k="new">…</td></tr>
+				<tr><th>更新あり</th><td data-k="changed">…</td></tr>
+				<tr><th>削除待ち（非公開・削除・除外）</th><td data-k="removed">…</td></tr>
+				<tr><th>エラー（次回やり直し）</th><td data-k="errors">…</td></tr>
+				<tr><th>分類（対象・目的・地域）が未設定</th><td data-k="unclassified">…</td></tr>
+			</tbody>
+		</table>
+
+		<p style="margin-top:18px">
+			<button type="button" class="button button-primary" id="nfa-ingest-diff">差分を取り込む</button>
+			<button type="button" class="button" id="nfa-ingest-all">全件を作り直す</button>
+			<button type="button" class="button-link" id="nfa-ingest-cancel" style="margin-left:12px;display:none">中止</button>
+		</p>
+		<div id="nfa-ingest-progress" style="max-width:640px;display:none">
+			<div style="background:#dcdcde;height:10px;border-radius:5px;overflow:hidden"><div id="nfa-ingest-bar" style="background:#2271b1;height:10px;width:0"></div></div>
+			<p id="nfa-ingest-text" class="description"></p>
+		</div>
+		<div id="nfa-ingest-errors"></div>
+
+		<h2>分類が未設定の記事</h2>
+		<?php if ( ! $unclassified ) : ?>
+			<p>ありません。</p>
+		<?php else : ?>
+			<p class="description">対象・目的・地域のどれかが未設定の記事です（新しい順に最大50件）。探索画面の絞り込みに出てこないので、編集画面で設定してください。</p>
+			<table class="widefat striped" style="max-width:820px"><thead><tr><th>記事</th><th>未設定の軸</th></tr></thead><tbody>
+			<?php
+			foreach ( array_slice( $unclassified, 0, 50 ) as $id ) {
+				$axes    = NFA_AIS_Taxonomies::axes_of( $id );
+				$missing = array();
+				foreach ( NFA_AIS_Taxonomies::FACETS as $key => $axis ) {
+					if ( ! $axes[ $key ] ) {
+						$missing[] = $axis[1];
+					}
+				}
+				printf( '<tr><td><a href="%s">%s</a></td><td>%s</td></tr>', esc_url( get_edit_post_link( $id ) ), esc_html( get_the_title( $id ) ), esc_html( implode( '・', $missing ) ) );
+			}
+			?>
+			</tbody></table>
+		<?php endif; ?>
+
+		<script>
+		(function () {
+			var api = <?php echo wp_json_encode( esc_url_raw( rest_url( NFA_AIS_Rest::NS . '/ingest' ) ) ); ?>;
+			var nonce = <?php echo wp_json_encode( wp_create_nonce( 'wp_rest' ) ); ?>;
+			var $ = function (id) { return document.getElementById(id); };
+			var running = false;
+			function call(path, method) {
+				return fetch(api + path, { method: method || 'GET', credentials: 'same-origin', headers: { 'X-WP-Nonce': nonce } }).then(function (r) { return r.json(); });
+			}
+			function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+			function showCounts(c) {
+				if (!c) return;
+				document.querySelectorAll('#nfa-ingest-counts [data-k]').forEach(function (td) { td.textContent = c[td.getAttribute('data-k')] + ' 件'; });
+			}
+			function showJob(d) {
+				var j = d.job, busy = d.queue > 0;
+				$('nfa-ingest-progress').style.display = j ? 'block' : 'none';
+				$('nfa-ingest-cancel').style.display = busy ? 'inline' : 'none';
+				$('nfa-ingest-diff').disabled = $('nfa-ingest-all').disabled = busy;
+				if (!j) return;
+				var pct = j.total ? Math.round(j.done / j.total * 100) : 100;
+				$('nfa-ingest-bar').style.width = pct + '%';
+				var label = { diff: '差分の取り込み', all: '全件の作り直し', auto: '記事更新による取り込み' }[j.mode] || '取り込み';
+				$('nfa-ingest-text').textContent = label + '：' + j.done + ' / ' + j.total + ' 件（取り込み ' + (j.indexed || 0) + '・変更なし ' + (j.unchanged || 0) + '・削除 ' + (j.removed || 0) + '・エラー ' + (j.errors || []).length + '）' +
+					(j.canceled ? ' 中止しました' : (busy ? ' 処理中…' : ' 完了'));
+				$('nfa-ingest-errors').innerHTML = (j.errors || []).length ? '<h3>エラー</h3><ul>' + j.errors.map(function (e) { return '<li>ID ' + e.id + '：' + esc(e.message) + '</li>'; }).join('') + '</ul>' : '';
+			}
+			/* この画面を開いている間は、画面から続きを進める（閉じても WP-Cron が進める） */
+			function loop() {
+				if (running) return;
+				running = true;
+				call('/step', 'POST').then(function (d) {
+					running = false;
+					showJob(d);
+					if (d.queue > 0) setTimeout(loop, 300);
+					else call('?counts=1').then(function (d2) { showCounts(d2.counts); showJob(d2); });
+				}).catch(function () { running = false; setTimeout(loop, 3000); });
+			}
+			function start(mode) {
+				if (mode === 'all' && !confirm('全件を作り直します。段階2（ベクトル化）を入れたあとは、API費用がかかります。よろしいですか？')) return;
+				call('/start?mode=' + mode, 'POST').then(function (d) { showJob(d); loop(); });
+			}
+			$('nfa-ingest-diff').addEventListener('click', function () { start('diff'); });
+			$('nfa-ingest-all').addEventListener('click', function () { start('all'); });
+			$('nfa-ingest-cancel').addEventListener('click', function () { call('/cancel', 'POST').then(function (d) { showJob(d); call('?counts=1').then(function (d2) { showCounts(d2.counts); }); }); });
+			call('?counts=1').then(function (d) { showCounts(d.counts); showJob(d); if (d.queue > 0) loop(); });
+		})();
+		</script>
+		<?php
 	}
 
 	private static function tab_log() {

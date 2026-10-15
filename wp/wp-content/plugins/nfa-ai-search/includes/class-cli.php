@@ -87,6 +87,60 @@ class NFA_AIS_CLI {
 	}
 
 	/**
+	 * 差分を取り込む（--all で全件を作り直す）。時間制限なしで最後まで実行する。
+	 *
+	 * 管理画面「設定 → AI検索 → 取り込み」のボタンと同じ処理。手元（wp-env）で一括実行するときに使う。
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--all]
+	 * : 変更がなくても全件を処理し直す
+	 *
+	 * ## EXAMPLES
+	 *     wp nfa reindex
+	 *     wp nfa reindex --all
+	 */
+	public function reindex( $args, $assoc ) {
+		$job = NFA_AIS_Ingest::start( isset( $assoc['all'] ) ? 'all' : 'diff' );
+		if ( ! $job['total'] ) {
+			WP_CLI::success( '差分はありません。' );
+			return;
+		}
+		$bar = \WP_CLI\Utils\make_progress_bar( '取り込み', $job['total'] );
+		$done = 0;
+		while ( NFA_AIS_Ingest::queue_size() ) {
+			delete_transient( NFA_AIS_Ingest::LOCK );
+			$j = NFA_AIS_Ingest::step( 200, 60 );
+			$bar->tick( $j['done'] - $done );
+			$done = $j['done'];
+		}
+		$bar->finish();
+		$j = NFA_AIS_Ingest::job();
+		WP_CLI::log( sprintf( '取り込み %d・変更なし %d・削除 %d・エラー %d', $j['indexed'], $j['unchanged'], $j['removed'], count( $j['errors'] ) ) );
+		foreach ( $j['errors'] as $e ) {
+			WP_CLI::warning( 'ID ' . $e['id'] . '：' . $e['message'] );
+		}
+		WP_CLI::success( '完了しました。' );
+	}
+
+	/**
+	 * 取り込みの状態（差分の件数）を表示する。
+	 *
+	 * ## EXAMPLES
+	 *     wp nfa ingest-status
+	 *
+	 * @subcommand ingest-status
+	 */
+	public function ingest_status() {
+		$c = NFA_AIS_Rest::ingest_status( true )['counts'];
+		$labels = array( 'eligible' => '検索対象', 'indexed' => '取り込み済み', 'new' => '未取り込み', 'changed' => '更新あり', 'removed' => '削除待ち', 'errors' => 'エラー', 'unclassified' => '分類が未設定' );
+		foreach ( $labels as $k => $l ) {
+			WP_CLI::log( sprintf( '%-12s %5d', $l, $c[ $k ] ) );
+		}
+		WP_CLI::log( '待ち行列     ' . sprintf( '%5d', NFA_AIS_Ingest::queue_size() ) );
+	}
+
+	/**
 	 * 索引のキャッシュを消して作り直させる。
 	 *
 	 * ## EXAMPLES
@@ -261,6 +315,68 @@ class NFA_AIS_CLI {
 		WP_CLI::log( '12. 条件をすべて外す' );
 		$r = NFA_AIS_Search::run( '', 'set', array() );
 		$check( '仕切り直しの案内', false !== strpos( $r['say'], '条件をすべて外しました' ) && 0 === $r['total'] );
+
+		WP_CLI::log( '13. 差分の再取り込み' );
+		$draft = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'selftest 取り込み確認', 'post_content' => '最初の本文', 'meta_input' => array( self::SAMPLE_META => 1 ) ) );
+		NFA_AIS_Ingest::cancel();
+		$run = function ( $mode = 'diff' ) {
+			NFA_AIS_Ingest::start( $mode );
+			while ( NFA_AIS_Ingest::queue_size() ) {
+				delete_transient( NFA_AIS_Ingest::LOCK );
+				NFA_AIS_Ingest::step( 500, 60 );
+			}
+			return NFA_AIS_Ingest::job();
+		};
+		$run();
+		$s = NFA_AIS_Ingest::scan();
+		$check( '取り込み後は差分なし', ! $s['new'] && ! $s['changed'] && ! $s['removed'], wp_json_encode( array( count( $s['new'] ), count( $s['changed'] ), count( $s['removed'] ) ) ) );
+		$check( '取り込み済み = 検索対象', $s['indexed'] === $s['eligible'], $s['indexed'] . ' / ' . $s['eligible'] );
+
+		global $wpdb;
+		// 更新日時だけ進める（本文は同じ）→「更新あり」になり、処理は「変更なし」で済む
+		$wpdb->update( $wpdb->posts, array( 'post_modified_gmt' => gmdate( 'Y-m-d H:i:s', time() + 60 ) ), array( 'ID' => $draft ) );
+		clean_post_cache( $draft );
+		$s = NFA_AIS_Ingest::scan();
+		$check( '更新日時が進んだ記事は「更新あり」', array( $draft ) === $s['changed'] );
+		$j = $run();
+		$check( '本文が同じなら「変更なし」（段階2の処理を呼ばない）', 1 === $j['unchanged'] && 0 === $j['indexed'] );
+
+		// 本文を変える → 段階2の差し込み口が呼ばれる
+		$called = array();
+		$hook   = function ( $id, $text ) use ( &$called ) { $called[] = array( $id, $text ); };
+		add_action( 'nfa_ais_document_changed', $hook, 10, 2 );
+		$wpdb->update( $wpdb->posts, array( 'post_content' => '書き換えた本文 [gallery ids="1"]', 'post_modified_gmt' => gmdate( 'Y-m-d H:i:s', time() + 120 ) ), array( 'ID' => $draft ) );
+		clean_post_cache( $draft );
+		$run();
+		$check( '本文が変わると取り込み処理が呼ばれる', 1 === count( $called ) && $draft === $called[0][0] && false !== strpos( $called[0][1], '書き換えた本文' ) );
+		$check( '取り込むテキストにショートコードは含めない', $called && false === strpos( $called[0][1], 'gallery' ) );
+		remove_action( 'nfa_ais_document_changed', $hook, 10 );
+
+		// 除外にする → 削除待ち → 記録から消える
+		$removed = array();
+		$hook2   = function ( $id ) use ( &$removed ) { $removed[] = $id; };
+		add_action( 'nfa_ais_document_removed', $hook2 );
+		update_post_meta( $draft, NFA_AIS_Eligibility::META_EXCLUDE, true );
+		NFA_AIS_Index::bump();
+		$check( '除外にすると「削除待ち」', array( $draft ) === NFA_AIS_Ingest::scan()['removed'] );
+		$run();
+		$check( '削除の差し込み口が呼ばれ、記録から消える', array( $draft ) === $removed && ! NFA_AIS_Ingest::scan()['removed'] );
+		remove_action( 'nfa_ais_document_removed', $hook2 );
+
+		// エラーは記録され、次回やり直す
+		delete_post_meta( $draft, NFA_AIS_Eligibility::META_EXCLUDE );
+		NFA_AIS_Index::bump();
+		$fail_hook = function () { throw new RuntimeException( 'テスト用のエラー' ); };
+		add_action( 'nfa_ais_document_changed', $fail_hook );
+		$j = $run();
+		remove_action( 'nfa_ais_document_changed', $fail_hook );
+		$check( 'エラーは記録される', 1 === count( $j['errors'] ) && 'テスト用のエラー' === $j['errors'][0]['message'] );
+		$check( 'エラーの記事は次回の差分に入る', in_array( $draft, NFA_AIS_Ingest::scan()['changed'], true ) );
+		$run();
+		$check( 'やり直すと解消', ! NFA_AIS_Ingest::scan()['changed'] );
+
+		wp_delete_post( $draft, true );
+		$run();
 
 		if ( $fail ) {
 			WP_CLI::error( "$fail 件の確認に失敗しました。" );

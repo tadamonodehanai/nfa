@@ -16,7 +16,7 @@ while ( have_posts() ) : the_post();?>
   <div class="visual"><div class="ph onDark"><span>写真｜はじめての体験の場面<br>（キッズフェスティバル・なでしこひろば等）</span></div></div>
   <div class="wrap">
     <div class="copy">
-      <p class="crumb"><a href="index.html">ホーム</a> ／ はじめる・つづける</p>
+      <p class="crumb"><a href="<?= getPageUrl('home');?>">ホーム</a> ／ はじめる・つづける</p>
       <p class="kicker en">GET STARTED</p>
       <h1>はじめるのに、<br>遅すぎることはありません。</h1>
       <p class="lead">サッカーをやったことがなくても、しばらく離れていても、体力に自信がなくても大丈夫です。長野県には、それぞれの世代・立場に合わせた場所があります。</p>
