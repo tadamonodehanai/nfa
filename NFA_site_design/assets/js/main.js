@@ -259,7 +259,7 @@
 
   /* 4. 要素：まとまりごとに少しずつ表示 */
   var sel = '.cards > *, .trn-grid > *, .nl > li, .catgrid > .ct, .tm > li, .steps > li, .pillars3 > li, .kpi > div, .dl > li, .ngrid > .nc, .cgrid > .cc, .pillars > .pl, .acc > .acc-i, .lnk > a, .gates > .gt, .org > div';
-  var items = $$(sel);
+  var items = $$(sel).filter(function(el){ return !el.closest('#sr-thread'); });   /* AI検索の会話は search.js 側で表示 */
   if (items.length){
     gsap.set(items, {y:36, opacity:0});
     ScrollTrigger.batch(items, {start:'top 92%', once:true, onEnter:function(b){ gsap.to(b, {y:0, opacity:1, duration:.9, ease:'power3.out', stagger:.07, overwrite:'auto'}); }});

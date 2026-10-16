@@ -47,16 +47,16 @@
 </div>
 <main>
 <nav aria-label="パンくず" class="bc wrap"><a href="index.html">TOP</a><span aria-hidden="true">›</span><span aria-current="page">情報を探す</span></nav>
-<section class="pg-hero"><div class="wrap"><div class="pg-ttl"><p aria-hidden="true" class="pg-en"><span class="ln"><span>AI SEARCH</span></span></p><h1 class="pg-ja">情報を探す</h1></div><div class="pg-sub"><p>知りたいことを入力するか、条件を選んでください。<br class="pc"/>担当の委員会が分からなくても探せます。</p></div></div></section>
+<section class="pg-hero"><div class="wrap"><div class="pg-ttl"><p aria-hidden="true" class="pg-en"><span class="ln"><span>AI SEARCH</span></span></p><h1 class="pg-ja">情報を探す</h1></div><div class="pg-sub"><p>知りたいことを、話しかけるように聞いてください。<br class="pc"/>続けて質問すると、条件を重ねて絞り込みます。</p></div></div></section>
 <!-- 入力 -->
 <section class="sr-ask"><div class="wrap">
 <form action="search.html" aria-label="サイト内の情報を探す" class="sr-form" id="sr-form" role="search">
 <label class="sr-lb" for="sr-q">何を知りたいですか？</label>
 <div class="sr-box">
 <input autocomplete="off" class="sr-in" id="sr-q" name="q" placeholder="例：小学生の大会はいつ？　審判の資格を更新したい" type="search" value=""/>
-<button class="sr-go" type="submit">探す</button>
+<button class="sr-go" type="submit">質問する</button>
 </div>
-<p class="sr-help">入力内容から「対象」「目的」「地域」の条件を読み取ります。条件は下の一覧からも追加できます。</p>
+<p class="sr-help">話しかけるように入力してください。続けて質問すると、条件を重ねて絞り込んでいきます。</p>
 </form>
 <div class="sr-ex">
 <span class="sr-ex-h">入力例</span>
@@ -92,12 +92,15 @@
 </div>
 </aside>
 <!-- 結果 -->
-<div aria-live="polite" class="sr-main" id="sr-main">
+<div class="sr-main" id="sr-main">
 <div class="sr-now" id="sr-now"></div>
-<article aria-label="回答" class="sr-ans" id="sr-ans"></article>
-<div id="sr-docs"></div>
-<div id="sr-news"></div>
-<div class="sr-more" id="sr-go"></div>
+<div aria-live="polite" class="sr-thread" id="sr-thread"></div>
+<form aria-label="続けて質問する" class="sr-cmp" id="sr-cmp" role="search">
+<label class="vh" for="sr-q2">続けて質問する</label>
+<input autocomplete="off" id="sr-q2" placeholder="続けて質問できます（例：北信だけ／結果も見たい／中学生は？）" type="text"/>
+<button type="submit">送信</button>
+</form>
+<div class="sr-cmp-n"><button class="sr-reset" type="button">最初から質問しなおす</button><span>AIの代わりに、掲載データからルールで回答するデモ版です</span></div>
 </div>
 </div>
 </div></section>
