@@ -2,7 +2,7 @@
 /**
  * REST API。
  *
- *   GET /wp-json/nfa/v1/search?q=...&via=text|set&cond[target]=...&cond[purpose]=...&cond[area]=...   1ターン分の探索結果
+ *   GET /wp-json/nfa/v1/search?q=...&via=text|set&c[t]=cat-4&c[p]=schedule&c[r]=北信&c[join]=0&c[kw]=...   1ターン分の探索結果
  *   GET /wp-json/nfa/v1/nonce                                        ページキャッシュで古くなった nonce の取り直し
  *
  *   管理者用（取り込み）：
@@ -41,15 +41,15 @@ class NFA_AIS_Rest {
 						'default'           => '',
 						'sanitize_callback' => fn( $v ) => mb_substr( sanitize_text_field( $v ), 0, 200 ),
 					),
-					'via'  => array(
+					'via' => array(
 						'type'    => 'string',
 						'default' => 'text',
 						'enum'    => array( 'text', 'set' ),
 					),
-					'cond' => array(
+					'c'   => array(
 						'type'              => 'object',
 						'default'           => array(),
-						'sanitize_callback' => fn( $v ) => is_array( $v ) ? array_map( fn( $c ) => mb_substr( sanitize_text_field( (string) $c ), 0, 40 ), array_intersect_key( $v, array_flip( array( 'target', 'purpose', 'area', 'keyword' ) ) ) ) : array(),
+						'sanitize_callback' => array( __CLASS__, 'sanitize_c' ),
 					),
 				),
 			)
@@ -111,6 +111,24 @@ class NFA_AIS_Rest {
 		);
 	}
 
+	/**
+	 * c[t]=cat-4&c[p]=schedule&c[r]=北信&c[join]=1&c[kw]=… を受け取る。
+	 */
+	public static function sanitize_c( $v ) {
+		if ( ! is_array( $v ) ) {
+			return array();
+		}
+		$out = array();
+		foreach ( array( 't', 'p', 'r' ) as $ax ) {
+			if ( isset( $v[ $ax ] ) ) {
+				$out[ $ax ] = array_slice( array_map( fn( $x ) => mb_substr( sanitize_text_field( (string) $x ), 0, 40 ), (array) $v[ $ax ] ), 0, 1 );
+			}
+		}
+		$out['join'] = ! empty( $v['join'] ) && '0' !== $v['join'];
+		$out['kw']   = isset( $v['kw'] ) ? mb_substr( sanitize_text_field( (string) $v['kw'] ), 0, 40 ) : '';
+		return $out;
+	}
+
 	public static function ingest_status( $with_counts ) {
 		$out = array(
 			'job'   => NFA_AIS_Ingest::job(),
@@ -152,13 +170,12 @@ class NFA_AIS_Rest {
 		}
 		$q     = (string) $req->get_param( 'q' );
 		$via   = (string) $req->get_param( 'via' );
-		$cond = (array) $req->get_param( 'cond' );
-		ksort( $cond );
+		$c     = NFA_AIS_Search::clean( (array) $req->get_param( 'c' ) );
 
-		$ck  = NFA_AIS_Index::cache_key( 'search|' . $via . '|' . $q . '|' . wp_json_encode( $cond ) );
+		$ck  = NFA_AIS_Index::cache_key( 'search|' . $via . '|' . $q . '|' . wp_json_encode( $c ) );
 		$res = get_transient( $ck );
 		if ( ! is_array( $res ) ) {
-			$res = NFA_AIS_Search::run( $q, $via, $cond );
+			$res = NFA_AIS_Search::run( $q, $via, $c );
 			set_transient( $ck, $res, 10 * MINUTE_IN_SECONDS );
 		}
 		NFA_AIS_Log::record( $via, $q, $res );

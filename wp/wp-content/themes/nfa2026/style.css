@@ -1,0 +1,10 @@
+/*
+Theme Name: NFA 2026
+Theme URI: https://www.nagano-fa.or.jp/
+Description: 長野県サッカー協会の公式サイト用テーマ。デザインデータ NFA_site_design を WordPress に置き換えたもの。見た目は assets/css/style.css にあり、このファイルはテーマの情報だけを持つ。必要なプラグイン：NFA AI Search、NFA Committee（ACF Pro は大会資料・協賛企業の入力に使用）。
+Author: tadamono
+Version: 0.1.0
+Requires at least: 6.5
+Requires PHP: 8.1
+Text Domain: nfa2026
+*/

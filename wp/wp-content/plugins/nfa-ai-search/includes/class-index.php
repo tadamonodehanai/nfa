@@ -1,13 +1,9 @@
 <?php
 /**
- * 条件ごとの該当投稿ID集合（段階1の索引）。
+ * 索引のバージョンとキャッシュ。
  *
- * 条件は「軸ごとにひとつの選択肢」と「キーワード（固有名詞など）」。
- * 条件1つにつき該当する投稿IDの集合を求めてキャッシュし、複数条件は集合の積（AND）で絞り込む。
- * 足すほど件数は減り、増えることはない（ワイヤーの設計メモ「絞り込みのロジック」）。
- * パネルの件数表示もこの集合で計算するので、選択肢が多くても問い合わせは増えない。
- *
- * 投稿や分類、設定が変わると索引のバージョンを上げ、古いキャッシュは使われなくなる。
+ * 投稿や分類、設定が変わると索引のバージョンを上げ、古いキャッシュ（掲載データ・検索結果）は使われなくなる。
+ * キーワード（固有名詞など）に当てはまる投稿の集合もここで求めてキャッシュする。
  * 段階2では、ここにベクトル検索（記事本文・PDF）を加える。
  *
  * @package NFA_AI_Search
@@ -77,37 +73,6 @@ class NFA_AIS_Index {
 	}
 
 	/**
-	 * 軸の選択肢に該当する投稿（同名のタクソノミー用語が付いているもの）。
-	 *
-	 * @return int[]
-	 */
-	public static function option_ids( $axis_key, $value ) {
-		return self::cached(
-			'opt|' . $axis_key . '|' . $value,
-			function () use ( $axis_key, $value ) {
-				$tax = NFA_AIS_Taxonomies::slug( $axis_key );
-				if ( ! $tax || ! taxonomy_exists( $tax ) ) {
-					return array();
-				}
-				$o        = NFA_AIS_Dictionary::option( $axis_key, $value );
-				$names    = array_unique( array_merge( array( $value ), $o ? $o['terms'] : array() ) );
-				$term_ids = array();
-				foreach ( $names as $name ) {
-					$t = get_term_by( 'name', $name, $tax );
-					if ( $t ) {
-						$term_ids[] = (int) $t->term_id;
-					}
-				}
-				if ( ! $term_ids ) {
-					return array();
-				}
-				$objs = get_objects_in_term( $term_ids, $tax );
-				return is_wp_error( $objs ) ? array() : array_map( 'intval', $objs );
-			}
-		);
-	}
-
-	/**
 	 * キーワード（固有名詞など）をタイトル・抜粋・本文に含む投稿。
 	 *
 	 * @return int[]
@@ -131,30 +96,6 @@ class NFA_AIS_Index {
 				);
 			}
 		);
-	}
-
-	/**
-	 * 条件（axis => value、keyword => 語）をすべて満たす投稿ID。条件なしなら空。
-	 *
-	 * @return int[]
-	 */
-	public static function match( array $cond ) {
-		$ids = null;
-		foreach ( $cond as $k => $v ) {
-			if ( '' === (string) $v ) {
-				continue;
-			}
-			$set = 'keyword' === $k ? self::keyword_ids( $v ) : self::option_ids( $k, $v );
-			$ids = null === $ids ? $set : array_values( array_intersect( $ids, $set ) );
-			if ( ! $ids ) {
-				return array();
-			}
-		}
-		return $ids ?? array();
-	}
-
-	public static function count( array $cond ) {
-		return count( self::match( $cond ) );
 	}
 
 	/**

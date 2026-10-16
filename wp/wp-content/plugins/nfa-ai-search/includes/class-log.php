@@ -71,7 +71,7 @@ class NFA_AIS_Log {
 				'created_at' => current_time( 'mysql', true ),
 				'via'        => $via,
 				'query'      => mb_substr( NFA_AIS_Text::mask_personal( $query ), 0, 200 ),
-				'conds'      => mb_substr( implode( ' / ', (array) $result['cond'] ), 0, 255 ),
+				'conds'      => mb_substr( implode( ' / ', array_filter( array_merge( $result['c']['t'], $result['c']['p'], $result['c']['r'], array( $result['c']['join'] ? 'チーム探し' : '', $result['c']['kw'] ) ) ) ), 0, 255 ),
 				'total'      => (int) $result['total'],
 				'parser'     => $result['parser'],
 			),

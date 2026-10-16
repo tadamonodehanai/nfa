@@ -72,7 +72,7 @@ $assets_url = get_assets_url();
         <h5>関連リンク</h5>
         <ul>
           <li><a href="https://www.jfa.jp/" target="_blank" rel="noopener">日本サッカー協会（JFA）</a></li>
-          <li><a href="#">北信越サッカー協会</a></li>
+          <li><a href="http://www.hokushinetsu-fa.football/site/" target="_blank" rel="noopener">北信越サッカー協会</a></li>
           <li><a href="#">郡市サッカー協会</a></li>
           <li><a href="<?= getPageUrl('contact');?>#form">お問い合わせ</a></li>
         </ul>

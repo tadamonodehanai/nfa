@@ -1,0 +1,18 @@
+<label><span class="ct-lb">お名前<span class="req">必須</span></span>[text* your-name autocomplete:name class:inp]</label>
+<label><span class="ct-lb">お名前（フリガナ）<span class="req">必須</span></span>[text* your-name-furigana class:inp]</label>
+<label><span class="ct-lb">電話番号</span>[tel tel autocomplete:tel class:inp]</label>
+<label><span class="ct-lb">メールアドレス<span class="req">必須</span></span>[email* your-email autocomplete:email class:inp]</label>
+<label><span class="ct-lb">お問い合わせタイトル<span class="req">必須</span></span>[text* text-title class:inp]</label>
+<label><span class="ct-lb">お問い合わせ内容<span class="req">必須</span></span>[textarea* textarea-message x10 class:inp]</label>
+<fieldset class="ct-files">
+<legend class="ct-lb">添付ファイル</legend>
+<div class="ct-fr"><b>ファイル1</b><label><span class="ct-sm">名称</span>[text shiryo-01 class:inp]</label>[file file-01 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx class:inp class:ct-file]</div>
+<div class="ct-fr"><b>ファイル2</b><label><span class="ct-sm">名称</span>[text shiryo-02 class:inp]</label>[file file-02 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx class:inp class:ct-file]</div>
+<div class="ct-fr"><b>ファイル3</b><label><span class="ct-sm">名称</span>[text shiryo-03 class:inp]</label>[file file-03 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx class:inp class:ct-file]</div>
+<p class="ct-hint"><b>添付ファイル・注意事項</b><br>Windows系ファイルでしたら受信可能（ワード、エクセル、パワーポイント、PDF、イラストレーター、フォトショップ、写真：jpeg,jpg,gif,png、テキスト）添付ファイルの合計20MBまで送信可能です。</p>
+</fieldset>
+<div class="ct-agree">
+<p>※当フォームをご利用の際には、<a href="/privacy/">「個人情報保護方針」</a>に同意いただく必要があります。</p>
+<label class="ct-chk">[acceptance acceptance-privacy]「個人情報保護方針」の内容に同意する[/acceptance]</label>
+</div>
+<div>[submit class:btn class:btn-g class:ct-submit "送信する"]</div>

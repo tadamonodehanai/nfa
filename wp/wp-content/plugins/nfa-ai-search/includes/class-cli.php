@@ -12,7 +12,6 @@ defined( 'ABSPATH' ) || exit;
  */
 class NFA_AIS_CLI {
 
-	const SAMPLE_META = '_nfa_ais_sample';
 
 	/**
 	 * 状態を表示する。
@@ -38,52 +37,50 @@ class NFA_AIS_CLI {
 	 * : 入力文
 	 *
 	 * [--via=<via>]
-	 * : text（入力文を読み取る）| set（--cond をそのまま使う）
+	 * : text（入力文を読み取る）| set（--c をそのまま使う）
 	 * ---
 	 * default: text
 	 * ---
 	 *
-	 * [--cond=<cond>]
-	 * : いまの条件。例：target=小学生（4種）,purpose=大会日程を知る,keyword=トレセン
+	 * [--c=<c>]
+	 * : いまの条件。例：t=cat-4,p=schedule,r=北信,join=1,kw=トレセン
 	 *
 	 * [--json]
 	 * : JSON で全体を出力する
 	 *
 	 * ## EXAMPLES
-	 *     wp nfa search "小学生の大会っていつ？"
-	 *     wp nfa search --via=set --cond="target=指導者,purpose=講習会に参加"
+	 *     wp nfa search "小学生の大会はいつありますか？"
+	 *     wp nfa search --via=set --c="t=technical,p=course"
 	 */
 	public function search( $args, $assoc ) {
-		$cond = array();
-		foreach ( array_filter( explode( ',', $assoc['cond'] ?? '' ) ) as $pair ) {
-			$kv = array_map( 'trim', explode( '=', $pair, 2 ) );
-			if ( 2 === count( $kv ) ) {
-				$cond[ $kv[0] ] = $kv[1];
-			}
-		}
-		$res = NFA_AIS_Search::run( $args[0] ?? '', $assoc['via'] ?? 'text', $cond );
+		$c = self::parse_c( $assoc['c'] ?? '' );
+		$res = NFA_AIS_Search::run( $args[0] ?? '', $assoc['via'] ?? 'text', $c );
 		if ( isset( $assoc['json'] ) ) {
 			WP_CLI::log( wp_json_encode( $res, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 			return;
 		}
-		$c = (array) $res['cond'];
-		WP_CLI::log( '条件 : ' . ( $c ? implode( ' / ', array_map( fn( $k, $v ) => "$k=$v", array_keys( $c ), $c ) ) : '（なし）' ) . '  [' . $res['parser'] . ']' );
-		WP_CLI::log( 'AI   : ' . wp_strip_all_tags( $res['say'] ) );
-		foreach ( $res['results'] as $r ) {
-			WP_CLI::log( '  ' . $r['date'] . '  ' . $r['title'] . '  [' . implode( ' / ', $r['meta'] ) . ']' );
+		$fmt = fn( $c ) => implode( ' / ', array_filter( array( $c['t'] ? 't=' . $c['t'][0] : '', $c['p'] ? 'p=' . $c['p'][0] : '', $c['r'] ? 'r=' . $c['r'][0] : '', $c['join'] ? 'join' : '', $c['kw'] ? 'kw=' . $c['kw'] : '' ) ) );
+		WP_CLI::log( '条件 : ' . ( $fmt( $res['c'] ) ? $fmt( $res['c'] ) : '（なし）' ) . '  [' . $res['parser'] . ']' . ( $res['unread'] ? '  読み取れず' : '' ) );
+		WP_CLI::log( '件数 : ' . $res['total'] . '（資料 ' . $res['npdf'] . '・記事 ' . $res['nnews'] . '）' . ( $res['relaxed'] ? '  ※「' . $res['relaxed'] . '」をゆるめた結果' : '' ) );
+		foreach ( array_slice( $res['docs'], 0, 8 ) as $d ) {
+			WP_CLI::log( '  ' . $d['d'] . '  [' . $d['k'] . '] ' . ( isset( $d['g'] ) ? $d['g'] . ' ／ ' : '' ) . $d['t'] );
 		}
-		if ( $res['more'] ) {
-			WP_CLI::log( '  → この条件の' . $res['more']['total'] . '件をすべて見る：' . $res['more']['url'] );
+	}
+
+	private static function parse_c( $str ) {
+		$c = array();
+		foreach ( array_filter( explode( ',', (string) $str ) ) as $pair ) {
+			$kv = array_map( 'trim', explode( '=', $pair, 2 ) );
+			if ( 2 !== count( $kv ) ) {
+				continue;
+			}
+			if ( in_array( $kv[0], array( 't', 'p', 'r' ), true ) ) {
+				$c[ $kv[0] ] = array( $kv[1] );
+			} else {
+				$c[ $kv[0] ] = $kv[1];
+			}
 		}
-		if ( $res['next'] ) {
-			WP_CLI::log( 'さらに絞り込むなら（' . $res['next']['name'] . '）: ' . implode( '  ', array_map( fn( $o ) => $o['value'] . '(' . $o['n'] . ')', $res['next']['options'] ) ) );
-		}
-		if ( $res['rescue'] ) {
-			WP_CLI::log( 'ひとつ条件を外すと: ' . implode( '  ', array_map( fn( $r ) => '「' . $r['value'] . '」を外す', $res['rescue'] ) ) );
-		}
-		if ( $res['popular'] ) {
-			WP_CLI::log( 'よく選ばれている条件: ' . implode( '  ', $res['popular'] ) );
-		}
+		return $c;
 	}
 
 	/**
@@ -152,87 +149,6 @@ class NFA_AIS_CLI {
 	}
 
 	/**
-	 * 動作確認用のサンプル記事を作成（または削除）する。
-	 *
-	 * サンプル記事に加えて、除外ルールの確認用に「お問い合わせ」ページ（Contact Form 7 のショートコード入り）、
-	 * 非公開の下書き、探索画面のページも作る。
-	 *
-	 * ## OPTIONS
-	 *
-	 * [--delete]
-	 * : 作成したサンプルを削除する
-	 *
-	 * ## EXAMPLES
-	 *     wp nfa sample
-	 *     wp nfa sample --delete
-	 */
-	public function sample( $args, $assoc ) {
-		$existing = get_posts(
-			array(
-				'post_type'      => 'any',
-				'post_status'    => 'any',
-				'posts_per_page' => -1,
-				'fields'         => 'ids',
-				'meta_key'       => self::SAMPLE_META, // phpcs:ignore WordPress.DB.SlowDBQuery
-			)
-		);
-		if ( isset( $assoc['delete'] ) ) {
-			foreach ( $existing as $id ) {
-				wp_delete_post( $id, true );
-			}
-			NFA_AIS_Index::bump();
-			WP_CLI::success( count( $existing ) . ' 件のサンプルを削除しました。' );
-			return;
-		}
-		if ( $existing ) {
-			WP_CLI::error( 'サンプルはすでにあります。作り直すときは先に `wp nfa sample --delete` を実行してください。' );
-		}
-		NFA_AIS_Taxonomies::seed_terms();
-		$items = require NFA_AIS_DIR . 'includes/sample-data.php';
-		foreach ( $items as $it ) {
-			$id = wp_insert_post(
-				array(
-					'post_type'    => 'post',
-					'post_status'  => 'publish',
-					'post_title'   => $it['t'],
-					'post_content' => "<!-- wp:paragraph -->\n<p>" . esc_html( $it['t'] ) . "の詳細です（サンプル）。</p>\n<!-- /wp:paragraph -->",
-					'post_date'    => $it['d'] . ' 10:00:00',
-					'meta_input'   => array( self::SAMPLE_META => 1 ),
-				),
-				true
-			);
-			if ( is_wp_error( $id ) ) {
-				WP_CLI::warning( $it['t'] . ': ' . $id->get_error_message() );
-				continue;
-			}
-			wp_set_object_terms( $id, $it['target'], 'nfa_target' );
-			wp_set_object_terms( $id, $it['purpose'], 'nfa_purpose' );
-			wp_set_object_terms( $id, $it['area'], 'nfa_area' );
-			wp_set_object_terms( $id, $it['committee'], NFA_AIS_Taxonomies::COMMITTEE );
-		}
-
-		// 除外ルールの確認用
-		$extras = array(
-			array( 'post_type' => 'page', 'post_status' => 'publish', 'post_name' => 'contact', 'post_title' => 'お問い合わせ', 'post_content' => "お問い合わせは下のフォームからどうぞ。小学生の大会や審判についてのご質問も受け付けます。\n\n[contact-form-7 id=\"1\" title=\"お問い合わせ\"]" ),
-			array( 'post_type' => 'post', 'post_status' => 'draft', 'post_title' => '【下書き】小学生 大会 審判 個人情報テスト', 'post_content' => '山田太郎 090-1234-5678 taro@example.com' ),
-			array( 'post_type' => 'post', 'post_status' => 'private', 'post_title' => '【非公開】小学生 大会 審判 内部メモ', 'post_content' => '非公開のメモ' ),
-			array( 'post_type' => 'page', 'post_status' => 'publish', 'post_name' => 'search', 'post_title' => '情報をさがす', 'post_content' => '[nfa_ai_search]' ),
-		);
-		foreach ( $extras as $p ) {
-			$p['meta_input'] = array( self::SAMPLE_META => 1 );
-			$id              = wp_insert_post( $p );
-			// 下書き・非公開にも分類を付けておく（除外が効いていなければ検索に出てしまう状態で確かめる）
-			if ( $id && 'post' === $p['post_type'] ) {
-				wp_set_object_terms( $id, '小学生（4種）', 'nfa_target' );
-				wp_set_object_terms( $id, '大会日程を知る', 'nfa_purpose' );
-				wp_set_object_terms( $id, '県全域', 'nfa_area' );
-			}
-		}
-		NFA_AIS_Index::bump();
-		WP_CLI::success( count( $items ) . ' 件のサンプル記事と、確認用のページを作成しました。探索画面：' . NFA_AIS_Frontend::search_page_url() );
-	}
-
-	/**
 	 * サンプル記事を使って、探索の主な流れと除外ルールを確認する。
 	 *
 	 * ## EXAMPLES
@@ -251,73 +167,89 @@ class NFA_AIS_CLI {
 		$titles = fn( $r ) => array_column( $r['results'], 'title' );
 		$cond   = fn( $r ) => (array) $r['cond'];
 
-		WP_CLI::log( '1. 例「小学生の大会っていつ？」→ 対象と目的を読み取り、1件' );
-		$r = NFA_AIS_Search::run( '小学生の大会っていつ？', 'text', array() );
-		$check( '条件 = 小学生（4種）/ 大会日程を知る', array( 'target' => '小学生（4種）', 'purpose' => '大会日程を知る' ) === $cond( $r ), wp_json_encode( $cond( $r ), JSON_UNESCAPED_UNICODE ) );
-		$check( '1件', 1 === $r['total'], (string) $r['total'] );
-		$check( '返事が「〜ですね。1件の情報があります。」', false !== strpos( $r['say'], 'ですね。<b>1件</b>の情報があります' ), $r['say'] );
+		$run_text = fn( $q, $c = array() ) => NFA_AIS_Search::run( $q, 'text', $c );
+		$C        = fn( $r ) => $r['c'];
 
-		WP_CLI::log( '2. 例「審判の資格更新はどうすれば？」' );
-		$r = NFA_AIS_Search::run( '審判の資格更新はどうすれば？', 'text', array() );
-		$check( '審判員登録の更新手続きが出る', array( '審判員登録の更新手続きについて（2026年度）' ) === $titles( $r ), implode( ',', $titles( $r ) ) );
+		WP_CLI::log( '1. 例「小学生の大会はいつありますか？」→ 対象と目的を読み取り、大会資料が出る' );
+		$r = $run_text( '小学生の大会はいつありますか？' );
+		$check( '条件 = cat-4 / schedule', array( 'cat-4' ) === $C( $r )['t'] && array( 'schedule' ) === $C( $r )['p'], wp_json_encode( $C( $r ) ) );
+		// 大会・リーグ資料がまだ1件もないあいだは確かめない
+		$has_doc = post_type_exists( 'nfa_doc' ) && (int) wp_count_posts( 'nfa_doc' )->publish > 0;
+		$check( '資料（pdf）がある' . ( $has_doc ? '' : '（大会資料が未登録のため省略）' ), ! $has_doc || $r['npdf'] > 0, (string) $r['npdf'] );
+		$check( '新しい順', ! $r['docs'] || count( $r['docs'] ) < 2 || $r['docs'][0]['d'] >= $r['docs'][1]['d'] );
 
-		WP_CLI::log( '3. 例「女子のチームに入りたい」→ 2件、次は目的で絞れる' );
-		$r = NFA_AIS_Search::run( '女子のチームに入りたい', 'text', array() );
-		$check( '2件', 2 === $r['total'], (string) $r['total'] );
-		$check( 'さらに絞り込むなら（目的）', $r['next'] && 'purpose' === $r['next']['key'] && 2 === count( $r['next']['options'] ) );
+		WP_CLI::log( '2. 例「審判の資格を更新したい」' );
+		$r = $run_text( '審判の資格を更新したい' );
+		$check( '条件 = referee / course', array( 'referee' ) === $C( $r )['t'] && array( 'course' ) === $C( $r )['p'], wp_json_encode( $C( $r ) ) );
 
-		WP_CLI::log( '4. 例「指導者の講習会を探しています」→ 2件、次は地域で絞れる' );
-		$r = NFA_AIS_Search::run( '指導者の講習会を探しています', 'text', array() );
-		$check( '2件', 2 === $r['total'], (string) $r['total'] );
-		$check( 'さらに絞り込むなら（地域）北信・東信', $r['next'] && 'area' === $r['next']['key'] && array( '北信', '東信' ) === array_column( $r['next']['options'], 'value' ) );
-		$r2 = NFA_AIS_Search::run( '東信だと？', 'text', $cond( $r ) );
-		$check( '続けて「東信だと？」→ 条件が累積して1件', 1 === $r2['total'] && '東信' === ( $cond( $r2 )['area'] ?? '' ), wp_json_encode( $cond( $r2 ), JSON_UNESCAPED_UNICODE ) );
+		WP_CLI::log( '3. 例「女子のチームに入りたい」→ チーム探し' );
+		$r = $run_text( '女子のチームに入りたい' );
+		$check( 'join・目的なし・cat-w', $C( $r )['join'] && ! $C( $r )['p'] && array( 'cat-w' ) === $C( $r )['t'], wp_json_encode( $C( $r ) ) );
+
+		WP_CLI::log( '4. 例「指導者の講習会を探している」→ 続けて「北信だけ」' );
+		$r  = $run_text( '指導者の講習会を探している' );
+		$check( '条件 = technical / course', array( 'technical' ) === $C( $r )['t'] && array( 'course' ) === $C( $r )['p'], wp_json_encode( $C( $r ) ) );
+		$r2 = $run_text( '東信だけ', $C( $r ) );
+		$check( '条件が重なる（地域が足される）', array( 'technical' ) === $C( $r2 )['t'] && array( '東信' ) === $C( $r2 )['r'], wp_json_encode( $C( $r2 ) ) );
 
 		WP_CLI::log( '5. 読み取れない言葉' );
-		$r = NFA_AIS_Search::run( 'zzzzqqqq', 'text', array( 'target' => '女子' ) );
-		$check( 'unread・よく選ばれている条件', $r['unread'] && $r['popular'] );
-		$check( 'いまの条件は変わらない', array( 'target' => '女子' ) === $cond( $r ) );
+		$r = $run_text( 'zzzzqqqq', array( 't' => array( 'cat-w' ) ) );
+		$check( 'unread・いまの条件は変わらない', $r['unread'] && array( 'cat-w' ) === $C( $r )['t'] );
 
-		WP_CLI::log( '6. 0件：ひとつ条件を外す提案' );
-		$r = NFA_AIS_Search::run( '', 'set', array( 'target' => 'シニア', 'purpose' => '試合結果を見る' ) );
-		$check( '0件で「外す」が2つ', 0 === $r['total'] && 2 === count( $r['rescue'] ) );
-
-		WP_CLI::log( '7. パネル：0件になる選択肢は押せない' );
-		$r    = NFA_AIS_Search::run( '', 'set', array( 'target' => '審判' ) );
-		$opts = array_column( array_values( array_filter( $r['facets'], fn( $f ) => 'purpose' === $f['key'] ) )[0]['options'], null, 'value' );
-		$check( '審判×試合結果を見る は dead', $opts['試合結果を見る']['dead'] && 0 === $opts['試合結果を見る']['n'] );
-		$check( '審判×講習会に参加 は 1件', 1 === $opts['講習会に参加']['n'] && ! $opts['講習会に参加']['dead'] );
-
-		WP_CLI::log( '8. 6件以上は「すべて見る」' );
-		$r = NFA_AIS_Search::run( '', 'set', array( 'area' => '県全域' ) );
-		$check( '結果は5件まで＋すべて見るリンク', 5 === count( $r['results'] ) && $r['more'] && $r['more']['total'] > 5 );
-		$check( '新しい順', $r['results'][0]['date'] >= $r['results'][1]['date'] );
-
-		WP_CLI::log( '9. 担当部署（発信元）は公開側に出さない' );
-		$all = wp_json_encode( NFA_AIS_Search::run( '', 'set', array( 'area' => '県全域' ) ), JSON_UNESCAPED_UNICODE );
-		$check( '応答に委員会名が含まれない', false === strpos( $all, '委員会' ) );
-
-		WP_CLI::log( '10. 除外ルール（お問い合わせ・下書き・非公開・探索画面は出ない）' );
-		$forbidden = array( 'お問い合わせ', '個人情報テスト', '内部メモ', '情報をさがす' );
-		foreach ( array( 'お問い合わせ', '個人情報テスト', '内部メモ', '情報をさがす', '山田太郎', '小学生の大会' ) as $q ) {
-			foreach ( array( NFA_AIS_Search::run( $q, 'text', array() ), NFA_AIS_Search::run( '', 'set', array( 'keyword' => $q ) ) ) as $r ) {
-				$hit = array_filter( $titles( $r ), fn( $t ) => (bool) array_filter( $forbidden, fn( $f ) => false !== mb_strpos( $t, $f ) ) );
-				$check( "「{$q}」に除外対象が出ない", ! $hit, implode( ',', $hit ) );
+		WP_CLI::log( '6. 0件：目的をゆるめる' );
+		$found = false;
+		foreach ( array( 'cat-f', 'cat-s', 'medical', 'para' ) as $t ) {
+			foreach ( array( 'course', 'reg', 'event' ) as $p ) {
+				$r = NFA_AIS_Search::run( '', 'set', array( 't' => array( $t ), 'p' => array( $p ) ) );
+				if ( 0 === $r['total'] && $r['docs'] ) {
+					$found = true;
+					$check( "{$t}×{$p} は0件 → 目的をゆるめた結果を返す", 'p' === $r['relaxed'] && ! $r['st']['p'] );
+					break 2;
+				}
 			}
 		}
-		$cf = get_page_by_path( 'contact' );
-		$check( 'お問い合わせページは is_eligible = false', $cf && ! NFA_AIS_Eligibility::is_eligible( $cf ) );
+		if ( ! $found ) {
+			WP_CLI::log( '  （0件になる組み合わせがサンプルにないため省略）' );
+		}
 
-		WP_CLI::log( '11. 伏せ字' );
+		WP_CLI::log( '7. 件数：パネル・候補タグ用' );
+		$r = NFA_AIS_Search::run( '', 'set', array( 't' => array( 'cat-4' ) ) );
+		$check( '対象を cat-4 に置いたときの件数 = いまの件数', $r['counts']['t']['cat-4'] === $r['total'], $r['counts']['t']['cat-4'] . ' / ' . $r['total'] );
+		$sum = array_sum( $r['counts']['p'] );
+		$check( '目的ごとの件数が出る', $sum > 0 );
+
+		WP_CLI::log( '8. 担当委員会（バッジ）と記事のリンク' );
+		$news = array_values( array_filter( $r['docs'], fn( $d ) => 'news' === $d['k'] ) );
+		$check( '記事にバッジとURLがある', ! $news || ( '' !== $news[0]['l'] && 0 === strpos( $news[0]['u'], home_url() ) ) );
+
+		WP_CLI::log( '9. 除外ルール（お問い合わせ・下書き・非公開・探索画面は出ない）' );
+		// 「お問い合わせ」ページそのもの（題名が一致）と、テスト用の下書き・非公開の記事が出ないこと。
+		// 「よくあるお問い合わせ」のような普通の記事は出てよい
+		$forbidden = array( '個人情報テスト', '内部メモ' );
+		foreach ( array( 'お問い合わせ', '個人情報テスト', '内部メモ', '山田太郎', 'フォーム' ) as $q ) {
+			$r   = NFA_AIS_Search::run( '', 'set', array( 'kw' => $q ) );
+			$hit = array_filter( array_column( $r['docs'], 't' ), fn( $t ) => 'お問い合わせ' === $t || (bool) array_filter( $forbidden, fn( $f ) => false !== mb_strpos( $t, $f ) ) );
+			$check( "「{$q}」に除外対象が出ない", ! $hit, implode( ',', $hit ) );
+		}
+		$cf = get_page_by_path( 'contact' );
+		if ( $cf ) {
+			$check( 'お問い合わせページは is_eligible = false', ! NFA_AIS_Eligibility::is_eligible( $cf ) );
+		}
+		$sp = get_page_by_path( 'search' );
+		if ( $sp ) {
+			$check( '探索画面のページは is_eligible = false', ! NFA_AIS_Eligibility::is_eligible( $sp ) );
+		}
+
+		WP_CLI::log( '10. 伏せ字' );
 		$m = NFA_AIS_Text::mask_personal( '山田 taro@example.com 090-1234-5678 に連絡' );
 		$check( 'メール・電話番号が伏せ字になる', false === strpos( $m, 'example.com' ) && false === strpos( $m, '5678' ), $m );
 
-		WP_CLI::log( '12. 条件をすべて外す' );
+		WP_CLI::log( '11. 条件をすべて外す' );
 		$r = NFA_AIS_Search::run( '', 'set', array() );
-		$check( '仕切り直しの案内', false !== strpos( $r['say'], '条件をすべて外しました' ) && 0 === $r['total'] );
+		$check( '0件・docs なし', 0 === $r['total'] && ! $r['docs'] );
 
 		WP_CLI::log( '13. 差分の再取り込み' );
-		$draft = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'selftest 取り込み確認', 'post_content' => '最初の本文', 'meta_input' => array( self::SAMPLE_META => 1 ) ) );
+		$draft = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'selftest 取り込み確認', 'post_content' => '最初の本文', 'meta_input' => array( '_nfa_demo' => 1 ) ) );
 		NFA_AIS_Ingest::cancel();
 		$run = function ( $mode = 'diff' ) {
 			NFA_AIS_Ingest::start( $mode );

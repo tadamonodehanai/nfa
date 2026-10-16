@@ -2,19 +2,17 @@
 /**
  * 探索の語彙（3軸の選択肢と言い換え）。
  *
- * ワイヤー NFA_wireframes_site/search.html の AXES / LEX / utterance を初期値とし、
- * 管理画面で JSON として編集できる。
+ * デザイン NFA_site_design/assets/js/search.js の AX / SHORT / toFacets を初期値とし、管理画面で JSON として編集できる。
  *
- *   axes[].key      target（対象）| purpose（目的）| area（地域）
- *   axes[].name     パネルの見出し
- *   axes[].axis     見出しの下の説明（「誰に向けた情報か」など）
- *   axes[].options[]
- *       value    選択肢の名前。同名のタクソノミー用語が付いた記事が該当する
- *       terms    同じ選択肢として扱う別の用語名（任意）
- *       pattern  入力文から、この選択肢を読み取るための正規表現
- *       say      会話での言い回し（「小学生（4種）のこと」など）
- *   examples   入口に出す聞き方の例
- *   popular    読み取れなかったときに出す「よく選ばれている条件」（対象の value）
+ *   axes[].key   t（対象）| p（目的）| r（地域）   … 画面と API で使う短い名前（search.js と同じ）
+ *   axes[].tax   対応するタクソノミー（nfa_target / nfa_purpose / nfa_area）
+ *   axes[].items[]
+ *       v      値。タクソノミー用語のスラッグ（地域は用語の名前）と同じにする
+ *       l      表示名
+ *       short  会話で使う短い名前（任意。対象の「小学生」など）
+ *       rx     入力文から読み取る正規表現
+ *   join      「チームに入りたい」をチーム探しとして扱う正規表現
+ *   examples  入口に出す質問の例
  *
  * @package NFA_AI_Search
  */
@@ -23,59 +21,65 @@ defined( 'ABSPATH' ) || exit;
 
 class NFA_AIS_Dictionary {
 
-	const OPTION = 'nfa_ais_dictionary_v2';
+	const OPTION = 'nfa_ais_dictionary_v3';
 
 	private static $cache = null;
 
 	public static function defaults() {
-		$o = fn( $value, $pattern, $say ) => array( 'value' => $value, 'pattern' => $pattern, 'say' => $say );
+		$i = fn( $v, $l, $rx, $short = '' ) => array_filter( array( 'v' => $v, 'l' => $l, 'short' => $short, 'rx' => $rx ), 'strlen' );
 		return array(
 			'axes'     => array(
 				array(
-					'key'     => 'target',
-					'name'    => '対象',
-					'axis'    => '誰に向けた情報か',
-					'options' => array(
-						$o( '小学生（4種）', '小学|4種|少年|低学年|高学年|キッズ|U-?12', '小学生（4種）のこと' ),
-						$o( '中学生（3種）', '中学|3種|ジュニアユース|U-?15', '中学生（3種）のこと' ),
-						$o( '高校生（2種）', '高校|2種|(?<!ジュニア)ユース|U-?18', '高校生（2種）のこと' ),
-						$o( '大人・社会人（1種）', '社会人|1種|大人', '大人・社会人のこと' ),
-						$o( '女子', '女子|女の子|なでしこ|girls', '女子サッカーのこと' ),
-						$o( 'シニア', 'シニア|O-?40|O-?50|オーバー', 'シニア世代のこと' ),
-						$o( 'フットサル', 'フットサル', 'フットサルのこと' ),
-						$o( '障がい者サッカー', '障がい|障害', '障がい者サッカーのこと' ),
-						$o( '審判', '審判|レフェリー|笛', '審判のこと' ),
-						$o( '指導者', '指導者|コーチ|監督', '指導者のこと' ),
+					'key'   => 't',
+					'name'  => '対象',
+					'sub'   => '誰に向けた情報か',
+					'tax'   => 'nfa_target',
+					'items' => array(
+						$i( 'cat-4', '小学生（4種）', '小学|4種|４種|U-?1[0-2](?!\d)|少年', '小学生' ),
+						$i( 'cat-3', '中学生（3種）', '中学|3種|３種|U-?1[3-5](?!\d)', '中学生' ),
+						$i( 'cat-2', '高校生（2種）', '高校|2種|２種|U-?1[6-8](?!\d)', '高校生' ),
+						$i( 'cat-1', '社会人・大学（1種）', '社会人|大学|1種|１種|大人|一般', '社会人・大学' ),
+						$i( 'cat-w', '女子', '女子|なでしこ|女の子|ガールズ|レディース' ),
+						$i( 'cat-s', 'シニア', 'シニア|O-?[3-7]\d|４０歳|40歳|50歳|60歳' ),
+						$i( 'cat-f', 'フットサル', 'フットサル' ),
+						$i( 'grassroots', 'キッズ', 'キッズ|幼児|未就学|園児|U-?[68](?!\d)' ),
+						$i( 'para', '障がい者サッカー', '障がい|障害|ブラインド|知的障|電動車椅子' ),
+						$i( 'referee', '審判', '審判|レフェリー' ),
+						$i( 'technical', '指導者', '指導者|コーチ|監督|ライセンス' ),
 					),
 				),
 				array(
-					'key'     => 'purpose',
-					'name'    => '目的',
-					'axis'    => '何をしたいか',
-					'options' => array(
-						$o( '大会日程を知る', '大会|日程|いつ|開催|予定|組み合わせ|組合せ', '大会の日程が知りたい' ),
-						$o( '試合結果を見る', '結果|順位|スコア|勝敗|勝った|負けた', '試合の結果が見たい' ),
-						$o( '登録・手続き', '登録|手続き|申込|申し込|エントリー|更新|書類|様式', '登録や手続きについて' ),
-						$o( '講習会に参加', '講習|研修|ライセンス|資格|養成', '講習会に参加したい' ),
-						$o( 'イベント・セミナーに参加', 'イベント|セミナー|フェスティバル|交流会|体験|参加したい', 'イベントやセミナーに参加したい' ),
-						$o( 'お知らせを読む', 'お知らせ|案内|連絡|中止|順延', 'お知らせが読みたい' ),
+					'key'   => 'p',
+					'name'  => '目的',
+					'sub'   => '何をしたいか',
+					'tax'   => 'nfa_purpose',
+					// 読み取りは並び順（具体的な意図が先）。画面の並びは order の順
+					'order' => array( 'schedule', 'result', 'reg', 'course', 'event', 'news' ),
+					'items' => array(
+						$i( 'course', '講習会に参加', '講習|資格|更新|ライセンス|研修|養成|受講|昇級' ),
+						$i( 'reg', '登録・手続き', '登録|手続|申請|申込|申し込|移籍|入りたい|入会|加入|チーム.{0,3}(探|入|さが)' ),
+						$i( 'result', '試合結果を見る', '結果|星取|順位|勝敗|スコア|優勝|勝った' ),
+						$i( 'event', 'イベント・セミナーに参加', 'イベント|セミナー|フェスティバル|体験|教室|参加したい|募集|キャンプ' ),
+						$i( 'schedule', '大会日程を知る', 'いつ|日程|予定|スケジュール|組み合わせ|組合せ|開催日|大会|試合' ),
+						$i( 'news', 'お知らせを読む', 'お知らせ|ニュース|最新|新着' ),
 					),
 				),
 				array(
-					'key'     => 'area',
-					'name'    => '地域',
-					'axis'    => 'どの地区か',
-					'options' => array(
-						$o( '北信', '北信|長野市|須坂|中野|飯山|千曲', '北信エリアで' ),
-						$o( '東信', '東信|上田|佐久|小諸|東御', '東信エリアで' ),
-						$o( '中信', '中信|松本|安曇野|塩尻|大町|木曽', '中信エリアで' ),
-						$o( '南信', '南信|飯田|伊那|諏訪|岡谷|茅野|駒ヶ根', '南信エリアで' ),
-						$o( '県全域', '県全域|県全体|全県', '県全域で' ),
+					'key'   => 'r',
+					'name'  => '地域',
+					'sub'   => 'どの地区か',
+					'tax'   => 'nfa_area',
+					'items' => array(
+						$i( '北信', '北信', '北信|長野市|千曲|須坂|中野|飯山' ),
+						$i( '東信', '東信', '東信|佐久|上田|上小|小諸|東御' ),
+						$i( '中信', '中信', '中信|松本|塩尻|安曇|大町|木曽' ),
+						$i( '南信', '南信', '南信|諏訪|伊那|飯田' ),
+						$i( '県全域', '県全域', '県全域|県全体|全県|県大会|県リーグ' ),
 					),
 				),
 			),
-			'examples' => array( '小学生の大会っていつ？', '審判の資格更新はどうすれば？', '女子のチームに入りたい', '指導者の講習会を探しています' ),
-			'popular'  => array( '小学生（4種）', '中学生（3種）', '女子', '審判', '指導者' ),
+			'join'     => 'チーム.{0,4}(入|探|さが)',
+			'examples' => array( '小学生の大会はいつありますか？', '審判の資格を更新したい', '女子のチームに入りたい', '指導者の講習会を探している' ),
 		);
 	}
 
@@ -86,13 +90,10 @@ class NFA_AIS_Dictionary {
 		$saved = get_option( self::OPTION );
 		$dict  = is_array( $saved ) && ! empty( $saved['axes'] ) ? $saved : self::defaults();
 		foreach ( $dict['axes'] as &$ax ) {
-			$ax['options'] = array_map(
-				fn( $o ) => wp_parse_args( $o, array( 'terms' => array(), 'pattern' => '', 'say' => $o['value'] ) ),
-				$ax['options']
-			);
+			$ax['items'] = array_map( fn( $it ) => $it + array( 'short' => '', 'rx' => '' ), $ax['items'] );
 		}
 		unset( $ax );
-		$dict += array( 'examples' => array(), 'popular' => array() );
+		$dict += array( 'join' => '', 'examples' => array() );
 		self::$cache = $dict;
 		return $dict;
 	}
@@ -114,45 +115,89 @@ class NFA_AIS_Dictionary {
 		return null;
 	}
 
-	public static function option( $axis_key, $value ) {
-		$ax = self::axis( $axis_key );
-		foreach ( $ax ? $ax['options'] : array() as $o ) {
-			if ( $o['value'] === $value ) {
-				return $o;
+	/**
+	 * 画面に出す並び（目的は order があればその順）。
+	 */
+	public static function display_items( $key ) {
+		$ax = self::axis( $key );
+		if ( ! $ax ) {
+			return array();
+		}
+		if ( empty( $ax['order'] ) ) {
+			return $ax['items'];
+		}
+		$by = array_column( $ax['items'], null, 'v' );
+		$out = array();
+		foreach ( $ax['order'] as $v ) {
+			if ( isset( $by[ $v ] ) ) {
+				$out[] = $by[ $v ];
+				unset( $by[ $v ] );
+			}
+		}
+		return array_merge( $out, array_values( $by ) );
+	}
+
+	public static function item( $key, $v ) {
+		foreach ( self::axis( $key )['items'] ?? array() as $it ) {
+			if ( $it['v'] === $v ) {
+				return $it;
 			}
 		}
 		return null;
-	}
-
-	public static function values( $axis_key ) {
-		$ax = self::axis( $axis_key );
-		return $ax ? array_column( $ax['options'], 'value' ) : array();
 	}
 
 	public static function examples() {
 		return self::get()['examples'];
 	}
 
-	public static function popular() {
-		return array_values( array_filter( self::get()['popular'], fn( $v ) => self::option( 'target', $v ) ) );
+	/**
+	 * 選択肢に対応するタクソノミー用語（スラッグ → 名前の順で探す）。
+	 */
+	public static function term( $key, $v ) {
+		$ax = self::axis( $key );
+		if ( ! $ax || ! taxonomy_exists( $ax['tax'] ) ) {
+			return null;
+		}
+		$t = get_term_by( 'slug', sanitize_title( $v ), $ax['tax'] );
+		return $t ? $t : ( get_term_by( 'name', $v, $ax['tax'] ) ?: null );
 	}
 
 	/**
-	 * 入力文から、軸ごとに最初に当てはまる選択肢を読み取る（各軸ひとつまで）。
+	 * 入力文 → 条件（search.js の toFacets と同じ考え方）。
+	 * 1つの軸につき1つだけ読み取る。目的は辞書の並び順（具体的な意図が先）、対象・地域は文中で先に出た語。
 	 *
-	 * @return array axis key => value
+	 * @return array{t:string[], p:string[], r:string[], join:bool, kw:string[]}
 	 */
-	public static function read( $text ) {
-		$out = array();
+	public static function read( $q ) {
+		$f    = array( 't' => array(), 'p' => array(), 'r' => array(), 'join' => false, 'kw' => array() );
+		$rest = $q;
 		foreach ( self::axes() as $ax ) {
-			foreach ( $ax['options'] as $o ) {
-				if ( '' !== $o['pattern'] && preg_match( '/' . $o['pattern'] . '/iu', $text ) ) {
-					$out[ $ax['key'] ] = $o['value'];
-					break;
+			$best = null;
+			foreach ( $ax['items'] as $it ) {
+				if ( '' === $it['rx'] ) {
+					continue;
 				}
+				if ( preg_match( '/' . $it['rx'] . '/iu', $q, $m, PREG_OFFSET_CAPTURE ) ) {
+					$pos = mb_strlen( substr( $q, 0, $m[0][1] ) );
+					if ( null === $best || ( 'p' !== $ax['key'] && $pos < $best['i'] ) ) {
+						$best = array( 'v' => $it['v'], 'i' => $pos );
+					}
+				}
+				$rest = preg_replace( '/' . $it['rx'] . '/iu', ' ', $rest );
+			}
+			if ( $best ) {
+				$f[ $ax['key'] ][] = $best['v'];
 			}
 		}
-		return $out;
+		$join = self::get()['join'];
+		if ( $join && preg_match( '/' . $join . '/u', $q ) ) {
+			$f['join'] = true;
+			$f['p']    = array();
+		}
+		$rest    = preg_replace( '/[？?！!、。・「」（）()]/u', ' ', (string) $rest );
+		$rest    = preg_replace( '/について|ですか|ますか|ありますか|知りたい|したい|たい|ている|いる|どう|すれば|どこ|なに|何|ください|教えて|情報|の|は|を|が|に|で|と|も|へ|や/u', ' ', $rest );
+		$f['kw'] = array_values( array_filter( preg_split( '/\s+/u', trim( $rest ) ), fn( $w ) => mb_strlen( $w ) >= 2 ) );
+		return $f;
 	}
 
 	/**
@@ -162,26 +207,26 @@ class NFA_AIS_Dictionary {
 		if ( ! is_array( $dict ) || empty( $dict['axes'] ) || ! is_array( $dict['axes'] ) ) {
 			return new WP_Error( 'nfa_dict', 'axes（配列）が必要です。' );
 		}
-		$allowed = array_keys( NFA_AIS_Taxonomies::FACETS );
+		$taxes = array( 't' => 'nfa_target', 'p' => 'nfa_purpose', 'r' => 'nfa_area' );
 		foreach ( $dict['axes'] as $ax ) {
-			if ( empty( $ax['key'] ) || ! in_array( $ax['key'], $allowed, true ) ) {
-				return new WP_Error( 'nfa_dict', '軸の key は target / purpose / area のいずれかにしてください。' );
+			if ( empty( $ax['key'] ) || ! isset( $taxes[ $ax['key'] ] ) ) {
+				return new WP_Error( 'nfa_dict', '軸の key は t / p / r のいずれかにしてください。' );
 			}
-			if ( empty( $ax['name'] ) || empty( $ax['options'] ) || ! is_array( $ax['options'] ) ) {
-				return new WP_Error( 'nfa_dict', sprintf( '軸「%s」に name と options が必要です。', $ax['key'] ) );
+			if ( empty( $ax['items'] ) || ! is_array( $ax['items'] ) ) {
+				return new WP_Error( 'nfa_dict', sprintf( '軸「%s」に items が必要です。', $ax['key'] ) );
 			}
 			$seen = array();
-			foreach ( $ax['options'] as $o ) {
-				if ( empty( $o['value'] ) ) {
-					return new WP_Error( 'nfa_dict', sprintf( '軸「%s」に value のない選択肢があります。', $ax['key'] ) );
+			foreach ( $ax['items'] as $it ) {
+				if ( empty( $it['v'] ) || empty( $it['l'] ) ) {
+					return new WP_Error( 'nfa_dict', sprintf( '軸「%s」に v か l のない選択肢があります。', $ax['key'] ) );
 				}
-				if ( isset( $seen[ $o['value'] ] ) ) {
-					return new WP_Error( 'nfa_dict', sprintf( '「%s」が重複しています。', $o['value'] ) );
+				if ( isset( $seen[ $it['v'] ] ) ) {
+					return new WP_Error( 'nfa_dict', sprintf( '「%s」が重複しています。', $it['v'] ) );
 				}
-				if ( ! empty( $o['pattern'] ) && false === @preg_match( '/' . $o['pattern'] . '/iu', '' ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors
-					return new WP_Error( 'nfa_dict', sprintf( '「%s」の pattern が正規表現として不正です。', $o['value'] ) );
+				if ( ! empty( $it['rx'] ) && false === @preg_match( '/' . $it['rx'] . '/iu', '' ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors
+					return new WP_Error( 'nfa_dict', sprintf( '「%s」の rx が正規表現として不正です。', $it['v'] ) );
 				}
-				$seen[ $o['value'] ] = true;
+				$seen[ $it['v'] ] = true;
 			}
 		}
 		return true;

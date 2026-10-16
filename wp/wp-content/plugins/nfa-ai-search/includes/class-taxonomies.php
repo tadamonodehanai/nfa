@@ -1,9 +1,10 @@
 <?php
 /**
- * 3軸のカスタムタクソノミー（対象・目的・地域）と、管理用の発信元。
+ * 分類の登録：担当委員会（nfa_committee）と、AI検索の3軸（対象・目的・地域）。
  *
- * 3軸は探索画面の絞り込みに使う。発信元（担当委員会）は CMS 内部の管理項目として持ち、公開側には出さない。
+ * 担当委員会は、権限・委員会ページ（カテゴリトップ）・TOPの日程タブ・AI検索のすべての軸になる。
  * テーマを作り替えても分類データが残るよう、テーマではなくプラグインで登録する。
+ * ACF の画面ではなくコードで登録するのは、ACF が無効になっても分類が消えないようにするため。
  *
  * @package NFA_AI_Search
  */
@@ -12,66 +13,91 @@ defined( 'ABSPATH' ) || exit;
 
 class NFA_AIS_Taxonomies {
 
-	/** 絞り込みに使う軸：キー => [スラッグ, 表示名] */
+	/** 絞り込みに使う軸：画面のキー（t/p/r）=> [スラッグ, 表示名] */
 	const FACETS = array(
-		'target'  => array( 'nfa_target', '対象' ),
-		'purpose' => array( 'nfa_purpose', '目的' ),
-		'area'    => array( 'nfa_area', '地域' ),
+		't' => array( 'nfa_target', '対象' ),
+		'p' => array( 'nfa_purpose', '目的' ),
+		'r' => array( 'nfa_area', '地域' ),
 	);
 
-	/** 管理用（公開側に出さない） */
 	const COMMITTEE = 'nfa_committee';
-
-	const COMMITTEES = array( '1種委員会', '2種委員会', '3種委員会', '4種委員会', '女子委員会', 'シニア委員会', 'フットサル委員会', '審判委員会', '技術委員会', '医学委員会', '普及委員会', '事務局' );
 
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register' ), 5 );
+		// 辞書が変わったら、足りない用語を作る
+		add_action(
+			'init',
+			function () {
+				$sig = md5( wp_json_encode( NFA_AIS_Dictionary::axes() ) );
+				if ( get_option( 'nfa_ais_terms_sig' ) !== $sig ) {
+					self::seed_terms();
+					update_option( 'nfa_ais_terms_sig', $sig, false );
+				}
+			},
+			20
+		);
 	}
 
 	public static function slug( $key ) {
 		return self::FACETS[ $key ][0] ?? '';
 	}
 
+	public static function post_types() {
+		return array_values( array_unique( array_merge( NFA_AIS_Settings::post_types(), array( 'post', 'nfa_doc' ) ) ) );
+	}
+
 	public static function register() {
-		$object_types = NFA_AIS_Settings::post_types();
+		$types = self::post_types();
+		register_taxonomy(
+			self::COMMITTEE,
+			$types,
+			array(
+				'labels'            => self::labels( '担当委員会' ),
+				'public'            => true,
+				'hierarchical'      => true,
+				'show_admin_column' => true,
+				'show_in_rest'      => true,
+				'query_var'         => 'committee',
+				// 委員会ページの URL（仮）。決まったら変更し、パーマリンク設定を保存し直す
+				'rewrite'           => array( 'slug' => apply_filters( 'nfa_committee_rewrite_slug', 'committee' ), 'with_front' => false ),
+				'capabilities'      => array(
+					'manage_terms' => 'manage_categories',
+					'edit_terms'   => 'manage_categories',
+					'delete_terms' => 'manage_categories',
+					'assign_terms' => 'edit_posts',
+				),
+			)
+		);
 		foreach ( self::FACETS as $axis ) {
 			list( $slug, $label ) = $axis;
 			register_taxonomy(
 				$slug,
-				$object_types,
+				$types,
 				array(
 					'labels'            => self::labels( $label ),
 					'public'            => true,
+					'publicly_queryable' => false,
 					// 階層ありにすると投稿画面がチェックボックスになり、表記ゆれが起きにくい。
 					'hierarchical'      => true,
 					'show_admin_column' => true,
 					'show_in_rest'      => true,
-					'query_var'         => $slug,
-					'rewrite'           => array( 'slug' => str_replace( '_', '-', $slug ) ),
+					'rewrite'           => false,
+					'capabilities'      => array(
+						'manage_terms' => 'manage_categories',
+						'edit_terms'   => 'manage_categories',
+						'delete_terms' => 'manage_categories',
+						'assign_terms' => 'edit_posts',
+					),
 				)
 			);
 		}
-		register_taxonomy(
-			self::COMMITTEE,
-			$object_types,
-			array(
-				'labels'             => self::labels( '発信元（管理用）' ),
-				'public'             => false,
-				'publicly_queryable' => false,
-				'show_ui'            => true,
-				'show_in_rest'       => true,
-				'hierarchical'       => true,
-				'show_admin_column'  => true,
-				'rewrite'            => false,
-			)
-		);
 	}
 
 	private static function labels( $label ) {
 		return array(
 			'name'          => $label,
 			'singular_name' => $label,
-			'menu_name'     => 'AI検索：' . $label,
+			'menu_name'     => $label,
 			'all_items'     => $label . 'の一覧',
 			'edit_item'     => $label . 'を編集',
 			'add_new_item'  => $label . 'を追加',
@@ -80,26 +106,39 @@ class NFA_AIS_Taxonomies {
 	}
 
 	/**
-	 * 語彙（辞書の選択肢）と同名の用語を用意する。
+	 * 語彙（辞書の選択肢）と同じ用語を用意する。対象・目的はスラッグ＝値、地域は名前＝値。
 	 */
 	public static function seed_terms() {
 		foreach ( NFA_AIS_Dictionary::axes() as $ax ) {
-			$tax = self::slug( $ax['key'] );
-			foreach ( $ax['options'] as $o ) {
-				if ( $tax && ! term_exists( $o['value'], $tax ) ) {
-					wp_insert_term( $o['value'], $tax );
-				}
+			if ( ! taxonomy_exists( $ax['tax'] ) ) {
+				continue;
 			}
-		}
-		foreach ( self::COMMITTEES as $name ) {
-			if ( ! term_exists( $name, self::COMMITTEE ) ) {
-				wp_insert_term( $name, self::COMMITTEE );
+			foreach ( $ax['items'] as $it ) {
+				if ( ! NFA_AIS_Dictionary::term( $ax['key'], $it['v'] ) ) {
+					$args = preg_match( '/^[a-z0-9\-]+$/', $it['v'] ) ? array( 'slug' => $it['v'] ) : array();
+					wp_insert_term( $it['l'] === $it['v'] || 'r' === $ax['key'] ? $it['v'] : $it['l'], $ax['tax'], $args );
+				}
 			}
 		}
 	}
 
 	/**
-	 * 投稿の3軸を [axis => [term name, ...]] で返す（発信元は含めない）。
+	 * 投稿の3軸を [t => [値...], p => [...], r => [...]] で返す（値はスラッグ、地域は名前）。
+	 */
+	public static function values_of( $post_id ) {
+		$out = array();
+		foreach ( self::FACETS as $key => $axis ) {
+			$terms       = get_the_terms( $post_id, $axis[0] );
+			$out[ $key ] = array();
+			foreach ( ( $terms && ! is_wp_error( $terms ) ) ? $terms : array() as $t ) {
+				$out[ $key ][] = 'r' === $key ? $t->name : $t->slug;
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * 投稿の3軸を表示名で返す（テーマのチップ用）。
 	 */
 	public static function axes_of( $post_id ) {
 		$out = array();

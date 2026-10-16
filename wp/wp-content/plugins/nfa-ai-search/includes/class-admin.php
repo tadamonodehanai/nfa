@@ -121,11 +121,10 @@ class NFA_AIS_Admin {
 		}
 		$json = $json ? $json : wp_json_encode( $dict, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		?>
-		<p>探索画面の3軸（対象・目的・地域）の選択肢と、入力文を条件に読み替えるための言い換えです。<?php echo $saved ? '（編集済み）' : '（初期値）'; ?></p>
+		<p>AI検索の3軸（t 対象・p 目的・r 地域）の選択肢と、入力文を条件に読み替えるための言い換えです。<?php echo $saved ? '（編集済み）' : '（初期値：デザインの search.js と同じ）'; ?></p>
 		<p class="description">
-			各選択肢の <code>value</code> と同じ名前のタクソノミー用語が付いた記事が該当します（別名の用語も含めるときは <code>terms</code>）。
-			<code>pattern</code> は入力文から選択肢を読み取る正規表現、<code>say</code> は会話での言い回しです。
-			検索ログの「0件だった入力」を見て、<code>pattern</code> に言い換えを足していってください。選択肢を増やしたら、同名の用語も作られます。
+			各選択肢の <code>v</code> がタクソノミー用語のスラッグ（地域は用語の名前）、<code>l</code> が表示名、<code>short</code> が会話で使う短い名前、<code>rx</code> が入力文から読み取る正規表現です。
+			検索ログの「0件だった入力」を見て、<code>rx</code> に言い換えを足していってください。選択肢を増やしたら、同じ用語も作られます。
 		</p>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="nfa_ais_save_dictionary">
@@ -160,27 +159,39 @@ class NFA_AIS_Admin {
 			exit;
 		}
 		$txt   = fn( $a ) => array_values( array_filter( array_map( 'sanitize_text_field', (array) $a ), 'strlen' ) );
+		$taxes = array( 't' => 'nfa_target', 'p' => 'nfa_purpose', 'r' => 'nfa_area' );
 		$clean = array(
 			'axes'     => array_map(
-				fn( $ax ) => array(
-					'key'     => sanitize_key( $ax['key'] ),
-					'name'    => sanitize_text_field( $ax['name'] ),
-					'axis'    => sanitize_text_field( $ax['axis'] ?? '' ),
-					'options' => array_map(
-						fn( $o ) => array(
-							'value'   => sanitize_text_field( $o['value'] ),
-							'terms'   => $txt( $o['terms'] ?? array() ),
-							'pattern' => (string) ( $o['pattern'] ?? '' ), // validate() で正規表現として検査済み
-							'say'     => sanitize_text_field( $o['say'] ?? $o['value'] ),
+				fn( $ax ) => array_filter(
+					array(
+						'key'   => $ax['key'],
+						'name'  => sanitize_text_field( $ax['name'] ?? '' ),
+						'sub'   => sanitize_text_field( $ax['sub'] ?? '' ),
+						'tax'   => $taxes[ $ax['key'] ],
+						'order' => isset( $ax['order'] ) ? $txt( $ax['order'] ) : null,
+						'items' => array_map(
+							fn( $it ) => array(
+								'v'     => sanitize_text_field( $it['v'] ),
+								'l'     => sanitize_text_field( $it['l'] ),
+								'short' => sanitize_text_field( $it['short'] ?? '' ),
+								'rx'    => (string) ( $it['rx'] ?? '' ), // validate() で正規表現として検査済み
+							),
+							$ax['items']
 						),
-						$ax['options']
 					),
+					fn( $v ) => null !== $v
 				),
 				$dict['axes']
 			),
+			'join'     => (string) ( $dict['join'] ?? '' ),
 			'examples' => $txt( $dict['examples'] ?? array() ),
-			'popular'  => $txt( $dict['popular'] ?? array() ),
 		);
+		if ( '' !== $clean['join'] && false === @preg_match( '/' . $clean['join'] . '/u', '' ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			set_transient( 'nfa_ais_dict_error', 'join が正規表現として不正です。', 60 );
+			set_transient( 'nfa_ais_dict_draft', $raw, 60 );
+			wp_safe_redirect( self::url( 'dictionary' ) );
+			exit;
+		}
 		update_option( NFA_AIS_Dictionary::OPTION, $clean, false );
 		NFA_AIS_Dictionary::reset_cache();
 		NFA_AIS_Taxonomies::seed_terms();
