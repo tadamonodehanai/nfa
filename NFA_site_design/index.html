@@ -39,7 +39,7 @@
 </header>
 <div class="drawer" id="drawer" data-lenis-prevent hidden>
   <div class="dr-cta"><a href="grow.html#register">チーム・選手登録</a><a class="g" href="partner.html">協賛について</a></div>
-  <form class="dr-q" action="search.html" role="search" data-demo><label class="vh" for="drq">サイト内を探す</label><input id="drq" type="search" placeholder="知りたいことを入力"><button type="submit" aria-label="探す"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></form>
+  <form class="dr-q" action="search.html" role="search"><label class="vh" for="drq">サイト内を探す</label><input id="drq" name="q" type="search" placeholder="知りたいことを入力"><button type="submit" aria-label="探す"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></form>
   <button class="acc-h" type="button" data-acc aria-expanded="true" aria-controls="dr-cat">カテゴリ・日程</button>
   <div class="dr-cats" id="dr-cat"><a href="cat-4.html">小学生<small>4種</small></a><a href="cat-3.html">中学生<small>3種</small></a><a href="cat-2.html">高校生<small>2種</small></a><a href="cat-1.html">社会人・大学<small>1種</small></a><a href="cat-w.html">女子<small>女子委員会</small></a><a href="cat-f.html">フットサル<small>フットサル委員会</small></a><a href="cat-s.html">シニア<small>シニア委員会</small></a><a href="grassroots.html">キッズ<small>グラスルーツ</small></a><a href="referee.html">審判<small>審判委員会</small></a><a href="technical.html">指導者<small>技術委員会</small></a><a href="medical.html">医学<small>医学委員会</small></a></div>
   <button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-about">協会について</button><ul class="dr-sub" id="dr-about" hidden><li><a href="about.html">協会概要・ビジョン</a></li><li><a href="about.html#plan">中期経営計画</a></li><li><a href="about.html#org">組織・体制</a></li><li><a href="about.html#report">事業報告・決算</a></li></ul><button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-start">はじめる</button><ul class="dr-sub" id="dr-start" hidden><li><a href="start.html">はじめる</a></li><li><a href="start.html#steps">はじめかた</a></li><li><a href="start.html#faq">よくある質問</a></li><li><a href="teams.html">チームを探す</a></li></ul><button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-grow">育成・強化</button><ul class="dr-sub" id="dr-grow" hidden><li><a href="grow.html">育成・強化</a></li><li><a href="grow.html#register">選手・チーム登録</a></li><li><a href="referee.html">審判</a></li><li><a href="technical.html">指導者</a></li></ul><button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-partner">関わる</button><ul class="dr-sub" id="dr-partner" hidden><li><a href="partner.html">協賛のご案内</a></li><li><a href="partner.html#plans">協賛のかたち</a></li><li><a href="partner.html#flow">お申し込みの流れ</a></li></ul>
@@ -153,9 +153,9 @@
 <div aria-hidden="true" class="bgword">ASK NFA</div>
 <div class="wrap">
 <div class="sh"><div class="e">AI <i style="color:#7FD3FF">SEARCH</i></div><span class="j">探しているものを、そのまま聞いてください</span><p>どの委員会の担当かを考える必要はありません。知りたいことを言葉のまま入力すると、必要な情報にたどり着けます。</p></div>
-<form action="search.html" class="sbox" data-demo="" id="sform" role="search">
+<form action="search.html" class="sbox" id="sform" role="search">
 <label class="sr" for="q" style="position:absolute;left:-9999px">質問を入力</label>
-<input id="q" placeholder="例）小学生の大会っていつ？　審判の更新はどうすれば？" type="text"/>
+<input id="q" name="q" placeholder="例）小学生の大会っていつ？　審判の更新はどうすれば？" type="text"/>
 <button type="submit">探す</button>
 </form>
 <div class="chips">

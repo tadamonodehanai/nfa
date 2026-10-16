@@ -85,7 +85,8 @@
 
   /* ---------- フォーム（デザイン確認用：送信しない） ---------- */
   $$('form[data-demo]').forEach(function(f){ f.addEventListener('submit', function(e){ e.preventDefault(); }); });
-  $$('.chips button[data-q]').forEach(function(b){ b.addEventListener('click', function(){ var q = d.getElementById(b.getAttribute('data-q')); if(q){ q.value = b.textContent + 'の情報を知りたい'; q.focus(); } }); });
+  /* TOPのAI検索：ボタンを押すとその対象の質問として検索ページへ */
+  $$('.chips button[data-q]').forEach(function(b){ b.addEventListener('click', function(){ location.href = 'search.html?q=' + encodeURIComponent(b.textContent.replace(/（.*?）/,'') + 'の最新情報'); }); });
 
   /* ---------- 入場の幕（TOPのみ） ---------- */
   var cur = $('.curtain');

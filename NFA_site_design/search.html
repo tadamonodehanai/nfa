@@ -38,7 +38,7 @@
 </header>
 <div class="drawer" id="drawer" data-lenis-prevent hidden>
   <div class="dr-cta"><a href="grow.html#register">チーム・選手登録</a><a class="g" href="partner.html">協賛について</a></div>
-  <form class="dr-q" action="search.html" role="search" data-demo><label class="vh" for="drq">サイト内を探す</label><input id="drq" type="search" placeholder="知りたいことを入力"><button type="submit" aria-label="探す"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></form>
+  <form class="dr-q" action="search.html" role="search"><label class="vh" for="drq">サイト内を探す</label><input id="drq" name="q" type="search" placeholder="知りたいことを入力"><button type="submit" aria-label="探す"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></form>
   <button class="acc-h" type="button" data-acc aria-expanded="true" aria-controls="dr-cat">カテゴリ・日程</button>
   <div class="dr-cats" id="dr-cat"><a href="cat-4.html">小学生<small>4種</small></a><a href="cat-3.html">中学生<small>3種</small></a><a href="cat-2.html">高校生<small>2種</small></a><a href="cat-1.html">社会人・大学<small>1種</small></a><a href="cat-w.html">女子<small>女子委員会</small></a><a href="cat-f.html">フットサル<small>フットサル委員会</small></a><a href="cat-s.html">シニア<small>シニア委員会</small></a><a href="grassroots.html">キッズ<small>グラスルーツ</small></a><a href="referee.html">審判<small>審判委員会</small></a><a href="technical.html">指導者<small>技術委員会</small></a><a href="medical.html">医学<small>医学委員会</small></a></div>
   <button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-about">協会について</button><ul class="dr-sub" id="dr-about" hidden><li><a href="about.html">協会概要・ビジョン</a></li><li><a href="about.html#plan">中期経営計画</a></li><li><a href="about.html#org">組織・体制</a></li><li><a href="about.html#report">事業報告・決算</a></li></ul><button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-start">はじめる</button><ul class="dr-sub" id="dr-start" hidden><li><a href="start.html">はじめる</a></li><li><a href="start.html#steps">はじめかた</a></li><li><a href="start.html#faq">よくある質問</a></li><li><a href="teams.html">チームを探す</a></li></ul><button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-grow">育成・強化</button><ul class="dr-sub" id="dr-grow" hidden><li><a href="grow.html">育成・強化</a></li><li><a href="grow.html#register">選手・チーム登録</a></li><li><a href="referee.html">審判</a></li><li><a href="technical.html">指導者</a></li></ul><button class="acc-h" type="button" data-acc aria-expanded="false" aria-controls="dr-partner">関わる</button><ul class="dr-sub" id="dr-partner" hidden><li><a href="partner.html">協賛のご案内</a></li><li><a href="partner.html#plans">協賛のかたち</a></li><li><a href="partner.html#flow">お申し込みの流れ</a></li></ul>
@@ -50,10 +50,10 @@
 <section class="pg-hero"><div class="wrap"><div class="pg-ttl"><p aria-hidden="true" class="pg-en"><span class="ln"><span>AI SEARCH</span></span></p><h1 class="pg-ja">情報を探す</h1></div><div class="pg-sub"><p>知りたいことを入力するか、条件を選んでください。<br class="pc"/>担当の委員会が分からなくても探せます。</p></div></div></section>
 <!-- 入力 -->
 <section class="sr-ask"><div class="wrap">
-<form aria-label="サイト内の情報を探す" class="sr-form" data-demo="" role="search">
+<form action="search.html" aria-label="サイト内の情報を探す" class="sr-form" id="sr-form" role="search">
 <label class="sr-lb" for="sr-q">何を知りたいですか？</label>
 <div class="sr-box">
-<input autocomplete="off" class="sr-in" id="sr-q" name="q" placeholder="例：小学生の大会の日程" type="search" value="小学生の大会はいつありますか？"/>
+<input autocomplete="off" class="sr-in" id="sr-q" name="q" placeholder="例：小学生の大会はいつ？　審判の資格を更新したい" type="search" value=""/>
 <button class="sr-go" type="submit">探す</button>
 </div>
 <p class="sr-help">入力内容から「対象」「目的」「地域」の条件を読み取ります。条件は下の一覧からも追加できます。</p>
@@ -73,93 +73,31 @@
 <div class="sr-grid">
 <!-- 条件パネル（SPはアコーディオン） -->
 <aside aria-label="条件から絞り込む" class="sr-side">
-<button aria-controls="sr-pnl" aria-expanded="false" class="sr-side-b" data-acc="" type="button">条件から絞り込む<span>2件 選択中</span></button>
+<button aria-controls="sr-pnl" aria-expanded="false" class="sr-side-b" data-acc="" type="button">条件から絞り込む<span id="sr-sel">0件 選択中</span></button>
 <div class="sr-pnl" hidden="" id="sr-pnl">
 <div class="sr-side-h"><h2>条件から絞り込む</h2><button class="sr-clr" type="button">すべて解除</button></div>
 <fieldset class="sr-ax">
 <legend>対象<small>誰に向けた情報か</small></legend>
-<div class="sr-ops">
-<button aria-pressed="true" class="pill" type="button">小学生（4種）</button>
-<button aria-pressed="false" class="pill" type="button">中学生（3種）</button>
-<button aria-pressed="false" class="pill" type="button">高校生（2種）</button>
-<button aria-pressed="false" class="pill" type="button">社会人・大学（1種）</button>
-<button aria-pressed="false" class="pill" type="button">女子</button>
-<button aria-pressed="false" class="pill" type="button">シニア</button>
-<button aria-pressed="false" class="pill" type="button">フットサル</button>
-<button aria-pressed="false" class="pill" type="button">障がい者サッカー</button>
-<button aria-pressed="false" class="pill" type="button">審判</button>
-<button aria-pressed="false" class="pill" type="button">指導者</button>
-</div>
+<div class="sr-ops"><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-4" type="button">小学生（4種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-3" type="button">中学生（3種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-2" type="button">高校生（2種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-1" type="button">社会人・大学（1種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-w" type="button">女子</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-s" type="button">シニア</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-f" type="button">フットサル</button><button aria-pressed="false" class="pill" data-ax="t" data-v="grassroots" type="button">キッズ</button><button aria-pressed="false" class="pill" data-ax="t" data-v="para" type="button">障がい者サッカー</button><button aria-pressed="false" class="pill" data-ax="t" data-v="referee" type="button">審判</button><button aria-pressed="false" class="pill" data-ax="t" data-v="technical" type="button">指導者</button></div>
 </fieldset>
 <fieldset class="sr-ax">
 <legend>目的<small>何をしたいか</small></legend>
-<div class="sr-ops">
-<button aria-pressed="true" class="pill" type="button">大会日程を知る</button>
-<button aria-pressed="false" class="pill" type="button">試合結果を見る</button>
-<button aria-pressed="false" class="pill" type="button">登録・手続き</button>
-<button aria-pressed="false" class="pill" disabled="" type="button">講習会に参加</button>
-<button aria-pressed="false" class="pill" type="button">イベント・セミナーに参加</button>
-<button aria-pressed="false" class="pill" type="button">お知らせを読む</button>
-</div>
+<div class="sr-ops"><button aria-pressed="false" class="pill" data-ax="p" data-v="schedule" type="button">大会日程を知る</button><button aria-pressed="false" class="pill" data-ax="p" data-v="result" type="button">試合結果を見る</button><button aria-pressed="false" class="pill" data-ax="p" data-v="reg" type="button">登録・手続き</button><button aria-pressed="false" class="pill" data-ax="p" data-v="course" type="button">講習会に参加</button><button aria-pressed="false" class="pill" data-ax="p" data-v="event" type="button">イベント・セミナーに参加</button><button aria-pressed="false" class="pill" data-ax="p" data-v="news" type="button">お知らせを読む</button></div>
 </fieldset>
 <fieldset class="sr-ax">
 <legend>地域<small>どの地区か</small></legend>
-<div class="sr-ops">
-<button aria-pressed="false" class="pill" type="button">北信</button>
-<button aria-pressed="false" class="pill" type="button">東信</button>
-<button aria-pressed="false" class="pill" type="button">中信</button>
-<button aria-pressed="false" class="pill" disabled="" type="button">南信</button>
-<button aria-pressed="false" class="pill" type="button">県全域</button>
-</div>
+<div class="sr-ops"><button aria-pressed="false" class="pill" data-ax="r" data-v="北信" type="button">北信</button><button aria-pressed="false" class="pill" data-ax="r" data-v="東信" type="button">東信</button><button aria-pressed="false" class="pill" data-ax="r" data-v="中信" type="button">中信</button><button aria-pressed="false" class="pill" data-ax="r" data-v="南信" type="button">南信</button><button aria-pressed="false" class="pill" data-ax="r" data-v="県全域" type="button">県全域</button></div>
 </fieldset>
 <p class="sr-side-n">該当する情報がない条件は選べません。</p>
 </div>
 </aside>
 <!-- 結果 -->
-<div class="sr-main">
-<div class="sr-now">
-<span class="sr-now-h">現在の条件</span>
-<span class="sr-tag">対象：小学生（4種）</span><span class="sr-tag">目的：大会日程を知る</span>
-<span class="sr-cnt">該当 <b>11</b> 件</span>
-</div>
-<article aria-label="回答" class="sr-ans">
-<p class="sr-u"><span>質問</span>小学生の大会はいつありますか？</p>
-<div class="sr-a">
-<div class="sr-a-h"><span class="en">AI ANSWER</span>回答</div>
-<p>小学生（<span class="nw">4種</span>）の「JFA<span class="nw">第50回</span>全日本<span class="nw">U-12</span>サッカー<span class="nw">選手権大会</span><span class="nw">長野県大会</span>」の日程は次のとおりです（大会要項（案）より）。組み合わせ・試合結果は、下記の資料でご確認ください。</p>
-<div class="tbl-w"><table class="tbl sr-tbl">
-<thead><tr><th scope="col">日程</th><th scope="col">内容</th><th scope="col">会場</th></tr></thead>
-<tbody>
-<tr><th class="num" data-label="日程" scope="row">8月30日（日）</th><td data-label="内容">開会式及び抽選会</td><td data-label="会場">豊科公民館</td></tr>
-<tr><th class="num" data-label="日程" scope="row">9月26日（土）・27日（日）</th><td data-label="内容">1・2回戦</td><td data-label="会場">県下各地</td></tr>
-<tr><th class="num" data-label="日程" scope="row">10月4日（日）</th><td data-label="内容">3・4回戦</td><td data-label="会場">県下各地</td></tr>
-<tr><th class="num" data-label="日程" scope="row">10月10日（土）</th><td data-label="内容">準々決勝</td><td data-label="会場">あがた運動公園多目的広場</td></tr>
-<tr><th class="num" data-label="日程" scope="row">10月18日（日）</th><td data-label="内容">準決勝</td><td data-label="会場">あがた運動公園多目的広場</td></tr>
-<tr><th class="num" data-label="日程" scope="row">10月31日（土）</th><td data-label="内容">決勝・3位決定戦</td><td data-label="会場">サンプロアルウィン</td></tr>
-</tbody>
-</table></div>
-<p>あわせて「JFA 長野県<span class="nw">U-12</span><span class="nw">サッカーリーグ</span>2026」（県リーグ・各地区リーグ）の日程・試合結果・星取表を、<a href="cat-4.html">小学生（4種）のページ</a>に掲載しています。</p>
-<p class="sr-src">この回答は、公式サイトに掲載された下記の資料・記事をもとに作成しています。日程は変更になる場合があります。</p>
-</div>
-</article>
-<div class="sr-rel-h"><h2>該当する資料</h2><span>PDF</span></div>
-<ul class="dl sr-dl">
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2026/09/2026_U12_outline.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span><span class="sr-dn">全日本U-12 長野県大会 大会要項</span><small>2026.09</small></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2026/10/2026_U12_tournament_3.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span><span class="sr-dn">全日本U-12 長野県大会 組み合わせ</span><small>2026.10</small></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2026/09/2026_U12_tournament-results.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span><span class="sr-dn">全日本U-12 長野県大会 1・2回戦</span><small>2026.09</small></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2026/10/2026_U12_tournament-results-1.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span><span class="sr-dn">全日本U-12 長野県大会 3・4回戦</span><small>2026.10</small></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2026/10/2026_U12_tournament_quarterfinals.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span><span class="sr-dn">全日本U-12 長野県大会 準々決勝</span><small>2026.10</small></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2026/06/20260617_U12.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span><span class="sr-dn">JFA 長野県U-12サッカーリーグ2026 県リーグ 日程・試合結果</span><small>2026.06</small></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2026/06/20260617_U12_hoshi.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span><span class="sr-dn">JFA 長野県U-12サッカーリーグ2026 県リーグ 星取表</span><small>2026.06</small></a></li>
-</ul>
-<div class="sr-rel-h"><h2>該当する記事</h2><span>新しい順</span></div>
-<ul class="nl" id="sr-list">
-<li><a href="https://www.nagano-fa.or.jp/news_top/kids_news/39645" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="assets/img/ph-photo.jpg"/><span class="badge" style="background:var(--tag-event)">イベント</span></span><span><span class="mt"><span class="dt">2026.09.08</span><span class="sr-meta">キッズ・小学1〜3年生</span></span><h3>[参加募集]JFA キッズサッカーフェスティバル 2026 長野 in 千曲川リバーフロント 開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39102" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="assets/img/ph-photo.jpg"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.07.06</span><span class="sr-meta">小学生（4種）・トレセン</span></span><h3>トレセンマッチ（U10）が開催されました。</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li><a href="https://www.nagano-fa.or.jp/news_top/technical_news/38916" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="assets/img/ph-photo.jpg"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.06.17</span><span class="sr-meta">小学生（4種）・トレセン</span></span><h3>トレセンマッチ（U11）が開催されました。</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li><a href="https://www.nagano-fa.or.jp/news_top/kids_news/38528" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="assets/img/ph-photo.jpg"/><span class="badge" style="background:var(--tag-event)">イベント</span></span><span><span class="mt"><span class="dt">2026.05.13</span><span class="sr-meta">キッズ・U-8</span></span><h3>JFA キッズ（<span class="nw">U-8</span>）サッカーフェスティバル2026 in 佐久</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-</ul>
-<div class="sr-more"><a class="btn btn-o" href="cat-4.html">小学生のページで探す<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
+<div aria-live="polite" class="sr-main" id="sr-main">
+<div class="sr-now" id="sr-now"></div>
+<article aria-label="回答" class="sr-ans" id="sr-ans"></article>
+<div id="sr-docs"></div>
+<div id="sr-news"></div>
+<div class="sr-more" id="sr-go"></div>
 </div>
 </div>
 </div></section>
@@ -168,17 +106,8 @@
 <div class="bh"><div><div class="e">CATEGORY</div><h2>カテゴリから探す</h2></div></div>
 <div class="catgrid"><h3 class="cg-h">年代別</h3><a class="ct" href="cat-4.html"><span class="lb"><span class="en">U-12</span><span class="tg">4種</span></span><b>小学生</b><span class="ft2">日程・結果・お知らせ<i>→</i></span></a><a class="ct" href="cat-3.html"><span class="lb"><span class="en">U-15</span><span class="tg">3種</span></span><b>中学生</b><span class="ft2">日程・結果・お知らせ<i>→</i></span></a><a class="ct" href="cat-2.html"><span class="lb"><span class="en">U-18</span><span class="tg">2種</span></span><b>高校生</b><span class="ft2">日程・結果・お知らせ<i>→</i></span></a><a class="ct" href="cat-1.html"><span class="lb"><span class="en">ADULT</span><span class="tg">1種</span></span><b>社会人・大学</b><span class="ft2">日程・結果・お知らせ<i>→</i></span></a><h3 class="cg-h">種目・対象別</h3><a class="ct" href="cat-w.html"><span class="lb"><span class="en">WOMEN</span></span><b>女子</b><span class="ft2">日程・結果・お知らせ<i>→</i></span></a><a class="ct" href="cat-f.html"><span class="lb"><span class="en">FUTSAL</span></span><b>フットサル</b><span class="ft2">日程・結果・お知らせ<i>→</i></span></a><a class="ct" href="cat-s.html"><span class="lb"><span class="en">SENIOR</span></span><b>シニア</b><span class="ft2">日程・結果・お知らせ<i>→</i></span></a><a class="ct" href="grassroots.html"><span class="lb"><span class="en">KIDS</span></span><b>キッズ</b><span class="ft2">お知らせ・資料<i>→</i></span></a><h3 class="cg-h">その他</h3><a class="ct" href="referee.html"><span class="lb"><span class="en">REFEREE</span></span><b>審判</b><span class="ft2">講習会・資格・お知らせ<i>→</i></span></a><a class="ct" href="technical.html"><span class="lb"><span class="en">COACH</span></span><b>指導者</b><span class="ft2">講習会・資格・お知らせ<i>→</i></span></a><a class="ct" href="medical.html"><span class="lb"><span class="en">MEDICAL</span></span><b>医学</b><span class="ft2">お知らせ・資料<i>→</i></span></a></div>
 </div></section>
-<script>
-/* デザイン確認用：条件の選択表示と入力例の反映のみ（検索は行わない） */
-(function(){
-  var q=document.getElementById('sr-q');
-  document.querySelectorAll('.sr-chips [data-sq]').forEach(function(b){b.addEventListener('click',function(){q.value=b.textContent;q.focus();});});
-  var ps=document.querySelectorAll('.sr-ops .pill');
-  ps.forEach(function(p){p.addEventListener('click',function(){p.setAttribute('aria-pressed',p.getAttribute('aria-pressed')!=='true');});});
-  var c=document.querySelector('.sr-clr');
-  if(c)c.addEventListener('click',function(){ps.forEach(function(p){p.setAttribute('aria-pressed','false');});});
-})();
-</script>
+<script src="assets/js/search-data.js"></script>
+<script src="assets/js/search.js"></script>
 </main>
 
 <section class="spband"><div class="wrap"><div class="bh"><div><div class="e">SPONSOR</div><h2>協賛企業</h2></div><a class="more" href="partner.html">協賛について</a></div><div class="spons">

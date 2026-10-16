@@ -1925,6 +1925,34 @@ a.dt-cat:hover{background:var(--blue);color:#fff}
   .tbl.sr-tbl thead th{font-size:11px}
   .tbl.sr-tbl th::before,.tbl.sr-tbl td::before{content:none!important}
 }
+/* ===== AI検索デモ（動く版） ===== */
+.sr-tag{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;font-family:inherit;line-height:1.4}
+.sr-tag i{font-style:normal;font-size:13px;opacity:.7}
+.sr-tag:hover{background:var(--cyan)}
+.sr-tag.is-none{background:transparent;color:var(--ink2);cursor:default;padding-left:0}
+.sr-demo{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--ink2);border:1px solid var(--line);padding:2px 8px;border-radius:2px}
+.sr-a-list{list-style:none;margin:12px 0 16px;padding:0;border-top:1px solid var(--line)}
+.sr-a-list li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.7}
+.sr-a-list b{font-weight:700;color:var(--navy)}
+.sr-a-list span{flex:0 0 auto;font-size:12px;color:var(--ink2);white-space:nowrap}
+.sr-a-b p{margin:0 0 10px}
+.sr-a-b a{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.sr-a-b.is-wait{opacity:0}
+.sr-a-b.is-in{animation:srIn .6s cubic-bezier(.16,1,.3,1) both}
+@keyframes srIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sr-think{margin:4px 0 0;font-size:13px;color:var(--ink2)}
+.sr-think i{display:inline-block;width:5px;height:5px;margin-left:4px;border-radius:50%;background:var(--cyan);animation:srDot 1s infinite ease-in-out}
+.sr-think i:nth-child(2){animation-delay:.15s}.sr-think i:nth-child(3){animation-delay:.3s}
+@keyframes srDot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.sr-back p{margin:0 0 12px}
+.sr-picks{display:flex;flex-wrap:wrap;gap:8px}
+.sr-pick{font-family:inherit;font-size:13px;font-weight:700;color:var(--navy);background:#fff;border:1px solid var(--navy);border-radius:999px;padding:8px 16px;cursor:pointer;transition:background .2s,color .2s}
+.sr-pick:hover{background:var(--navy);color:#fff}
+.sr-dl .sr-dn{font-size:12px;color:var(--ink2);line-height:1.6}
+.sr-dl .sr-dn b{font-size:14px;color:var(--ink);font-weight:700}
+.sr-more-in{margin:16px 0 32px}
+.sr-ops .pill:disabled{opacity:.35;cursor:not-allowed}
+@media (max-width:767px){ .sr-a-list li{flex-direction:column;gap:2px} }
 
 /* =========================================================
    start / grow 共通（中間層テンプレート）— 接頭辞 sg-
