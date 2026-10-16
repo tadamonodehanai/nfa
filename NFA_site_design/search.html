@@ -48,34 +48,15 @@
 <main>
 <nav aria-label="パンくず" class="bc wrap"><a href="index.html">TOP</a><span aria-hidden="true">›</span><span aria-current="page">情報を探す</span></nav>
 <section class="pg-hero"><div class="wrap"><div class="pg-ttl"><p aria-hidden="true" class="pg-en"><span class="ln"><span>AI SEARCH</span></span></p><h1 class="pg-ja">情報を探す</h1></div><div class="pg-sub"><p>知りたいことを、話しかけるように聞いてください。<br class="pc"/>続けて質問すると、条件を重ねて絞り込みます。</p></div></div></section>
-<!-- 入力 -->
-<section class="sr-ask"><div class="wrap">
-<form action="search.html" aria-label="サイト内の情報を探す" class="sr-form" id="sr-form" role="search">
-<label class="sr-lb" for="sr-q">何を知りたいですか？</label>
-<div class="sr-box">
-<input autocomplete="off" class="sr-in" id="sr-q" name="q" placeholder="例：小学生の大会はいつ？　審判の資格を更新したい" type="search" value=""/>
-<button class="sr-go" type="submit">質問する</button>
-</div>
-<p class="sr-help">話しかけるように入力してください。続けて質問すると、条件を重ねて絞り込んでいきます。</p>
-</form>
-<div class="sr-ex">
-<span class="sr-ex-h">入力例</span>
-<div class="sr-chips">
-<button data-sq="" type="button">小学生の大会はいつありますか？</button>
-<button data-sq="" type="button">審判の資格を更新したい</button>
-<button data-sq="" type="button">女子のチームに入りたい</button>
-<button data-sq="" type="button">指導者の講習会を探している</button>
-</div>
-</div>
-</div></section>
 <!-- 条件・結果 -->
-<section class="blk sr-res" id="result"><div class="wrap">
+<section class="sr-app is-entry" id="result"><div class="wrap">
 <div class="sr-grid">
 <!-- 条件パネル（SPはアコーディオン） -->
 <aside aria-label="条件から絞り込む" class="sr-side">
 <button aria-controls="sr-pnl" aria-expanded="false" class="sr-side-b" data-acc="" type="button">条件から絞り込む<span id="sr-sel">0件 選択中</span></button>
 <div class="sr-pnl" hidden="" id="sr-pnl">
-<div class="sr-side-h"><h2>条件から絞り込む</h2><button class="sr-clr" type="button">すべて解除</button></div>
+<div class="sr-now" id="sr-now"></div>
+<div class="sr-side-h"><h2>条件から絞り込む</h2></div>
 <fieldset class="sr-ax">
 <legend>対象<small>誰に向けた情報か</small></legend>
 <div class="sr-ops"><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-4" type="button">小学生（4種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-3" type="button">中学生（3種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-2" type="button">高校生（2種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-1" type="button">社会人・大学（1種）</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-w" type="button">女子</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-s" type="button">シニア</button><button aria-pressed="false" class="pill" data-ax="t" data-v="cat-f" type="button">フットサル</button><button aria-pressed="false" class="pill" data-ax="t" data-v="grassroots" type="button">キッズ</button><button aria-pressed="false" class="pill" data-ax="t" data-v="para" type="button">障がい者サッカー</button><button aria-pressed="false" class="pill" data-ax="t" data-v="referee" type="button">審判</button><button aria-pressed="false" class="pill" data-ax="t" data-v="technical" type="button">指導者</button></div>
@@ -93,14 +74,30 @@
 </aside>
 <!-- 結果 -->
 <div class="sr-main" id="sr-main">
-<div class="sr-now" id="sr-now"></div>
+<!-- 入口：チャット投稿フォーム -->
+<div class="sr-entry" id="sr-entry">
+<form action="search.html" aria-label="AIに質問する" class="sr-form" id="sr-form" role="search">
+<label class="sr-lb" for="sr-q">何を知りたいですか？</label>
+<div class="sr-box">
+<svg aria-hidden="true" class="sr-ico" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<input autocomplete="off" class="sr-in" id="sr-q" name="q" placeholder="例）小学生の大会はいつ？　審判の資格を更新したい" type="text" value=""/>
+<button aria-label="質問する" class="sr-send" type="submit"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+</div>
+</form>
+<p class="sr-ex-h">あなたが興味がありそうな情報</p>
+<div class="sr-chips"><button data-sq="" type="button"><span>#</span>小学生の大会はいつありますか？</button><button data-sq="" type="button"><span>#</span>審判の資格を更新したい</button><button data-sq="" type="button"><span>#</span>女子のチームに入りたい</button><button data-sq="" type="button"><span>#</span>指導者の講習会を探している</button></div>
+<p class="sr-help">話しかけるように入力するか、条件から選んでください。続けて質問すると、条件を重ねて絞り込んでいきます。</p>
+</div>
+<!-- 会話 -->
 <div aria-live="polite" class="sr-thread" id="sr-thread"></div>
+<div class="sr-dock">
 <form aria-label="続けて質問する" class="sr-cmp" id="sr-cmp" role="search">
 <label class="vh" for="sr-q2">続けて質問する</label>
-<input autocomplete="off" id="sr-q2" placeholder="続けて質問できます（例：北信だけ／結果も見たい／中学生は？）" type="text"/>
-<button type="submit">送信</button>
+<input autocomplete="off" id="sr-q2" placeholder="続けて聞く。例）北信だけ　結果も見たい　中学生は？" type="text"/>
+<button aria-label="送信" class="sr-send" type="submit"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
 </form>
-<div class="sr-cmp-n"><button class="sr-reset" type="button">最初から質問しなおす</button><span>AIの代わりに、掲載データからルールで回答するデモ版です</span></div>
+<p class="sr-cmp-n">タグを選ぶか、ことばで続けてください。案内には必ず出典がつきます。<button class="sr-reset" type="button">最初から聞きなおす</button></p>
+</div>
 </div>
 </div>
 </div></section>

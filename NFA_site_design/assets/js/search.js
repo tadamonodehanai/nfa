@@ -186,7 +186,7 @@
       return items.map(function (it) {
         var o = snap(); o[ax] = [it.v];
         var n = cnt(o); if (!n || (n === docs.length && mode !== 'swap' && C[ax].length)) return '';
-        return '<button type="button" class="sr-pick" data-ax="' + ax + '" data-v="' + it.v + '" data-mode="' + mode + '">' + (ax === 't' ? (SHORT[it.v] || it.l) : it.l) + '<small>（' + n + '件）</small></button>';
+        return '<button type="button" class="sr-pick" data-ax="' + ax + '" data-v="' + it.v + '" data-mode="' + mode + '"><span class="hash">#</span>' + (ax === 't' ? (SHORT[it.v] || it.l) : it.l) + '<small>（' + n + '件）</small></button>';
       }).join('');
     }
     var T = AX.t.items.filter(function (x) { return x.v !== 'para'; });
@@ -235,12 +235,11 @@
     else {
       if (relaxed) msg += '<p>「' + esc(relaxed) + '」に当てはまる掲載は、いまはありませんでした。条件をゆるめて、近い情報をご案内します。</p>';
       msg += compose(st, docs);
-      if (docs.length) msg += '<p class="sr-src">この回答は、下に並べた公式サイトの資料・記事（' + docs.length + '件）をもとに組み立てています。</p>';
     }
-    return { msg: msg, docs: ask ? [] : docs, rows: steps(docs) };   // 聞き返すときは一覧を出さず、選択肢を先に見せる
+    return { msg: msg, docs: ask ? [] : docs, rows: steps(docs), lead: !ask && docs.length > 0 };   // 聞き返すときは一覧を出さず、選択肢を先に見せる
   }
   function starters() {
-    return $$('.sr-chips [data-sq]').map(function (b) { return '<button type="button" class="sr-pick" data-say="' + esc(b.textContent) + '">' + esc(b.textContent) + '</button>'; }).join('');
+    return $$('.sr-chips [data-sq]').map(function (b) { var t = b.textContent.replace(/^#/, ''); return '<button type="button" class="sr-pick" data-say="' + esc(t) + '"><span class="hash">#</span>' + esc(t) + '</button>'; }).join('');
   }
 
   /* ---------- 描画 ---------- */
@@ -253,20 +252,36 @@
     });
     var n = C.t.length + C.p.length + C.r.length, sel = $('#sr-sel'); if (sel) sel.textContent = n + '件 選択中';
     var tags = [];
-    ['t', 'p', 'r'].forEach(function (ax) { C[ax].forEach(function (v) { tags.push('<button type="button" class="sr-tag" data-ax="' + ax + '" data-v="' + v + '" data-mode="drop" aria-label="' + AX[ax].name + '：' + label(ax, v) + 'をはずす">' + AX[ax].name + '：' + label(ax, v) + '<i aria-hidden="true">×</i></button>'); }); });
+    ['t', 'p', 'r'].forEach(function (ax) { C[ax].forEach(function (v) { tags.push('<button type="button" class="sr-tag" data-ax="' + ax + '" data-v="' + v + '" data-mode="drop" aria-label="' + AX[ax].name + '：' + label(ax, v) + 'をはずす"><span class="hash">#</span>' + label(ax, v) + '<i aria-hidden="true">×</i></button>'); }); });
     var total = n ? cnt(snap()) : 0;
-    $('#sr-now').innerHTML = '<span class="sr-now-h">いま重なっている条件</span>' + (tags.join('') || '<span class="sr-tag is-none">まだありません</span>') + (n ? '<span class="sr-cnt">該当 <b>' + total + '</b> 件</span>' : '');
+    $('#sr-now').innerHTML = '<div class="sr-now-top"><span class="sr-now-h">いまの条件</span>' + (n ? '<span class="sr-cnt">該当 <b>' + total + '</b> 件</span>' : '') + '</div>' +
+      '<div class="sr-now-tags">' + (tags.join('') || '<span class="sr-tag is-none">まだありません</span>') + '</div>' +
+      (n ? '<button type="button" class="sr-clr">条件をクリア</button>' : '');
+  }
+  /* 最初の一文のすぐ後に「いちばん近い資料・記事」のカードを置く */
+  function splitLead(msg, card) {
+    if (!card) return msg;
+    var m = msg.match(/^((?:<p class="sr-note">.*?<\/p>)?<p>.*?<\/p>)/);
+    return m ? m[1] + card + msg.slice(m[1].length) : card + msg;
   }
   function turnHtml(t, i) {
     var last = i === turns.length - 1;
-    var rows = last && t.rows.length ? '<div class="sr-steps"><p class="sr-steps-h">次の一歩</p>' + t.rows.map(function (r) { return '<div class="sr-step"><span>' + r[0] + '</span><div class="sr-picks">' + r[1] + '</div></div>'; }).join('') + '</div>' : '';
+    var rel = last && t.rows.length ? '<div class="sr-steps"><p class="sr-steps-h">' + (t.docs.length ? '関連のご案内' : '次の一歩') + '</p>' + t.rows.map(function (r) { return '<div class="sr-step"><span>' + r[0] + '</span><div class="sr-picks">' + r[1] + '</div></div>'; }).join('') + '</div>' : '';
+    var top = t.docs[0], card = '';
+    if (top && t.lead) {
+      card = '<div class="sr-card"><h3>' + esc(top.g ? top.g : top.t) + (top.g ? '<small>' + esc(top.t) + '</small>' : '') + '</h3>' +
+        '<p class="sr-card-src">出典：' + esc(top.k === 'pdf' ? '大会・リーグの資料（' + (top.f || 'PDF') + '）' : (top.l || 'お知らせ')) + '　・　' + top.d + ' 更新</p>' +
+        (top.x ? '<p class="sr-card-x">' + esc(top.x) + '</p>' : '') +
+        '<a class="btn btn-g" href="' + esc(top.u) + '" target="_blank" rel="noopener"><span>' + (top.k === 'pdf' ? 'この資料を開く' : 'この記事を開く') + '</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>';
+    }
     return (t.you ? '<div class="sr-you"><p>' + esc(t.you) + '</p></div>' : '') +
-      '<div class="sr-nfa' + (last ? ' is-last' : ' is-past') + '"><span class="sr-av" aria-hidden="true">NFA</span><div class="sr-bub"><div class="sr-a-h"><span class="en">AI ANSWER</span><span class="sr-demo">デモ版</span></div>' +
-      t.msg + (t.docs.length ? '<div class="sr-lists">' + listHtml(t.docs, last) + '</div>' : '') + rows + '</div></div>';
+      '<div class="sr-nfa' + (last ? ' is-last' : ' is-past') + '"><span class="sr-av" aria-hidden="true">N</span><div class="sr-bub">' +
+      splitLead(t.msg, card) + (t.docs.length > 1 ? '<div class="sr-lists">' + listHtml(t.docs.slice(t.lead ? 1 : 0), last) + '</div>' : '') + rel + '</div></div>';
   }
   function draw(animate) {
     syncSide();
-    var mn = $('#sr-main'); if (mn) mn.classList.toggle('is-chat', turns.some(function (t) { return t.you; }) && turns.length > 3);
+    var app = $('#result'), chat = turns.length > 0;
+    if (app) { app.classList.toggle('is-chat', chat); app.classList.toggle('is-entry', !chat); }
     thread.innerHTML = turns.map(turnHtml).join('');
     var last = thread.lastElementChild;
     if (animate && last && !RM) {
@@ -291,7 +306,7 @@
     ['t', 'p', 'r'].forEach(function (ax) { if (f[ax].length) C[ax] = f[ax].slice(0, 1); });   // 軸ごとに置き換え（矛盾させない）
     if (f.join) { C.join = true; C.p = []; } else if (f.p.length) C.join = false;
     var r = reply(prev, !got, text);
-    turns.push({ you: text, msg: r.msg, docs: r.docs, rows: r.rows });
+    turns.push({ you: text, msg: r.msg, docs: r.docs, rows: r.rows, lead: r.lead });
     try { history.replaceState(null, '', location.pathname + '?q=' + encodeURIComponent(turns[0].you)); } catch (e) {}
     draw(true);
   }
@@ -301,12 +316,13 @@
     else C[ax] = [v];
     if (ax === 'p') C.join = false;
     var r = reply(prev, false, '');
-    turns.push({ you: utterance(ax, v, mode), msg: r.msg, docs: r.docs, rows: r.rows });
+    turns.push({ you: utterance(ax, v, mode), msg: r.msg, docs: r.docs, rows: r.rows, lead: r.lead });
     draw(true);
   }
-  function welcome() {
+  function welcome() {   // 入口（チャット投稿フォーム）に戻す
     C = { t: [], p: [], r: [], join: false };
-    turns = [{ you: '', msg: '<p>こんにちは。長野県サッカー協会です。<br>大会の日程、試合結果、登録や講習会のことなど、知りたいことを<b>話しかけるように</b>入力してください。担当の委員会が分からなくても大丈夫です。</p>', docs: [], rows: [['たとえば', starters()]] }];
+    turns = [];
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
     draw(false);
   }
 
@@ -314,17 +330,17 @@
   var form = $('#sr-form'), input = $('#sr-q'), cmp = $('#sr-cmp'), input2 = $('#sr-q2');
   function toThread() { var r = $('#result'); if (r) { var y = r.getBoundingClientRect().top + scrollY - 100; window.lenis ? lenis.scrollTo(y) : scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' }); } }
   if (form) form.addEventListener('submit', function (e) { e.preventDefault(); say(input.value, true); input.value = ''; toThread(); });
-  if (cmp) cmp.addEventListener('submit', function (e) { e.preventDefault(); say(input2.value, !turns.some(function (t) { return t.you; })); input2.value = ''; });
-  $$('.sr-chips [data-sq]').forEach(function (b) { b.addEventListener('click', function () { say(b.textContent, true); toThread(); }); });
+  if (cmp) cmp.addEventListener('submit', function (e) { e.preventDefault(); say(input2.value, !turns.length); input2.value = ''; });
+  $$('.sr-chips [data-sq]').forEach(function (b) { b.addEventListener('click', function () { say(b.textContent.replace(/^#/, ''), true); toThread(); }); });
   $$('.sr-ops .pill').forEach(function (b) { b.addEventListener('click', function () {
     var ax = b.getAttribute('data-ax'), v = b.getAttribute('data-v');
     pick(ax, v, C[ax].indexOf(v) > -1 ? 'drop' : (C[ax].length ? 'swap' : 'add'));
   }); });
-  var clr = $('.sr-clr'); if (clr) clr.addEventListener('click', welcome);
   var rst = $('.sr-reset'); if (rst) rst.addEventListener('click', function () { welcome(); toThread(); });
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return;
-    var s1 = e.target.closest('[data-say]'); if (s1) { say(s1.getAttribute('data-say'), !turns.some(function (t) { return t.you; })); return; }
+    if (e.target.closest('.sr-clr')) { welcome(); toThread(); return; }
+    var s1 = e.target.closest('[data-say]'); if (s1) { say(s1.getAttribute('data-say'), !turns.length); return; }
     var t = e.target.closest('.sr-pick[data-ax], .sr-tag[data-ax]'); if (t) { pick(t.getAttribute('data-ax'), t.getAttribute('data-v'), t.getAttribute('data-mode') || 'add'); return; }
     var a = e.target.closest('[data-all]'); if (a) expandAll();
   });
