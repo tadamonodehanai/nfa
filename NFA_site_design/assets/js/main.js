@@ -161,7 +161,7 @@
         .to({}, {duration:.45});
     };
     mm.add('(min-width:961px)', function(){ vmTl('inset(12% 5% 12% 46%)', 20.5, 0); });
-    mm.add('(max-width:960px)', function(){ vmTl('inset(52% 4% 5% 4%)', 0, 23.5); });
+    mm.add('(max-width:960px)', function(){ vmTl('inset(60% 4% 5% 4%)', 0, 27.5); });
   }
 
   /* ---------- 下層ヒーロー：画像がスクロールで縮む（参考サイトの縮小ギミック） ---------- */

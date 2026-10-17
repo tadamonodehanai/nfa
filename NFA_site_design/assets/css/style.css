@@ -270,8 +270,8 @@ img,video{display:block;max-width:100%}
   .spons{grid-template-columns:repeat(3,1fr)}
   .ft-g{grid-template-columns:1fr 1fr}
   .vm-pin{height:200vh}
-  .vm{clip-path:inset(52% 4% 5% 4%)}
-  .vm-media{transform:translate(0,23.5%)}
+  .vm{clip-path:inset(60% 4% 5% 4%)}
+  .vm-media{transform:translate(0,27.5%)}
   .vm-word{font-size:clamp(48px,14vw,72px)}
   .vm-copy{top:20px;transform:none;width:auto;right:16px}
   .vm-copy .e{font-size:36px}
@@ -1428,6 +1428,11 @@ a:hover .arr{transform:translateX(3px)}
 .cband-act .btn,.contact .btn-l{min-height:56px;font-size:14px}
 .btn .arr{margin:0;flex:0 0 auto}
 .vm-copy .vm-val{margin:14px 0 0;font-size:13px;font-weight:700;color:var(--navy);letter-spacing:.04em}.vm-copy .vm-val b{font-family:var(--f-en);font-weight:800;font-style:italic;letter-spacing:.16em;color:var(--cyan);margin-right:10px}
+/* v16: TOP VISION → ABOUT 動線 */
+.vm-copy .vm-more{margin-top:24px}
+@media (max-width:767px){.vm-copy .vm-more{margin-top:16px}}
+.vm-more-sp{display:none}
+@media (max-width:960px){.vm-copy .vm-more{display:none}.vision .pillars:has(+.vm-more-sp){padding-bottom:0}.vm-more-sp{display:flex;margin:32px 0 0;padding-bottom:64px}}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
