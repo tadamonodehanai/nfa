@@ -1537,6 +1537,37 @@ a:hover .arr{transform:translateX(3px)}
 }
 .spc-i [alt^="天皇杯"],.spc-i [alt^="皇后杯"]{max-height:86px}
 @media (max-width:767px){.spc-i [alt^="天皇杯"],.spc-i [alt^="皇后杯"]{max-height:54px}.spc-dl strong{font-size:13.5px;white-space:nowrap}}
+/* v27: SPECIAL 全タイル同じ高さ（ロゴ欄を固定）、KICKOFFの日付は左上の小さな札 */
+.spc-lg{flex:0 0 auto;height:128px;min-height:0;padding:22px 28px;position:relative}
+.spc-lg img{max-height:64px}
+.spc-k .spc-lg img{max-height:48px}
+.spc-i [alt^="天皇杯"],.spc-i [alt^="皇后杯"]{max-height:70px}
+.spc-i [alt="JFA女子サッカーデー"]{max-height:70px}
+.spc-k .spc-lg{padding-top:30px}
+.spc-dl{position:absolute;left:12px;top:10px;display:inline-flex;align-items:center;gap:6px;padding:0;background:none;color:var(--navy);font-size:10.5px;font-weight:700;letter-spacing:.02em;line-height:1}
+.spc-dl em{font-style:normal;font-family:var(--f-en);font-weight:800;letter-spacing:.04em;background:var(--navy);color:#fff;padding:3px 6px;margin:0}
+.spc-tx{padding:12px 18px 13px}
+@media (max-width:767px){
+  .spc-lg{height:92px;padding:14px 12px}
+  .spc-lg img{max-height:44px}
+  .spc-k .spc-lg{padding-top:26px}
+  .spc-k .spc-lg img{max-height:30px}
+  .spc-i [alt^="天皇杯"],.spc-i [alt^="皇后杯"]{max-height:50px}
+  .spc-i [alt="JFA女子サッカーデー"]{max-height:50px}
+  .spc-dl{left:8px;top:8px;font-size:9px;gap:4px}
+  .spc-dl em{padding:2px 4px}
+  .spc-tx{padding:9px 12px 10px}
+}
+@media (max-width:767px){
+  .spc-dl{white-space:nowrap;font-size:8.5px;left:7px;right:7px;top:7px;gap:4px;letter-spacing:0}
+  .spc-dl em{font-size:8.5px;padding:2px 4px}
+  .spc-k::after{display:none}
+  .spc-k .spc-lg{padding-top:28px}
+}
+.spc-dl{flex-direction:row;flex-wrap:nowrap;justify-content:flex-start;align-items:center}
+@media (max-width:767px){.spc-dl{flex-direction:row;flex-wrap:nowrap;justify-content:flex-start;align-items:center;padding:0}}
+/* v28: 協賛欄の写真の切り抜き位置 */
+.part .ph img[src$="pt-main.jpg"]{object-position:56% 50%}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
