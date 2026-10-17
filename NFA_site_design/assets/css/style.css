@@ -1443,6 +1443,11 @@ a:hover .arr{transform:translateX(3px)}
 }
 /* v18: 画像のない投稿のPICK UP：右上のNFAが切れないよう右上基準で切り抜く */
 .pk > img[src$="thumb-default-pk.jpg"]{object-position:100% 0}
+/* v19: MV写真ごとの切り抜き位置（被写体が見出しの裏に隠れないように） */
+.hero .slide img[src$="hero-train.jpg"]{object-position:50% 78%}
+.hero .slide img[src$="hero-match.jpg"]{object-position:50% 72%}
+.hero .slide img[src$="hero-kids.jpg"]{object-position:50% 62%}
+.hero .slide img[src$="hero-land.jpg"]{object-position:50% 48%}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
