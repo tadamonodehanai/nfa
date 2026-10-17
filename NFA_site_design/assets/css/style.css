@@ -1457,6 +1457,9 @@ a:hover .arr{transform:translateX(3px)}
 @media (max-width:767px){
   .slide::after{background:linear-gradient(0deg,rgba(8,10,14,.72) 0%,rgba(8,10,14,.5) 42%,rgba(8,10,14,.12) 72%,rgba(8,10,14,0) 100%)}
 }
+/* v21: MVの重ねはグラデーションをやめ、全面を均一に（無彩色） */
+.slide::after{background:rgba(8,10,14,.42)}
+@media (max-width:767px){.slide::after{background:rgba(8,10,14,.42)}}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
