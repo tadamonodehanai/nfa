@@ -1447,7 +1447,16 @@ a:hover .arr{transform:translateX(3px)}
 .hero .slide img[src$="hero-train.jpg"]{object-position:50% 78%}
 .hero .slide img[src$="hero-match.jpg"]{object-position:50% 72%}
 .hero .slide img[src$="hero-kids.jpg"]{object-position:50% 62%}
-.hero .slide img[src$="hero-land.jpg"]{object-position:50% 48%}
+.hero .slide img[src$="hero-land.jpg"]{object-position:50% 66%}
+/* v20: MVの重ねを青→無彩色に。文字の後ろだけを暗くして視認性を確保 */
+.slide::after{background:
+  linear-gradient(90deg,rgba(8,10,14,.76) 0%,rgba(8,10,14,.66) 44%,rgba(8,10,14,.28) 70%,rgba(8,10,14,0) 90%),
+  linear-gradient(0deg,rgba(8,10,14,.45) 0%,rgba(8,10,14,0) 38%)}
+.hero h1{text-shadow:0 2px 24px rgba(0,0,0,.28)}
+.hero-cap{text-shadow:0 1px 10px rgba(0,0,0,.45)}
+@media (max-width:767px){
+  .slide::after{background:linear-gradient(0deg,rgba(8,10,14,.72) 0%,rgba(8,10,14,.5) 42%,rgba(8,10,14,.12) 72%,rgba(8,10,14,0) 100%)}
+}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
