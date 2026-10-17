@@ -1460,6 +1460,21 @@ a:hover .arr{transform:translateX(3px)}
 /* v21: MVの重ねはグラデーションをやめ、全面を均一に（無彩色） */
 .slide::after{background:rgba(8,10,14,.42)}
 @media (max-width:767px){.slide::after{background:rgba(8,10,14,.42)}}
+/* v22: 協賛帯をロゴ表示に */
+.spons a{border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px 12px;background:#fff;transition:background .3s}
+.spons a:hover{background:var(--pale)}
+.spons img{display:block;width:auto;height:auto;max-width:82%;max-height:34px;object-fit:contain}
+.spons .gold{grid-column:span 2}
+.spons .gold small{font-family:var(--f-en);font-size:10px;letter-spacing:.16em;font-weight:600;color:#B08A1E}
+.spons .gold img{max-height:52px;max-width:60%}
+.spons [data-sp="meiji"] img{max-height:26px}
+.spons [data-sp="adidas"] img{max-height:40px}
+.spons [data-sp="adbureau"] img{max-height:22px}
+.spons [data-sp="tutti"] img{max-height:40px}
+/* v23: 見出しナビ：文字色を背景の塗りと同じ速度で切り替え（途中で白地に白文字にならない） */
+.lnav a .t,.lnav a .no{transition:color .35s cubic-bezier(.16,1,.3,1),opacity .35s}
+.lnav a::after{transition:transform .28s cubic-bezier(.16,1,.3,1)}
+.spons [data-sp="tsb"] img,.spons [data-sp="richade"] img{max-width:94%;max-height:40px}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
@@ -1848,6 +1863,16 @@ a.dt-cat:hover{background:var(--blue);color:#fff}
   .pt-cta .ctas{width:100%}
   .pt-cta .ctas .btn{width:100%;justify-content:center}
 }
+/* 協賛ロゴ（既存サイト・各社公式サイトの画像を規格化） */
+.pt-logos a{gap:10px}
+.pt-logos img{display:block;height:auto;max-width:78%;max-height:40px;object-fit:contain}
+.pt-logos .nm{font-size:11px;font-weight:500;color:var(--ink2)}
+.pt-logos.gold img{max-height:64px;max-width:70%}
+.pt-logos [data-sp="meiji"] img{max-height:30px}
+.pt-logos [data-sp="adidas"] img{max-height:46px}
+.pt-logos [data-sp="adbureau"] img{max-height:26px}
+.pt-logos [data-sp="tutti"] img{max-height:46px}
+.pt-logos [data-sp="tsb"] img,.pt-logos [data-sp="richade"] img{max-width:90%;max-height:46px}
 /* ===== privacy.html（静的文書：左目次＋右本文） ===== */
 .pv-doc{display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start}
 .pv-toc{position:sticky;top:calc(var(--hdh,0px) + 20px);border-top:2px solid var(--navy)}

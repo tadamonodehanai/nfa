@@ -3,11 +3,12 @@ import numpy as np
 from PIL import Image
 from skimage import color
 SRC='/home/claude/web/mv/lic/'; DST='/home/claude/web/build/src_assets/'
-FILES=[('B_train','hero-train'),('A_match','hero-match'),('C_kids','hero-kids'),('D_land','hero-land')]
+FILES=[('B_train','hero-train'),('A_match','hero-match'),('C_kids','hero-kids'),('D_land','hero-land'),('F_dev','fy-dev'),('F_start','fy-start'),('F_comm','fy-comm')]
+WIDTH={'fy-dev':1600,'fy-start':1600,'fy-comm':1600}
 T_L, T_SD, T_C = 48.0, 20.0, 21.0     # 目標：平均明度 / 明度のばらつき / 平均彩度（Lab）
 def stats(lab): return lab[...,0].mean(), lab[...,0].std(), np.hypot(lab[...,1],lab[...,2]).mean(), lab[...,1].mean(), lab[...,2].mean()
 def grade(name):
-    im=Image.open(SRC+name+'.jpg').convert('RGB'); w=2400; im=im.resize((w,round(im.height*w/im.width)),Image.LANCZOS)
+    im=Image.open(SRC+name+'.jpg').convert('RGB'); w=WIDTH.get(dict(FILES)[name],2400); im=im.resize((w,round(im.height*w/im.width)),Image.LANCZOS)
     rgb=np.asarray(im)/255.0; lab=color.rgb2lab(rgb)
     L,a,b=lab[...,0],lab[...,1],lab[...,2]
     before=stats(lab)
