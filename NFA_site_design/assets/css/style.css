@@ -2213,6 +2213,19 @@ a.dt-cat:hover{background:var(--blue);color:#fff}
   .tbl.fx-tbl:not(:has(thead)) th,.tbl.fx-tbl:not(:has(thead)) td{display:block!important;width:auto!important;white-space:normal!important;padding:2px 2px!important;border:0!important;background:none!important}
   .tbl.fx-tbl:not(:has(thead)) th{font-size:13px!important}
 }
+/* 事業計画・事業報告 */
+.rp-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 32px}
+.rp-g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rp-y{background:#fff;border:1px solid var(--line);padding:20px 22px 18px;scroll-margin-top:calc(var(--hdh,0px) + 70px)}
+.rp-yh{margin:0 0 10px;font-family:var(--f-en);font-weight:800;font-size:34px;line-height:1;color:var(--navy);letter-spacing:.02em}
+.rp-yh small{font-family:var(--f-jp);font-size:14px;font-weight:700;margin-left:2px}
+.rp-y .dl a,.rp-na{padding:11px 2px;font-size:13.5px}
+.rp-na{display:flex;align-items:center;gap:12px;color:var(--ink2);font-weight:500}
+.rp-na .fbtn-i{background:var(--pale);color:var(--ink2);font-family:var(--f-en);font-weight:800;font-size:10px;padding:3px 6px;border-radius:2px;width:40px;text-align:center}
+.rp-na small{margin-left:auto;font-size:11px}
+.rp-y .fx-note{margin-top:8px;font-size:12px}
+@media (max-width:960px){.rp-g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.rp-g,.rp-g3{grid-template-columns:1fr}.rp-y{padding:16px 16px 12px}}
 
 /* =========================================================
    grow（強くなる・関わる）固有 — 接頭辞 sg-

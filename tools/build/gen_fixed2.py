@@ -365,7 +365,7 @@ def festival():
 @page
 def sitemap():
     s = head('sitemap', 'サイトマップ', '長野県サッカー協会Webサイトのページ一覧です。', [], 'SITEMAP', 'サイトマップ', '当サイトのページ一覧です。', 'SITEMAP')
-    G = [('ABOUT', '協会について', [('協会について', 'about.html'), ('利用規約', 'terms.html'), ('プライバシーポリシー', 'privacy.html'), ('お問い合わせ', 'contact.html')]),
+    G = [('ABOUT', '協会について', [('協会について', 'about.html'), ('事業計画・事業報告', 'reports.html'), ('利用規約', 'terms.html'), ('プライバシーポリシー', 'privacy.html'), ('お問い合わせ', 'contact.html')]),
          ('CATEGORY', 'カテゴリ', [('1種（社会人・大学）', 'cat-1.html'), ('2種（高校）', 'cat-2.html'), ('3種（中学）', 'cat-3.html'), ('4種（小学）', 'cat-4.html'), ('女子', 'cat-w.html'), ('フットサル', 'cat-f.html'), ('シニア', 'cat-s.html'), ('キッズ', 'grassroots.html')]),
          ('COMMITTEE', '専門委員会', [('審判', 'referee.html'), ('長野県レフェリーアカデミー', 'academy.html'), ('審判 各種講習会 年間計画', 'referee-schedule.html'), ('指導者', 'technical.html'), ('指導者講習会', 'coach-course.html'), ('医学', 'medical.html')]),
          ('START / GROW', 'はじめる・育成強化', [('はじめる', 'start.html'), ('チームを探す', 'teams.html'), ('JFAフェスティバル', 'festival.html'), ('育成・強化', 'grow.html'), ('長野スタイル', 'nagano-style.html'), ('女子トレセンについて', 'tracen.html')]),
@@ -373,6 +373,35 @@ def sitemap():
          ('INFO', 'お知らせ・情報', [('お知らせ一覧', 'list.html'), ('情報を探す（AI）', 'search.html'), ('リンク', 'links.html')])]
     body = '<div class="sm-g">' + ''.join(f'<div class="sm-c"><p class="e">{en}</p><h2>{ja}</h2><ul>' + ''.join(f'<li><a href="{h}">{t}</a></li>' for t, h in xs) + '</ul></div>' for en, ja, xs in G) + '</div>'
     s += f'\n<section class="blk"><div class="wrap">\n{body}\n</div></section>\n'
+    return s + end()
+
+# ======================================================================
+@page
+def reports():
+    import json, os
+    Y = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'reports.json'), encoding='utf-8'))
+    s = head('reports', '事業計画・事業報告', '長野県サッカー協会の事業計画・収支予算・事業報告・決算報告（2013年〜）を年度別に掲載しています。',
+             [('協会について', 'about.html')], 'BUSINESS REPORTS', '事業計画・事業報告', '一般社団法人 長野県サッカー協会の事業計画・収支予算・事業報告・決算報告を、2013年から年度別に掲載しています。', 'REPORTS')
+    yrs = [y for y, _, _ in Y]
+    s += '<nav class="lnav" aria-label="ページ内メニュー"><ul>' + ''.join(f'<li><a href="#y{y}">{y}年</a></li>' for y in yrs[:6]) + f'<li><a href="#y{yrs[6]}">{yrs[-1]}〜{yrs[6]}年</a></li></ul></nav>\n'
+    def card(y, items, note):
+        li = ''
+        for t, u in items:
+            if u:
+                li += f'<li><a href="{E(U(u))}" target="_blank" rel="noopener"><span class="fbtn-i">PDF</span><span>{E(t)}</span></a></li>'
+            else:
+                li += f'<li><span class="rp-na"><span class="fbtn-i">—</span><span>{E(t)}</span><small>掲載なし</small></span></li>'
+        n = f'<p class="fx-note">{E(note)}</p>' if note else ''
+        return f'<div class="rp-y" id="y{y}"><h3 class="rp-yh">{y}<small>年</small></h3><ul class="dl fx-dl1">{li}</ul>{n}</div>'
+    latest = ''.join(card(*x) for x in Y[:2])
+    past = ''.join(card(*x) for x in Y[2:])
+    s += sec('latest', 'LATEST', '最新の事業計画・事業報告', f'<div class="rp-g">{latest}</div>')
+    s += sec('archive', 'ARCHIVE', '過去の事業計画・事業報告', f'<div class="rp-g rp-g3">{past}</div>', pale=True)
+    s += '''
+<section class="blk"><div class="wrap">
+  <div class="fx-rel"><a href="about.html#business"><span class="e">BUSINESS</span><b>事業内容（定款より）</b></a><a href="about.html#profile"><span class="e">PROFILE</span><b>協会概要・定款・役員名簿</b></a></div>
+</div></section>
+'''
     return s + end()
 
 if __name__ == '__main__':
