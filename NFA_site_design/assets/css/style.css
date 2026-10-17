@@ -1339,7 +1339,7 @@ select.inp:invalid{color:#8A93AE;font-weight:400}
 .lnav a{z-index:0;transition:color .3s cubic-bezier(.16,1,.3,1)}
 .lnav a::after,.lnav li:first-child a::after{left:0;right:0;top:0;bottom:0;height:auto;transform:scaleY(0);transform-origin:50% 100%;z-index:-1}
 @media (max-width:960px){.lnav a::after{left:0;right:0}}
-.lnav a:hover::after,.lnav a[aria-current="true"]::after{transform:scaleY(1)}
+.lnav a:hover::after,.lnav a[aria-current="true"]::after,.lnav li:first-child a:hover::after,.lnav li:first-child a[aria-current="true"]::after{transform:scaleY(1)}
 .lnav a:hover,.lnav a[aria-current="true"],.lnav a:hover .t,.lnav a[aria-current="true"] .t,.lnav a:hover .no,.lnav a[aria-current="true"] .no{color:#fff}
 .lnav a:hover .no,.lnav a[aria-current="true"] .no{opacity:.8}
 /* v11 logo: NFA (label font) + 2-line name */
