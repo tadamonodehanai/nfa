@@ -1441,6 +1441,8 @@ a:hover .arr{transform:translateX(3px)}
   .vm-copy ol{display:none}
   .vm-copy .vm-more{margin-top:20px}
 }
+/* v18: 画像のない投稿のPICK UP：右上のNFAが切れないよう右上基準で切り抜く */
+.pk > img[src$="thumb-default-pk.jpg"]{object-position:100% 0}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
@@ -2160,17 +2162,28 @@ a.dt-cat:hover{background:var(--blue);color:#fff}
 
 /* チームを探す */
 .sg-find{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;align-items:stretch}
-.sg-fbox{background:#fff;border:1px solid var(--line);padding:26px 28px;display:grid;gap:18px;align-content:start}
+.sg-fbox{background:#fff;border:1px solid var(--line);padding:26px 28px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.sg-fbox .sg-btn{margin-top:6px}
 .sg-fbox > p{margin:0;font-size:14px;line-height:1.9;color:var(--ink2)}
 .sg-row{display:grid;grid-template-columns:6em 1fr;gap:10px;align-items:start}
 .sg-k{font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;padding-top:8px}
 .sg-pills{display:flex;flex-wrap:wrap;gap:8px}
 .sg-pills .pill small{font-size:10px;font-weight:700;opacity:.8}
-.sg-btn{justify-self:start;padding:14px 28px;font-size:15px}
-.sg-map{position:relative;overflow:hidden;background:var(--pale);min-height:240px}
-.sg-map img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.sg-map ul{position:absolute;left:12px;right:12px;bottom:12px;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.sg-map li{background:rgba(20,28,94,.88);color:#fff;text-align:center;font-weight:700;font-size:13px;padding:8px 4px;letter-spacing:.1em}
+.sg-btn{align-self:flex-start;padding:14px 28px;font-size:15px}
+.sg-map{position:relative;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:44px 28px 28px}
+.mp-cap{position:absolute;left:24px;top:20px;margin:0;font-family:var(--f-en);font-weight:600;font-size:11px;letter-spacing:.28em;color:var(--ink2)}
+.mp-cap b{display:block;font-weight:800;font-size:15px;letter-spacing:.18em;color:var(--navy)}
+.mp{width:auto;height:auto;max-width:100%;max-height:380px;display:block;overflow:visible}
+.mp-r{cursor:pointer;outline:none}
+.mp-hit{fill:transparent}
+.mp-dot{fill:none;stroke:var(--blue);stroke-width:3.3;stroke-linecap:round;opacity:.3;transition:opacity .35s,stroke .35s}
+.mp-r:hover .mp-dot,.mp-r:focus-visible .mp-dot{opacity:.5}
+.mp-r[aria-pressed="true"] .mp-dot{stroke:var(--cyan);opacity:1}
+.mp-r:focus-visible .mp-hit{stroke:var(--cyan);stroke-width:1.5;stroke-dasharray:2 3}
+.mp text{text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}
+.mp-en{font-family:var(--f-en);font-weight:800;font-style:italic;font-size:18px;letter-spacing:.2em;fill:var(--cyan)}
+.mp-ja{font-weight:900;font-size:32px;letter-spacing:.12em;fill:var(--navy)}
+.mp-r[aria-pressed="true"] .mp-en{fill:var(--navy)}
 
 /* 注記 */
 .sg-note{margin:20px 0 0;font-size:13px;line-height:1.9;color:var(--ink2)}
@@ -2181,7 +2194,8 @@ a.dt-cat:hover{background:var(--blue);color:#fff}
   .sg-act .mt{grid-column:2;padding-left:0;border-left:0;display:flex;flex-wrap:wrap;gap:4px 18px}
   .sg-act .go{display:none}
   .sg-find{grid-template-columns:1fr}
-  .sg-map{min-height:200px}
+  .sg-map{padding:48px 20px 24px}
+  .mp{max-width:260px}
 }
 @media (max-width:560px){
   /* JFA SP：左サムネ＋右に種別・見出し、説明と条件は全幅 */
@@ -2196,9 +2210,8 @@ a.dt-cat:hover{background:var(--blue);color:#fff}
   .sg-fbox{padding:20px 16px}
   .sg-row{grid-template-columns:1fr;gap:6px}
   .sg-k{padding-top:0}
-  .sg-btn{justify-self:stretch;justify-content:center}
-  .sg-map{min-height:180px}
-  .sg-map li{font-size:12px;padding:6px 2px;letter-spacing:.04em}
+  .sg-btn{align-self:stretch;justify-content:center}
+  .mp{max-width:220px}
 }
 
 /* 調整 */

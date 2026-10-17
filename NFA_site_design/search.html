@@ -9,6 +9,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="長野県サッカー協会（NFA）">
+<meta property="og:title" content="情報を探す｜長野県サッカー協会">
+<meta property="og:description" content="知りたいことを入力するか、対象・目的・地域の条件を選んで、大会日程、講習会、登録手続きなどの情報を探せます。">
+<!-- OGP画像はデモの公開先の絶対URL。WordPressでは本番ドメインに置き換え -->
+<meta property="og:image" content="https://tadamonodehanai.github.io/nfa/NFA_site_design/assets/img/ogp.jpg">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
 <div class="pt" aria-hidden="true"><i></i></div>
@@ -79,9 +89,9 @@
 <form action="search.html" aria-label="AIに質問する" class="sr-form" id="sr-form" role="search">
 <label class="sr-lb" for="sr-q">何を知りたいですか？</label>
 <div class="sr-box">
-<svg aria-hidden="true" class="sr-ico" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<svg aria-hidden="true" class="sr-ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
 <input autocomplete="off" class="sr-in" id="sr-q" name="q" placeholder="例）小学生の大会はいつ？　審判の資格を更新したい" type="text" value=""/>
-<button aria-label="質問する" class="sr-send" type="submit"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+<button aria-label="質問する" class="sr-send" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
 </div>
 </form>
 <p class="sr-ex-h">あなたが興味がありそうな情報</p>
@@ -94,7 +104,7 @@
 <form aria-label="続けて質問する" class="sr-cmp" id="sr-cmp" role="search">
 <label class="vh" for="sr-q2">続けて質問する</label>
 <input autocomplete="off" id="sr-q2" placeholder="続けて聞く。例）北信だけ　結果も見たい　中学生は？" type="text"/>
-<button aria-label="送信" class="sr-send" type="submit"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+<button aria-label="送信" class="sr-send" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
 </form>
 <p class="sr-cmp-n">タグを選ぶか、ことばで続けてください。案内には必ず出典がつきます。<button class="sr-reset" type="button">最初から聞きなおす</button></p>
 </div>
