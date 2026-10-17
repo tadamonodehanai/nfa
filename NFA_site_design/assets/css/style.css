@@ -1611,7 +1611,17 @@ a:hover .arr{transform:translateX(3px)}
 .part .ph img[src$="pt-main.jpg"]{object-position:62% 60%}
 .part .ph img[src$="pt-main.jpg"]{object-position:84% 92%}
 .spc-i:has(img[src$="spc-kougou-kv.jpg"])::after{color:var(--ink2);text-shadow:none}
-@media (min-width:768px){.part .ph{aspect-ratio:5/4}.part .ph img[src$="pt-main.jpg"]{object-position:72% 96%}}
+/* v31: 県内クラブ：公式の横長ロゴ（白地） */
+.lnk.c3{gap:0;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.lnk.c3 a.lk-club{aspect-ratio:auto;height:112px;background:#fff;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 28px}
+.lnk.c3 a.lk-club:hover,.lnk.c3 a.lk-club[data-club]:hover{background:var(--pale)}
+.lnk.c3 a.lk-club::after{color:var(--ink2)}
+.lnk.c3 a.lk-club .em{height:auto;width:auto;max-width:86%;max-height:60px;filter:none}
+.lnk.c3 a.lk-club[data-club="boaluz"] .em{max-height:46px}
+.lk-club[data-club]{background:#fff}
+@media (max-width:767px){.lnk.c3{grid-template-columns:1fr}.lnk.c3 a.lk-club{aspect-ratio:auto;height:84px}.lnk.c3 a.lk-club .em{max-height:48px;max-width:78%}.lnk.c3 a.lk-club[data-club="boaluz"] .em{max-height:36px}}
+/* 協賛欄：握手の手元が中心に */
+.part .ph img[src$="pt-main.jpg"]{object-position:50% 50%}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
