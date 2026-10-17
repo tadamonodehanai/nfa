@@ -1568,6 +1568,13 @@ a:hover .arr{transform:translateX(3px)}
 @media (max-width:767px){.spc-dl{flex-direction:row;flex-wrap:nowrap;justify-content:flex-start;align-items:center;padding:0}}
 /* v28: 協賛欄の写真の切り抜き位置 */
 .part .ph img[src$="pt-main.jpg"]{object-position:56% 50%}
+/* v29: JFAロゴを大きく（公式画像196×93を約1.6倍まで） */
+.lsub-jfa{gap:18px;margin-top:32px}
+.lsub-jfa img{height:58px;width:auto}
+.lsub-jfa span{font-size:13px;letter-spacing:.12em;color:var(--navy)}
+@media (max-width:767px){.lsub-jfa{gap:14px}.lsub-jfa img{height:46px}}
+/* なでしこひろば：ロゴの「JFA」がタイルの水平中央に来るよう画像側で余白調整済み */
+.spc-i [alt="JFAなでしこひろば"]{max-width:90%}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
