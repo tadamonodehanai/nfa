@@ -1632,6 +1632,14 @@ a:hover .arr{transform:translateX(3px)}
 /* v33 NFAの字詰め：F–Aの斜めの空きを詰め、N–Fと見た目の間隔をそろえる */
 .ab-f{margin-left:.01em}
 .ab-a{margin-left:-.06em}
+/* v34 MV 1〜3枚目差し替え：見せたい被写体に合わせた位置 */
+.hero .slide img[src$="hero-train.jpg"]{object-position:50% 55%}
+.hero .slide img[src$="hero-match.jpg"]{object-position:20% 45%}
+.hero .slide img[src$="hero-kids.jpg"]{object-position:50% 70%}
+@media (max-width:960px){
+  .hero .slide img[src$="hero-match.jpg"]{object-position:8% 50%}
+  .hero .slide img[src$="hero-kids.jpg"]{object-position:45% 70%}
+}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
