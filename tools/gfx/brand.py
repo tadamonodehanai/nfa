@@ -11,12 +11,16 @@ NAVY, BLUE, CYAN, LCYAN = '#141C5E', '#1D2A8C', '#0090C8', '#7FD3FF'
 def text_path(ttf, text, size, x, y, track=0.0, anchor='middle'):
     f = TTFont(ttf); gs = f.getGlyphSet(); cmap = f.getBestCmap(); upm = f['head'].unitsPerEm; hmtx = f['hmtx']
     s = size / upm; names = [cmap[ord(c)] for c in text]
-    adv = [hmtx[n][0] * s for n in names]; w = sum(adv) + track * size * (len(text) - 1)
+    adv = [hmtx[n][0] * s for n in names]
+    # 字間：NFAはWebのロゴと同じ詰め（N–F をわずかに開き、F–A を詰めて、見た目の間隔を均等に）
+    KERN = {'NF': 0.005, 'FA': -0.065}
+    gaps = [KERN.get(text[i:i + 2], track) * size for i in range(len(text) - 1)]
+    w = sum(adv) + sum(gaps)
     cx = x - (w / 2 if anchor == 'middle' else 0)
     out = []
-    for n, a in zip(names, adv):
+    for i, (n, a) in enumerate(zip(names, adv)):
         pen = SVGPathPen(gs); tp = TransformPen(pen, (s, 0, 0, -s, cx, y)); gs[n].draw(tp)
-        out.append(pen.getCommands()); cx += a + track * size
+        out.append(pen.getCommands()); cx += a + (gaps[i] if i < len(gaps) else 0)
     return out, w
 
 def contours(w, h, step=120, cx=0.40, cy=0.52, zoom=1.5):

@@ -1622,6 +1622,16 @@ a:hover .arr{transform:translateX(3px)}
 @media (max-width:767px){.lnk.c3{grid-template-columns:1fr}.lnk.c3 a.lk-club{aspect-ratio:auto;height:84px}.lnk.c3 a.lk-club .em{max-height:48px;max-width:78%}.lnk.c3 a.lk-club[data-club="boaluz"] .em{max-height:36px}}
 /* 協賛欄：握手の手元が中心に */
 .part .ph img[src$="pt-main.jpg"]{object-position:55% 62%}
+/* v32 SNS：公式アカウントへのリンク（ロゴ） */
+.sns a,.dr-sns a{display:grid;place-items:center;border-radius:50%;transition:background .25s,border-color .25s,color .25s}
+.sns a{width:38px;height:38px;border:1px solid rgba(255,255,255,.3);color:#fff}
+.sns a:hover{background:var(--cyan);border-color:var(--cyan)}
+.dr-sns a{width:42px;height:42px;border:1px solid var(--line);color:var(--navy)}
+.dr-sns a:hover{background:var(--cyan);border-color:var(--cyan);color:#fff}
+.sns svg,.dr-sns svg{width:16px;height:16px}
+/* v33 NFAの字詰め：F–Aの斜めの空きを詰め、N–Fと見た目の間隔をそろえる */
+.ab-f{margin-left:.01em}
+.ab-a{margin-left:-.06em}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
