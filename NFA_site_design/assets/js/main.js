@@ -159,6 +159,18 @@
     });
   });
 
+  /* 主要競技場：地図の地区と絞り込みタブを連動 */
+  $$('.fc-top').forEach(function(box){
+    var tabs = $$('.fc-filt [data-f]', box), map = $$('.mp-r', box);
+    function sync(){ var cur = tabs.filter(function(t){ return t.getAttribute('aria-selected') === 'true'; })[0]; map.forEach(function(g){ g.setAttribute('aria-pressed', cur && cur.dataset.r === g.dataset.r ? 'true' : 'false'); }); }
+    tabs.forEach(function(t){ t.addEventListener('click', function(){ setTimeout(sync, 0); }); });
+    map.forEach(function(g){
+      function go(){ var on = g.getAttribute('aria-pressed') === 'true'; var t = on ? tabs[0] : tabs.filter(function(x){ return x.dataset.r === g.dataset.r; })[0]; if (t) t.click(); }
+      g.addEventListener('click', go);
+      g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+    });
+  });
+
   if (!hasST || reduce) return;
 
   /* ---------- ビジョン：全面の映像がスクロールで縮む ---------- */
