@@ -1621,7 +1621,7 @@ a:hover .arr{transform:translateX(3px)}
 .lk-club[data-club]{background:#fff}
 @media (max-width:767px){.lnk.c3{grid-template-columns:1fr}.lnk.c3 a.lk-club{aspect-ratio:auto;height:84px}.lnk.c3 a.lk-club .em{max-height:48px;max-width:78%}.lnk.c3 a.lk-club[data-club="boaluz"] .em{max-height:36px}}
 /* 協賛欄：握手の手元が中心に */
-.part .ph img[src$="pt-main.jpg"]{object-position:50% 50%}
+.part .ph img[src$="pt-main.jpg"]{object-position:55% 62%}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
