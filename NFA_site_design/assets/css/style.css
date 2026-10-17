@@ -1575,6 +1575,43 @@ a:hover .arr{transform:translateX(3px)}
 @media (max-width:767px){.lsub-jfa{gap:14px}.lsub-jfa img{height:46px}}
 /* なでしこひろば：ロゴの「JFA」がタイルの水平中央に来るよう画像側で余白調整済み */
 .spc-i [alt="JFAなでしこひろば"]{max-width:90%}
+/* v30: SPECIAL — 天皇杯・皇后杯の公式キービジュアル(1200×630)を全幅で、その比率を全タイル共通の基準に */
+.spc-lg{height:auto;aspect-ratio:40/21;padding:20px 28px}
+.spc-lg img{max-width:72%;max-height:58%}
+.spc-k .spc-lg{padding-top:34px}
+.spc-k .spc-lg img{max-width:80%;max-height:46%}
+.spc-i [alt="JFA女子サッカーデー"]{max-height:66%}
+.spc-i [alt="JFAフェスティバル"]{max-height:62%}
+.spc-i [alt="JFAなでしこひろば"]{max-height:52%;max-width:86%}
+.spc-lg.spc-kv{padding:0;overflow:hidden}
+.spc-lg.spc-kv img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.spc-i:hover .spc-kv img{transform:scale(1.04)}
+.spc-i:has(.spc-kv)::after{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);z-index:1}
+@media (max-width:767px){
+  .spc-lg{height:auto;padding:12px}
+  .spc-k .spc-lg{padding-top:24px}
+  .spc-k .spc-lg img{max-height:40%}
+  .spc-lg img{max-height:60%}
+}
+/* 県内クラブ：文字なし、クラブカラーの横長面にエンブレム */
+.lnk.c3 a.lk-club{display:flex;align-items:center;justify-content:center;min-height:0;aspect-ratio:3/1;padding:0;border-color:transparent;overflow:hidden;position:relative}
+.lnk.c3 a.lk-club::after{color:rgba(255,255,255,.85)}
+.lnk.c3 a.lk-club .em{width:auto;height:66%;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+.lnk.c3 a.lk-club:hover .em{transform:scale(1.07)}
+.lnk.c3 a.lk-club:hover{background:inherit}
+.lk-club[data-club="yamaga"]{background:#00733A}
+.lk-club[data-club="parceiro"]{background:#E9620F}
+.lk-club[data-club="boaluz"]{background:#B71127}
+.lnk.c3 a.lk-club[data-club="yamaga"]:hover{background:#006532}
+.lnk.c3 a.lk-club[data-club="parceiro"]:hover{background:#D9570A}
+.lnk.c3 a.lk-club[data-club="boaluz"]:hover{background:#A30E22}
+.lnk.c3{gap:12px;border:0}
+@media (max-width:767px){.lnk.c3{grid-template-columns:repeat(3,1fr);gap:8px}.lnk.c3 a.lk-club{aspect-ratio:1/1}.lnk.c3 a.lk-club .em{height:62%}}
+/* 協賛欄：シルエットは下寄りに */
+.part .ph img[src$="pt-main.jpg"]{object-position:62% 60%}
+.part .ph img[src$="pt-main.jpg"]{object-position:84% 92%}
+.spc-i:has(img[src$="spc-kougou-kv.jpg"])::after{color:var(--ink2);text-shadow:none}
+@media (min-width:768px){.part .ph{aspect-ratio:5/4}.part .ph img[src$="pt-main.jpg"]{object-position:72% 96%}}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
