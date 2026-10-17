@@ -161,7 +161,12 @@
         .to({}, {duration:.45});
     };
     mm.add('(min-width:961px)', function(){ vmTl('inset(12% 5% 12% 46%)', 20.5, 0); });
-    mm.add('(max-width:960px)', function(){ vmTl('inset(60% 4% 5% 4%)', 0, 27.5); });
+    mm.add('(max-width:960px)', function(){
+      /* 縮んだ映像が文章に重ならない位置を、文章の高さから決める */
+      var st = $('.vm-sticky'), c = $('#vmCopy');
+      var t = Math.min(76, Math.max(52, Math.ceil((c.offsetTop + c.offsetHeight + 24) / st.clientHeight * 100)));
+      vmTl('inset(' + t + '% 4% 5% 4%)', 0, (t - 5) / 2);
+    });
   }
 
   /* ---------- 下層ヒーロー：画像がスクロールで縮む（参考サイトの縮小ギミック） ---------- */

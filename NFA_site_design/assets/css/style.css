@@ -1433,6 +1433,14 @@ a:hover .arr{transform:translateX(3px)}
 @media (max-width:767px){.vm-copy .vm-more{margin-top:16px}}
 .vm-more-sp{display:none}
 @media (max-width:960px){.vm-copy .vm-more{display:none}.vision .pillars:has(+.vm-more-sp){padding-bottom:0}.vm-more-sp{display:flex;margin:32px 0 0;padding-bottom:64px}}
+/* v17: 画面の高さが低いPCでもVISIONの文章とボタンが収まるように */
+@media (min-width:961px) and (max-height:860px){
+  .vm-copy .e{font-size:48px}
+  .vm-copy h2{margin:20px 0 10px;font-size:28px}
+  .vm-copy p{line-height:1.85}
+  .vm-copy ol{display:none}
+  .vm-copy .vm-more{margin-top:20px}
+}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
