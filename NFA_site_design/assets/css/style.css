@@ -1427,6 +1427,7 @@ a:hover .arr{transform:translateX(3px)}
 .btn,a.btn,button.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:20px;min-height:56px;padding:0 24px;font-size:14px;font-weight:700;letter-spacing:.06em;line-height:1.4;border-radius:2px}
 .cband-act .btn,.contact .btn-l{min-height:56px;font-size:14px}
 .btn .arr{margin:0;flex:0 0 auto}
+.vm-copy .vm-val{margin:14px 0 0;font-size:13px;font-weight:700;color:var(--navy);letter-spacing:.04em}.vm-copy .vm-val b{font-family:var(--f-en);font-weight:800;font-style:italic;letter-spacing:.16em;color:var(--cyan);margin-right:10px}
 /* ===== 404.html ===== */
 .nf-hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
 .nf-hero .wrap{position:relative;padding-block:56px 60px}
@@ -1480,6 +1481,25 @@ a:hover .arr{transform:translateX(3px)}
   .ab-btns .btn{width:100%;justify-content:center}
   .ab-biz li{grid-template-columns:36px 1fr;font-size:14px}
 }
+/* ===== VISION 本文 / VALUE / 中期ビジョン（中期経営計画 2026-31） ===== */
+.ab-vis{max-width:46em;margin:0 0 32px}
+.ab-val{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.ab-val article{background:#fff;border:1px solid var(--line);border-top:3px solid var(--navy);padding:24px 24px 26px}
+.ab-val .lab{font-family:var(--f-en);font-weight:800;font-size:12px;letter-spacing:.2em;color:var(--cyan)}
+.ab-val .en{margin:6px 0 0;font-family:var(--f-en);font-weight:800;font-size:30px;line-height:1;letter-spacing:.01em;color:var(--navy);text-transform:uppercase}
+.ab-val h3{margin:12px 0 12px;font-size:18px;font-weight:900;color:var(--navy);line-height:1.5}
+.ab-val h3 small{display:block;margin-top:2px;font-size:13px;font-weight:700;color:var(--ink2)}
+.ab-val article > p:last-child{margin:0;font-size:14px;line-height:1.9;color:var(--ink)}
+.ab-mtv{list-style:none;margin:24px 0 12px;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ab-mtv li{background:#fff;border:1px solid var(--line);padding:22px 24px 24px}
+.ab-mtv .no{font-family:var(--f-en);font-weight:800;font-size:28px;line-height:1;color:var(--cyan)}
+.ab-mtv h3{margin:10px 0 10px;font-size:17px;font-weight:900;color:var(--navy);line-height:1.5}
+.ab-mtv h3 small{display:block;margin-top:2px;font-size:13px;font-weight:700;color:var(--ink2)}
+.ab-mtv p{margin:0;font-size:14px;line-height:1.9}
+@media (max-width:960px){ .ab-val,.ab-mtv{grid-template-columns:1fr} .ab-val .en{font-size:26px} }
+.ab-biz li{display:block;position:relative;padding-left:48px}
+.ab-biz li::before{position:absolute;left:4px;top:20px}
+@media (max-width:960px){ .ab-biz li{padding-left:40px} }
 /* ===== contact.html — クラスは ct- で始まるものに限定 ===== */
 .ct-art{align-items:start}
 .ct-main{min-width:0}
