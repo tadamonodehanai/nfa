@@ -1837,6 +1837,51 @@ a.dt-cat:hover{background:var(--blue);color:#fff}
   .dt-body .tbl{min-width:0;font-size:13px}
   .dt-body .tbl th,.dt-body .tbl td{padding:10px 8px}
 }
+
+/* ===== 記事テンプレート（3パターン共通の追加分） ===== */
+.dt-cta{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0 32px}
+.dt-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dt-gal figure{margin:0;aspect-ratio:4/3;overflow:hidden;background:var(--pale)}
+.dt-gal img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.dt-gal figure:hover img{transform:scale(1.04)}
+.dt-alert{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 28px;padding:16px 20px;border-left:6px solid var(--alert);background:#FFF3F1}
+.dt-alert b{font-size:14px;font-weight:900;color:var(--alert);letter-spacing:.08em}
+.dt-alert span{font-size:14px;color:var(--ink)}
+.dt-important .art-h h1{border-left:0}
+.dt-important .dt-body{font-size:16px}
+.dt-toc{margin-top:0}
+.dt-src{margin:28px 0 0;font-size:12px;color:var(--ink2)}
+.dt-src a{color:var(--ink2);text-decoration:underline}
+@media (max-width:560px){
+  .dt-gal{grid-template-columns:repeat(2,1fr)}
+  .dt-cta .btn{width:100%;justify-content:center}
+}
+/* ===== チーム詳細 ===== */
+.tmd-area{font-family:var(--f-en);font-weight:800;font-style:italic;letter-spacing:.16em;color:var(--cyan)}
+.tmd-pr{position:relative;margin:0 0 32px;padding:22px 24px 22px 28px;background:var(--pale);border-left:4px solid var(--cyan)}
+.tmd-pr .e{font-family:var(--f-en);font-weight:800;font-size:12px;letter-spacing:.2em;color:var(--ink2);margin-bottom:6px}
+.tmd-pr p{margin:0;font-size:16px;line-height:2;font-weight:500}
+.tmd-contact p{font-size:14px;line-height:1.9}
+.tm-side{grid-template-columns:1fr!important}
+.tm-side li{padding:12px 0!important}
+.side .tm.tm-side .lp-lk,.side .tm.tm-side .tg{display:none}
+.tm-side b{font-size:14px}
+.tm-side span > span{font-size:12px}
+a.tm-nm{color:inherit}
+a.tm-nm:hover{color:var(--blue);text-decoration:underline}
+/* ===== 過去の日程・試合結果 ===== */
+.arc-y{padding-top:56px}
+.arc-i{margin:0 0 28px}
+.arc-i h3{margin:0 0 10px;font-size:17px;font-weight:900;color:var(--navy);line-height:1.5;padding-left:12px;border-left:4px solid var(--cyan)}
+.arc-t{table-layout:fixed;width:100%}
+.arc-t th{width:20em;background:var(--pale);vertical-align:top;font-size:13px}
+.arc-t td .gap{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:560px){
+  .tbl.arc-t,.tbl.arc-t tbody,.tbl.arc-t tr,.tbl.arc-t th,.tbl.arc-t td{display:block;width:100%;min-width:0}
+  .tbl.arc-t th{border-bottom:0;padding:10px 12px 4px}
+  .tbl.arc-t td{padding:4px 12px 12px}
+  .tbl.arc-t tr{border-bottom:1px solid var(--line)}
+}
 /* ===== 固定ページ群（download / links / facilities / request / terms / registration / coach-course / academy / referee-schedule / nagano-style / tracen / festival / sitemap）共通 — 接頭辞 fx- / fc- ===== */
 .fx-k{margin:20px 0 8px;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink2)}
 .fx-g2{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
