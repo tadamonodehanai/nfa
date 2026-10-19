@@ -1882,6 +1882,103 @@ a.tm-nm:hover{color:var(--blue);text-decoration:underline}
   .tbl.arc-t td{padding:4px 12px 12px}
   .tbl.arc-t tr{border-bottom:1px solid var(--line)}
 }
+/* ===== emperorscup.html（天皇杯 特設） ===== */
+.emp-hero{position:relative;overflow:hidden;background:var(--navy);color:#fff;padding:56px 0 64px}
+.emp-hero .bgword{position:absolute;right:-2vw;bottom:-0.18em;font-family:var(--f-en);font-weight:800;font-style:italic;font-size:clamp(80px,13vw,200px);line-height:1;color:rgba(255,255,255,.05);white-space:nowrap;pointer-events:none}
+.emp-hero-in{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center}
+.emp-hero .e{font-family:var(--f-en);font-weight:800;letter-spacing:.18em;font-size:14px;color:#7FD3FF}
+.emp-hero .e i{color:#C8A24A;margin-left:.4em}
+.emp-hero h1{margin:14px 0 18px;font-size:clamp(30px,3.6vw,48px);font-weight:900;line-height:1.3;font-feature-settings:"palt" 1}
+.emp-hero h1 small{display:block;font-size:.42em;letter-spacing:.2em;color:#C8D3F2;margin-bottom:6px}
+.emp-hero p{margin:0;font-size:15px;line-height:2;color:#DDE4F7;max-width:34em}
+.emp-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.emp-kv{box-shadow:0 30px 60px rgba(0,0,0,.35);background:#fff}
+.emp-kv img{display:block;width:100%;height:auto}
+.emp-card{border:1px solid var(--line);border-top:4px solid #C8A24A;background:#fff}
+.emp-round{display:flex;align-items:center;gap:14px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.emp-round .en{font-family:var(--f-en);font-weight:800;font-style:italic;letter-spacing:.16em;color:var(--cyan);font-size:14px}
+.emp-round b{font-size:18px;font-weight:900;color:var(--navy)}
+.emp-round .st{margin-left:auto;font-size:12px;font-weight:700;padding:3px 12px;background:var(--pale);color:var(--ink2)}
+.emp-vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;padding:36px 24px}
+.emp-vs .tm{text-align:center}
+.emp-vs .tm small{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px}
+.emp-vs .tm b{font-size:clamp(20px,2.4vw,30px);font-weight:900;color:var(--navy);line-height:1.4}
+.emp-vs .vs{font-family:var(--f-en);font-weight:800;font-style:italic;font-size:44px;color:#C8A24A}
+.emp-info{display:grid;grid-template-columns:repeat(3,1fr);margin:0;border-top:1px solid var(--line)}
+.emp-info > div{padding:16px 24px;border-left:1px solid var(--line)}
+.emp-info > div:first-child{border-left:0}
+.emp-info dt{font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--ink2)}
+.emp-info dd{margin:4px 0 0;font-size:15px;font-weight:700;color:var(--navy)}
+.emp-info dd .en{font-family:var(--f-en);font-weight:800;font-size:22px;letter-spacing:.04em}
+.emp-info dd small{display:block;font-size:12px;font-weight:500;color:var(--ink2)}
+.emp-note{margin:0;padding:14px 24px;background:var(--pale);font-size:13px}
+.emp-note a{color:var(--blue);text-decoration:underline}
+.emp-price{min-width:640px}
+.emp-price th small{display:block;font-size:11px;font-weight:500;color:var(--ink2)}
+.emp-price tbody th{background:var(--pale);vertical-align:top;width:15em}
+.emp-price .num{font-family:var(--f-en);font-weight:700;font-size:16px;text-align:right;white-space:nowrap}
+.emp-price tr.g > *{border-top:2px solid var(--line)}
+.emp-notes{margin:16px 0 0;padding-left:1.2em;font-size:13px;line-height:1.9;color:var(--ink2)}
+.emp-maps{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.emp-2col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.emp-box{background:#fff;padding:28px;border:1px solid var(--line)}
+.emp-box .e{font-family:var(--f-en);font-weight:800;font-size:12px;letter-spacing:.2em;color:var(--cyan)}
+.emp-box h3{margin:6px 0 16px;font-size:20px;font-weight:900;color:var(--navy)}
+.emp-box p{font-size:14px;line-height:1.9;margin:0 0 12px}
+.emp-dl{display:grid;grid-template-columns:8.5em 1fr;gap:10px 16px;margin:0 0 16px;font-size:14px;line-height:1.8}
+.emp-dl dt{font-weight:700;color:var(--navy)}
+.emp-dl dd{margin:0}
+.emp-dl a{color:var(--blue);text-decoration:underline}
+.emp-dl small{color:var(--ink2)}
+.emp-tel{padding:14px 16px;background:var(--pale);font-size:13px!important}
+.emp-tel b{font-size:18px;color:var(--navy)}
+.emp-tel small{margin-left:6px;color:var(--ink2)}
+.emp-steps{margin:0 0 12px;padding-left:1.4em;font-size:14px;line-height:1.9}
+.emp-steps li{margin-bottom:6px}
+.emp-sm{font-size:13px!important;color:var(--ink2)}
+.emp-visit{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:start}
+.emp-visit .ph{aspect-ratio:4/3;overflow:hidden;background:var(--pale)}
+.emp-visit .ph img{width:100%;height:100%;object-fit:cover}
+.emp-visit p{font-size:15px;line-height:2;margin:0 0 18px}
+.emp-arc th{width:9em;background:var(--pale);vertical-align:top}
+.emp-arc th small{display:block;font-family:var(--f-en);font-weight:600;font-size:12px;color:var(--ink2)}
+.emp-arc .gap{display:flex;flex-wrap:wrap;gap:8px}
+@media (max-width:960px){
+  .emp-hero-in{grid-template-columns:1fr;gap:32px}
+  .emp-2col,.emp-visit{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .emp-hero{padding:36px 0 44px}
+  .emp-vs{grid-template-columns:1fr;gap:10px;padding:24px 16px}
+  .emp-vs .vs{font-size:30px;text-align:center}
+  .emp-info{grid-template-columns:1fr}
+  .emp-info > div{border-left:0;border-top:1px solid var(--line);padding:12px 16px}
+  .emp-info > div:first-child{border-top:0}
+  .emp-round,.emp-note{padding-left:16px;padding-right:16px}
+  .emp-box{padding:20px 16px}
+  .emp-dl{grid-template-columns:1fr;gap:2px}
+  .emp-dl dd{margin-bottom:10px}
+  .emp-ctas .btn{width:100%;justify-content:center}
+}
+.tbl-w.emp-scroll{overflow-x:auto!important}
+.emp-vs .tm b{white-space:nowrap}
+@media (max-width:560px){
+  .emp-price{min-width:560px}
+  .emp-price tbody th{width:9em}
+  .emp-scroll::after{content:"← 横にスクロールできます →";display:block;text-align:center;font-size:11px;color:var(--ink2);padding:6px 0}
+  .emp-vs .tm b{white-space:normal}
+}
+.emp-price{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+.emp-price thead th{background:var(--navy);color:#fff;font-size:12px;font-weight:700;letter-spacing:.06em;padding:12px 14px;text-align:left;white-space:nowrap}
+.emp-price thead th:nth-child(n+3){text-align:right}
+.emp-price th,.emp-price td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.emp-price tbody th{text-align:left;font-weight:700;color:var(--navy)}
+@media (max-width:600px){
+  .emp-price{min-width:540px;font-size:13px}
+  .emp-price th,.emp-price td{padding:8px 10px}
+  .emp-price tbody th{width:8.5em}
+  .emp-price .num{font-size:14px}
+}
 /* ===== 固定ページ群（download / links / facilities / request / terms / registration / coach-course / academy / referee-schedule / nagano-style / tracen / festival / sitemap）共通 — 接頭辞 fx- / fc- ===== */
 .fx-k{margin:20px 0 8px;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink2)}
 .fx-g2{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
