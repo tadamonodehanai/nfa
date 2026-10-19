@@ -2587,6 +2587,15 @@ a.tm-nm:hover{color:var(--blue);text-decoration:underline}
 .pt-logos [data-sp="adbureau"] img{max-height:26px}
 .pt-logos [data-sp="tutti"] img{max-height:46px}
 .pt-logos [data-sp="tsb"] img,.pt-logos [data-sp="richade"] img{max-width:90%;max-height:46px}
+/* 2026-10-19 罫線整理：GOLDは1枠だけ囲む／SUPPORTERSは公式パートナーと同じグリッド */
+.pt-logos.gold{grid-template-columns:repeat(5,1fr);border:0}
+.pt-logos.gold li{grid-column:span 2;border:1px solid var(--line)}
+.pt-sup{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line);border-bottom:0}
+.pt-sup li,.pt-sup li+li{display:flex;align-items:center;justify-content:center;min-height:72px;padding:12px 14px;text-align:center;font-size:13px;line-height:1.6;border-left:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+@media (max-width:960px){.pt-sup{grid-template-columns:repeat(3,1fr)}.pt-logos.gold{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:600px){.pt-sup{display:grid;grid-template-columns:repeat(2,1fr)}.pt-sup li+li{border-top:0}.pt-logos.gold{grid-template-columns:1fr}.pt-logos.gold li{grid-column:auto}}
+.pt-sup{border:0}
+.pt-sup li,.pt-sup li+li{border:1px solid var(--line);margin:0 -1px -1px 0}
 /* ===== privacy.html（静的文書：左目次＋右本文） ===== */
 .pv-doc{display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start}
 .pv-toc{position:sticky;top:calc(var(--hdh,0px) + 20px);border-top:2px solid var(--navy)}
