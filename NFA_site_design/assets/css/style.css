@@ -1770,6 +1770,21 @@ a:hover .arr{transform:translateX(3px)}
   .ct-rot div{grid-template-columns:1fr;gap:2px}
   .ct-addr .contact h3 small{display:block;margin:2px 0 0}
 }
+/* request-jfa.html（JFAフェスティバル掲載依頼フォーム） */
+.rj-note{border-left:4px solid var(--cyan);background:var(--pale);padding:14px 18px;margin:0 0 28px}
+.rj-note p{margin:0;font-size:14px;line-height:1.9}
+.rj-form{max-width:none}
+.rj-h{display:flex;align-items:center;gap:12px;margin:18px 0 0;padding-bottom:10px;border-bottom:2px solid var(--navy);font-size:18px;font-weight:900;color:var(--navy)}
+.rj-h:first-child{margin-top:0}
+.rj-h span{font-family:var(--f-en);font-weight:800;font-size:14px;letter-spacing:.12em;color:var(--cyan)}
+.rj-ttl{display:grid;gap:6px;font-size:14px;font-weight:700}
+.rj-ttl-r{display:grid;grid-template-columns:minmax(0,15em) auto minmax(0,1fr);gap:10px;align-items:center}
+.rj-fix{font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap}
+.rj-dl{margin-top:8px}
+.rj-dl li a{font-size:13px}
+@media (max-width:760px){.rj-ttl-r{grid-template-columns:1fr}.rj-fix{white-space:normal}}
+.rj-ttl .req{font-size:11px;color:#fff;background:var(--alert);padding:1px 6px;margin-left:6px;border-radius:2px;font-weight:700}
+.rj-fl{display:block;margin-top:6px}
 /* ===== detail.html ===== */
 .dt-blk{padding-top:36px}
 .dt-flag{margin:0 0 10px}
