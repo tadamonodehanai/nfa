@@ -1,6 +1,6 @@
 <?php
 /**
- * プライバシーポリシー（デザイン privacy.html）。
+ * プライバシーポリシー（デザイン privacy.html）。scratchpad の conv2.py で生成。
  *
  * @package NFA2026
  */

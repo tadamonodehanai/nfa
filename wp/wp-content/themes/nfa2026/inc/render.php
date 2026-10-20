@@ -96,9 +96,8 @@ function nfa_fbtn( array $r ) {
 	if ( $r['pending'] ) {
 		return '<span class="fbtn is-pend" title="まだ掲載されていない資料"><i class="l">準備中</i>' . esc_html( $label ) . '</span>';
 	}
-	$ext = strtoupper( (string) pathinfo( (string) wp_parse_url( $r['url'], PHP_URL_PATH ), PATHINFO_EXTENSION ) );
-	$ext = in_array( $ext, array( 'PDF', 'XLSX', 'XLS', 'DOCX', 'DOC' ), true ) ? $ext : 'LINK';
-	return sprintf( '<a class="fbtn" href="%s" target="_blank" rel="noopener"><i class="">%s</i>%s</a>', esc_url( $r['url'] ), esc_html( $ext ), esc_html( $label ) );
+	list( $cls, $ext ) = nfa_file_kind( $r['url'] );
+	return sprintf( '<a class="fbtn" href="%s" target="_blank" rel="noopener"><i class="%s">%s</i>%s</a>', esc_url( $r['url'] ), esc_attr( $cls ), esc_html( $ext ), esc_html( $label ) );
 }
 
 /**
@@ -209,18 +208,12 @@ function nfa_cband( $term = null ) {
  */
 function nfa_sponsors_html() {
 	$s   = nfa_sponsor_list();
-	$box = function ( $r, $class, $small ) {
-		$name = esc_html( $r['name'] );
-		$in   = '<small>' . esc_html( $small ) . '</small>' . $name;
-		// デザインどおり文字だけ（リンクは協賛ページで出す）
-		return '<div' . ( $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . '>' . $in . '</div>';
-	};
 	$out = '<div class="spons">';
 	foreach ( $s['gold'] as $r ) {
-		$out .= $box( $r, 'gold', 'GOLD PARTNER' );
+		$out .= nfa_sponsor_a( $r, 'gold', '<small>GOLD PARTNER</small>' . nfa_sponsor_logo( $r ) );
 	}
 	foreach ( $s['official'] as $r ) {
-		$out .= $box( $r, '', 'OFFICIAL' );
+		$out .= nfa_sponsor_a( $r, '', nfa_sponsor_logo( $r ) );
 	}
 	$out .= '</div><div class="supp"><b>SUPPORTERS</b>';
 	foreach ( $s['supporters'] as $r ) {
@@ -230,40 +223,222 @@ function nfa_sponsors_html() {
 }
 
 /**
+ * 協賛企業のロゴ（設定のロゴ → テーマの img/sp-{key}.png → 名前の文字）。
+ */
+function nfa_sponsor_logo( array $r ) {
+	$src = ! empty( $r['logo'] ) ? $r['logo'] : ( ! empty( $r['key'] ) ? nfa_asset( 'img/sp-' . $r['key'] . '.png' ) : '' );
+	return $src ? '<img src="' . esc_url( $src ) . '" alt="' . esc_attr( $r['name'] ) . '" loading="lazy">' : '<span class="nm">' . esc_html( $r['name'] ) . '</span>';
+}
+
+/**
+ * 協賛企業のリンク（URL がなければ div）。
+ */
+function nfa_sponsor_a( array $r, $class, $inner ) {
+	$attr = ( $class ? ' class="' . esc_attr( $class ) . '"' : '' ) . ( ! empty( $r['key'] ) ? ' data-sp="' . esc_attr( $r['key'] ) . '"' : '' );
+	if ( empty( $r['url'] ) ) {
+		return '<div' . $attr . '>' . $inner . '</div>';
+	}
+	return '<a' . $attr . ' href="' . esc_url( $r['url'] ) . '" target="_blank" rel="noopener">' . $inner . '</a>';
+}
+
+/**
+ * 協賛ページのロゴの並び（ul.pt-logos の中）。$tier = gold | official
+ */
+function nfa_partner_logos_html( $tier ) {
+	$out = '';
+	foreach ( nfa_sponsor_list()[ $tier ] ?? array() as $r ) {
+		$out .= '<li>' . nfa_sponsor_a( $r, '', nfa_sponsor_logo( $r ) . ( ! empty( $r['logo'] ) || ! empty( $r['key'] ) ? '<span class="nm">' . esc_html( $r['name'] ) . '</span>' : '' ) ) . '</li>';
+	}
+	return $out;
+}
+
+/**
+ * 協賛ページのサポーター（ul.pt-sup の中）。
+ */
+function nfa_partner_sup_html() {
+	$out = '';
+	foreach ( nfa_sponsor_list()['supporters'] ?? array() as $r ) {
+		$out .= '<li>' . ( ! empty( $r['url'] ) ? '<a href="' . esc_url( $r['url'] ) . '" rel="noopener" target="_blank">' . esc_html( $r['name'] ) . '</a>' : esc_html( $r['name'] ) ) . '</li>';
+	}
+	return $out;
+}
+
+/* ---------- ファイル・旧サイトへのリンク ---------- */
+
+/**
+ * ファイルの種類の表示（[クラス, 表記]）。デザインの PDF／XLS（x）／DOC（w）／LINK（l）。
+ */
+function nfa_file_kind( $url ) {
+	$ext = strtolower( (string) pathinfo( (string) wp_parse_url( (string) $url, PHP_URL_PATH ), PATHINFO_EXTENSION ) );
+	if ( 'pdf' === $ext ) {
+		return array( '', 'PDF' );
+	}
+	if ( in_array( $ext, array( 'xls', 'xlsx', 'csv' ), true ) ) {
+		return array( 'x', 'XLS' );
+	}
+	if ( in_array( $ext, array( 'doc', 'docx' ), true ) ) {
+		return array( 'w', 'DOC' );
+	}
+	if ( in_array( $ext, array( 'ppt', 'pptx', 'zip' ), true ) ) {
+		return array( 'o', strtoupper( $ext ) );
+	}
+	return array( 'l', 'LINK' );
+}
+
+/**
+ * 旧サイト（www.nagano-fa.or.jp）の URL を、新サイトの中の URL に読み替える（NFA Committee の読み替え表）。
+ */
+function nfa_legacy_link( $url ) {
+	return function_exists( 'nfa_legacy_url' ) ? nfa_legacy_url( $url ) : $url;
+}
+
+/**
+ * href 属性を出す。読み替えたあとも外部のサイトなら別タブで開く。
+ */
+function nfa_href( $url ) {
+	$url  = nfa_legacy_link( $url );
+	$host = wp_parse_url( $url, PHP_URL_HOST );
+	$out  = 'href="' . esc_url( $url ) . '"';
+	if ( $host && wp_parse_url( home_url(), PHP_URL_HOST ) !== $host ) {
+		$out .= ' rel="noopener" target="_blank"';
+	} elseif ( preg_match( '#/wp-content/uploads/#', $url ) ) {
+		$out .= ' target="_blank"';   // 取り込んだファイルも別タブで
+	}
+	echo $out; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+
+/**
+ * Contact Form 7 のフォーム（題名で探す）。項目・クラス名はデザインと同じ（inc/*-form.txt）。
+ */
+function nfa_cf7( $title, $class = 'form' ) {
+	$cf7 = get_posts( array( 'post_type' => 'wpcf7_contact_form', 'title' => $title, 'posts_per_page' => 1 ) );
+	if ( $cf7 && shortcode_exists( 'contact-form-7' ) ) {
+		return do_shortcode( '[contact-form-7 id="' . (int) $cf7[0]->ID . '" html_class="' . esc_attr( $class ) . '"]' );
+	}
+	return current_user_can( 'manage_options' )
+		? '<p class="lead2">Contact Form 7 のフォーム「' . esc_html( $title ) . '」が見つかりません。<code>wp nfa-committee setup-pages</code> で作成できます。</p>'
+		: '<p class="lead2">ただいまフォームを準備しています。</p>';
+}
+
+/* ---------- 事業計画・事業報告 ---------- */
+
+function nfa_reports( $years = 0 ) {
+	return class_exists( 'NFA_Com_Report_Type' ) ? NFA_Com_Report_Type::by_year( $years ) : array();
+}
+
+/**
+ * 資料の li（ファイルがなければ「掲載なし」）。
+ */
+function nfa_report_li( array $it ) {
+	if ( '' === $it['url'] ) {
+		return '<li><span class="rp-na"><span class="fbtn-i">—</span><span>' . esc_html( $it['title'] ) . '</span><small>掲載なし</small></span></li>';
+	}
+	list( $cls, $ext ) = nfa_file_kind( $it['url'] );
+	return '<li><a href="' . esc_url( $it['url'] ) . '" target="_blank"><span class="fbtn-i' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . esc_html( $ext ) . '</span><span>' . esc_html( $it['title'] ) . '</span></a></li>';
+}
+
+/**
+ * 協会についての DOCUMENTS（最新の2年）。
+ */
+function nfa_reports_about_html() {
+	$out = '<div class="ab-yr">';
+	foreach ( nfa_reports( 2 ) as $g ) {
+		$out .= '<div><h3 class="ab-yh">' . esc_html( $g['year'] ) . '年</h3><ul class="dl">' . implode( '', array_map( 'nfa_report_li', $g['items'] ) ) . '</ul>';
+		$out .= $g['note'] ? '<p class="ab-note">' . esc_html( $g['note'] ) . '</p>' : '';
+		$out .= '</div>';
+	}
+	return $out . '</div>';
+}
+
+/**
+ * 事業計画・事業報告ページのページ内メニュー（新しい6年は1年ずつ、それより前はまとめて）。
+ */
+function nfa_reports_lnav_html() {
+	$years = wp_list_pluck( nfa_reports(), 'year' );
+	$items = array();
+	foreach ( array_slice( $years, 0, 6 ) as $y ) {
+		$items[] = array( $y, $y . '年' );
+	}
+	$rest = array_slice( $years, 6 );
+	if ( $rest ) {
+		$items[] = array( $rest[0], ( count( $rest ) > 1 ? end( $rest ) . '〜' . $rest[0] : $rest[0] ) . '年' );
+	}
+	$out = '<nav aria-label="ページ内メニュー" class="lnav"><div class="lnav-in"><span class="lnav-lb">CONTENTS</span><ul>';
+	foreach ( $items as $i => $it ) {
+		$out .= sprintf( '<li><a href="#y%d"><span class="no">%02d</span><span class="t">%s</span></a></li>', $it[0], $i + 1, esc_html( $it[1] ) );
+	}
+	return $out . '</ul></div></nav>';
+}
+
+/**
+ * 事業計画・事業報告の年ごとの欄。
+ */
+function nfa_reports_grid_html( $offset, $limit, $class ) {
+	$groups = array_slice( nfa_reports(), $offset, $limit ? $limit : null );
+	$out    = '<div class="' . esc_attr( $class ) . '">';
+	foreach ( $groups as $g ) {
+		$out .= '<div class="rp-y" id="y' . (int) $g['year'] . '"><h3 class="rp-yh">' . esc_html( $g['year'] ) . '<small>年</small></h3><ul class="dl fx-dl1">' . implode( '', array_map( 'nfa_report_li', $g['items'] ) ) . '</ul>';
+		$out .= $g['note'] ? '<p class="fx-note">' . esc_html( $g['note'] ) . '</p>' : '';
+		$out .= '</div>';
+	}
+	return $out . '</div>';
+}
+
+/**
  * チームの1件（ul.tm > li）。data-c はデザインの絞り込みの値（地域・競技・年代・性別）。
  */
 function nfa_team_li( $team ) {
-	$codes = array(
-		'hokushin' => 'hokushin', 'toushin' => 'toshin', 'chushin' => 'chushin', 'nanshin' => 'nanshin',
-		'soccer' => 'soc', 'futsal' => 'fut',
-		'preschool' => 'a0', 'elem-low' => 'a1', 'elem-high' => 'a2', 'junior' => 'a3', 'high' => 'a4', 'adult' => 'a5',
-		'over40' => 'a40', 'over50' => 'a40', 'over60' => 'a40', 'over70' => 'a40',
-		'male' => 'm', 'female' => 'f', 'both' => 'm f',
-	);
-	$c = array();
-	foreach ( array( 'team_area', 'team_sport', 'team_age', 'team_gender' ) as $tax ) {
-		foreach ( nfa_team_terms( $team, $tax, 'slugs' ) as $slug ) {
-			if ( isset( $codes[ $slug ] ) ) {
-				$c[] = $codes[ $slug ];
-			}
-		}
-	}
+	$c        = nfa_team_codes( $team );
 	$area     = implode( '・', nfa_team_terms( $team, 'team_area' ) );
 	$city     = (string) nfa_team_field( $team, 'team_city' );
 	$location = (string) nfa_team_field( $team, 'team_activity_location' );
 	$site     = (string) nfa_team_field( $team, 'team_website_url' );
-	$tags     = array_merge( nfa_team_terms( $team, 'team_sport' ), nfa_team_terms( $team, 'team_age' ), nfa_team_terms( $team, 'team_gender' ) );
+	$tags     = array_merge( nfa_team_terms( $team, 'team_sport' ), nfa_team_terms( $team, 'team_age' ), array_filter( array( nfa_team_gender( $team ) ) ) );
 	$title    = get_the_title( $team );
+	$url      = get_permalink( $team );
 	return sprintf(
-		'<li data-c="%1$s"><span aria-hidden="true" class="em">%2$s</span><span><b>%3$s</b><span>%4$s</span><span class="tg">%5$s</span><span class="lp-lk"><a class="lp-tlink" href="%6$s">チーム情報（活動日・活動頻度）</a>%7$s</span></span></li>',
-		esc_attr( implode( ' ', array_unique( explode( ' ', implode( ' ', $c ) ) ) ) ),
+		'<li data-c="%1$s"><span aria-hidden="true" class="em">%2$s</span><span><b><a class="tm-nm" href="%6$s">%3$s</a></b><span>%4$s</span><span class="tg">%5$s</span><span class="lp-lk"><a class="lp-tlink" href="%6$s">チーム情報（活動日・活動頻度）</a>%7$s</span></span></li>',
+		esc_attr( implode( ' ', $c ) ),
 		esc_html( nfa_team_initials( $title ) ),
 		esc_html( $title ),
 		esc_html( trim( $area . ( $city ? '・' . $city : '' ) . ( $location ? '／' . $location : '' ), '・／' ) ),
 		implode( '', array_map( fn( $t ) => '<i>' . esc_html( $t ) . '</i>', $tags ) ),
-		esc_url( get_permalink( $team ) ),
+		esc_url( $url ),
 		$site ? '<a class="lp-tlink" href="' . esc_url( $site ) . '" rel="noopener" target="_blank">チームWebサイト</a>' : ''
 	);
+}
+
+/**
+ * チームの絞り込みの値（デザインの data-c：地域・競技・年代・性別）。
+ */
+function nfa_team_codes( $team ) {
+	$codes = array(
+		'hokushin' => 'hokushin', 'toushin' => 'toshin', 'chushin' => 'chushin', 'nanshin' => 'nanshin',
+		'soccer' => 'soc', 'futsal' => 'fut',
+		'preschool' => 'a0', 'elem-low' => 'a1', 'elem-high' => 'a2', 'junior' => 'a3', 'high' => 'a4', 'adult' => 'a5',
+		'over40' => 'a40', 'over50' => 'a50', 'over60' => 'a60', 'over70' => 'a70',
+		'male' => 'm', 'female' => 'f', 'both' => 'm f',
+	);
+	$c = array();
+	foreach ( array( 'team_area', 'team_sport', 'team_gender', 'team_age' ) as $tax ) {
+		foreach ( nfa_team_terms( $team, $tax, 'slugs' ) as $slug ) {
+			if ( isset( $codes[ $slug ] ) ) {
+				$c = array_merge( $c, explode( ' ', $codes[ $slug ] ) );
+			}
+		}
+	}
+	return array_values( array_unique( $c ) );
+}
+
+/**
+ * 募集性別の表記（両方 → 男子・女子）。
+ */
+function nfa_team_gender( $team ) {
+	$slugs = nfa_team_terms( $team, 'team_gender', 'slugs' );
+	if ( in_array( 'both', $slugs, true ) || ( in_array( 'male', $slugs, true ) && in_array( 'female', $slugs, true ) ) ) {
+		return '男子・女子';
+	}
+	return implode( '・', nfa_team_terms( $team, 'team_gender' ) );
 }
 
 /**

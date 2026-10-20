@@ -1,6 +1,6 @@
 <?php
 /**
- * 委員会ページの説明セクション（grassroots）。デザイン grassroots.html から。文言は既存サイトの内容。
+ * 委員会ページ（grassroots）の説明の欄。デザイン grassroots.html から。scratchpad の conv2.py の出力を切り出したもの。
  *
  * @package NFA2026
  */

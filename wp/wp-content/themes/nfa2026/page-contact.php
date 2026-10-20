@@ -1,6 +1,6 @@
 <?php
 /**
- * お問い合わせ（デザイン contact.html）。
+ * お問い合わせ（デザイン contact.html）。scratchpad の conv2.py で生成。
  *
  * @package NFA2026
  */
@@ -16,15 +16,7 @@ get_header();
 <div class="bh"><div><div class="e">CONTACT FORM</div><h2>お問い合わせフォーム</h2></div></div>
 <div class="art ct-art">
 <div class="ct-main">
-<?php
-// Contact Form 7 のフォーム「お問い合わせ」（項目・クラス名はデザインと同じ。記述は inc/contact-form.txt）
-$cf7 = get_posts( array( 'post_type' => 'wpcf7_contact_form', 'title' => 'お問い合わせ', 'posts_per_page' => 1 ) );
-if ( $cf7 && shortcode_exists( 'contact-form-7' ) ) {
-	echo do_shortcode( '[contact-form-7 id="' . (int) $cf7[0]->ID . '" html_class="form"]' );
-} else {
-	echo '<p class="lead2">お問い合わせフォームは準備中です。お急ぎの方はお電話でお問い合わせください。</p>';
-}
-?>
+<?php echo nfa_cf7( 'お問い合わせ', 'form' ); // Contact Form 7（記述は inc/contact-form.txt） phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div>
 <aside aria-label="お問い合わせの前に" class="side ct-side">
 <div>
@@ -51,8 +43,8 @@ if ( $cf7 && shortcode_exists( 'contact-form-7' ) ) {
 <p class="lead2">下記のフォームから必要事項を入力の上、掲載依頼を送信ください。試合結果・星取表は必ずPDF化し、掲載依頼フォームよりアップロードしてください。</p>
 <div class="ct-rq">
 <div class="ct-rq-f">
-<a class="ct-rq-b" href="https://forms.gle/NwtuuFpxL4AaL17t7" rel="noopener" target="_blank"><small>日程｜試合結果、NEWS</small>掲載依頼フォーム（Googleフォーム）<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
-<a class="ct-rq-b" href="https://www.nagano-fa.or.jp/office-form-jfa" rel="noopener" target="_blank"><small>JFAフェスティバル</small>掲載依頼フォーム<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="ct-rq-b" href="https://forms.gle/NwtuuFpxL4AaL17t7" rel="noopener" target="_blank"><small>日程｜試合結果、NEWS</small>掲載依頼フォーム（Googleフォーム）<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<a class="ct-rq-b" href="<?php echo esc_url( nfa_u( 'request-jfa.html' ) ); ?>"><small>JFAフェスティバル</small>掲載依頼フォーム<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
 </div>
 <div class="ct-rq-s">
 <h3 class="ct-rq-h">掲載依頼から掲載までのローテーション</h3>
@@ -65,10 +57,10 @@ if ( $cf7 && shortcode_exists( 'contact-form-7' ) ) {
 </div>
 <h3 class="h3j">関連資料</h3>
 <ul class="dl">
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2017/03/df65d8a55fb60012ebcca948a5f9bdd7.xlsx"><span class="fbtn-i x">XLSX</span><span>試合結果用のフォーマット【リーグ戦用】</span></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2017/03/game-results-format.xls"><span class="fbtn-i x">XLS</span><span>試合結果用のフォーマット【リーグ戦以外用】</span></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2025/04/bb1236bdcf13ec57628dbb882b699f8a.xlsx"><span class="fbtn-i x">XLSX</span><span>星取表フォーマット</span></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2017/03/request-hp.docx"><span class="fbtn-i w">DOCX</span><span>試合結果以外のフォーマット</span></a></li>
+<li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2017/03/df65d8a55fb60012ebcca948a5f9bdd7.xlsx' ); ?>><span class="fbtn-i x">XLSX</span><span>試合結果用のフォーマット【リーグ戦用】</span></a></li>
+<li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2017/03/game-results-format.xls' ); ?>><span class="fbtn-i x">XLS</span><span>試合結果用のフォーマット【リーグ戦以外用】</span></a></li>
+<li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2025/04/bb1236bdcf13ec57628dbb882b699f8a.xlsx' ); ?>><span class="fbtn-i x">XLSX</span><span>星取表フォーマット</span></a></li>
+<li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2017/03/request-hp.docx' ); ?>><span class="fbtn-i w">DOCX</span><span>試合結果以外のフォーマット</span></a></li>
 </ul>
 </div></section>
 <!-- 所在地・連絡先（出典：/office_top、サイト共通フッター） -->

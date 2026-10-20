@@ -1,6 +1,6 @@
 <?php
 /**
- * 委員会ページの説明セクション（referee）。デザイン referee.html から。文言は既存サイトの内容。
+ * 委員会ページ（referee）の説明の欄。デザイン referee.html から。scratchpad の conv2.py の出力を切り出したもの。
  *
  * @package NFA2026
  */

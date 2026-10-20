@@ -1,0 +1,9 @@
+<?php
+/**
+ * 委員会ページ（medical）の説明の欄。デザイン medical.html から。scratchpad の conv2.py の出力を切り出したもの。
+ *
+ * @package NFA2026
+ */
+?>
+<section class="blk" id="topics"><div class="wrap">
+<div class="bh"><div><div class="e">MEDICAL INFO</div><h2>トピック別の情報</h2></div></div><p class="lead2">医学委員会では、選手をはじめサッカーに携わる全ての人々に、より安全に最適な環境を提供することでベストなパフォーマンスを発揮してもらえるよう、メディカルの観点から情報を発信しています。</p><h3 class="h3j">外傷の応急処置</h3><ul class="dl"><li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2022/05/5584019aee0c301ca0fbbf852cb4b2d6.pdf' ); ?>><span class="fbtn-i">PDF</span>医学委員会からのお知らせ（外傷の応急処置）<small>2021-05-16 更新</small></a></li></ul><h3 class="h3j">熱中症について</h3><ul class="dl"><li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2024/07/open_id1fZXU3ZVhdetWEyLt2riEPFaOOPvp6Q9j.pdf' ); ?>><span class="fbtn-i">PDF</span>医学委員会からのお知らせ（熱中症について）<small>2024-07-26 更新</small></a></li><li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2019/06/2ee7a1844555f94c14d2950996e3064d.pdf' ); ?>><span class="fbtn-i">PDF</span>JFAnews 2019年6月号 熱中症特集（抜粋版）<small>2019-07-12 更新</small></a></li><li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2019/06/640e53d2b15b1e971f432e3f317510ba.pdf' ); ?>><span class="fbtn-i">PDF</span>暑熱対策について（日本サッカー協会 2019年7月お知らせ）<small>2019-07-19 更新</small></a></li></ul><h3 class="h3j">水分補給</h3><ul class="dl"><li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2022/08/822d642b30a1a7eb08b3ce778500020a.pdf' ); ?>><span class="fbtn-i">PDF</span>医学委員会からのお知らせ（水分補給について）<small>2022-08-24 更新</small></a></li></ul><h3 class="h3j">夏バテ対策</h3><ul class="dl"><li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2022/08/d7aab1ff525388f8d5c43cdfd4c557c3.pdf' ); ?>><span class="fbtn-i">PDF</span>医学委員会からのお知らせ（夏バテ対策について）<small>2022-08-24 更新</small></a></li></ul></div></section>

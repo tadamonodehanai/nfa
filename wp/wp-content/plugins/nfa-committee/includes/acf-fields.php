@@ -102,6 +102,21 @@ class NFA_Com_ACF {
 			)
 		);
 
+		// 事業計画・事業報告（無料版の ACF で使える欄だけ）
+		acf_add_local_field_group(
+			array(
+				'key'      => 'group_nfa_report',
+				'title'    => '資料',
+				'fields'   => array(
+					array( 'key' => 'field_nfa_report_year', 'name' => 'nfa_report_year', 'label' => '掲載年', 'type' => 'number', 'required' => 1, 'default_value' => (int) wp_date( 'Y' ), 'instructions' => '「事業計画・事業報告」ページで、この年の欄に並びます（例：2026年の欄に「2026事業計画」「2025事業報告」）。', 'wrapper' => array( 'width' => 30 ) ),
+					array( 'key' => 'field_nfa_report_file', 'name' => 'nfa_report_file', 'label' => 'ファイル', 'type' => 'file', 'return_format' => 'id', 'instructions' => '空欄なら「掲載なし」と表示します。', 'wrapper' => array( 'width' => 70 ) ),
+					array( 'key' => 'field_nfa_report_note', 'name' => 'nfa_report_note', 'label' => '注記', 'type' => 'text', 'instructions' => 'その年の欄の下に表示します（例：※ファイルサイズが大きいため分割してあります。）' ),
+				),
+				'location' => array( array( array( 'param' => 'post_type', 'operator' => '==', 'value' => NFA_Com_Report_Type::TYPE ) ) ),
+				'position' => 'acf_after_title',
+			)
+		);
+
 		if ( function_exists( 'acf_add_options_page' ) ) {
 			acf_add_options_page(
 				array(
@@ -123,6 +138,7 @@ class NFA_Com_ACF {
 				'sub_fields'   => array(
 					array( 'key' => 'field_nfa_sponsors_' . $key . '_name', 'name' => 'name', 'label' => '名前', 'type' => 'text' ),
 					array( 'key' => 'field_nfa_sponsors_' . $key . '_url', 'name' => 'url', 'label' => 'URL', 'type' => 'url' ),
+					array( 'key' => 'field_nfa_sponsors_' . $key . '_logo', 'name' => 'logo', 'label' => 'ロゴ', 'type' => 'image', 'return_format' => 'id', 'preview_size' => 'thumbnail', 'instructions' => 'サポーター（テキスト掲載）は不要' ),
 				),
 			);
 			acf_add_local_field_group(

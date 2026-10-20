@@ -69,27 +69,29 @@ class NFA_Com_Settings {
 	/**
 	 * 協賛企業の初期値（デザイン NFA_site_design の並び）。
 	 */
+	/**
+	 * 協賛企業の初期値（デザインの並び）。key はテーマのロゴ画像 img/sp-{key}.png。
+	 */
 	public static function default_sponsors() {
+		$r = fn( $name, $url, $key = '' ) => array( 'name' => $name, 'url' => $url, 'logo' => '', 'key' => $key );
 		return array(
-			'gold'       => array(
-				array( 'name' => 'マクセルイズミ株式会社', 'url' => 'https://www.izumi.maxell.co.jp/' ),
-			),
+			'gold'       => array( $r( 'マクセルイズミ株式会社', 'https://www.izumi.maxell.co.jp/', 'maxell' ) ),
 			'official'   => array(
-				array( 'name' => 'アルピコグループ', 'url' => 'https://holdings.alpico.co.jp/' ),
-				array( 'name' => 'テレビ信州', 'url' => 'https://www.tsb.jp/' ),
-				array( 'name' => 'ながのアド・ビューロ', 'url' => 'https://www.adbureau.co.jp/' ),
-				array( 'name' => 'リッチエイド', 'url' => 'http://www.richade.co.jp/' ),
-				array( 'name' => 'abn長野放送', 'url' => 'https://www.abn-tv.co.jp/' ),
-				array( 'name' => 'Tutti', 'url' => 'http://tutti-armonia.jp/' ),
-				array( 'name' => 'みずほ証券', 'url' => 'https://www.mizuho-sc.com/index.html' ),
-				array( 'name' => '明治安田生命', 'url' => 'https://www.meijiyasuda.co.jp/' ),
-				array( 'name' => 'アディダスジャパン', 'url' => 'https://www.adidas.jp/' ),
-				array( 'name' => 'レアルスポーツ', 'url' => 'https://www.realsports.jp/' ),
+				$r( 'アルピコグループ', 'https://holdings.alpico.co.jp/', 'alpico' ),
+				$r( 'テレビ信州', 'https://www.tsb.jp/', 'tsb' ),
+				$r( 'ながのアド・ビューロ', 'https://www.adbureau.co.jp/', 'adbureau' ),
+				$r( 'リッチエード', 'http://www.richade.co.jp/', 'richade' ),
+				$r( '長野朝日放送', 'https://www.abn-tv.co.jp/', 'abn' ),
+				$r( 'Tutti', 'http://tutti-armonia.jp/', 'tutti' ),
+				$r( 'みずほ証券', 'https://www.mizuho-sc.com/', 'mizuho' ),
+				$r( '明治安田生命', 'https://www.meijiyasuda.co.jp/', 'meiji' ),
+				$r( 'アディダスジャパン', 'https://www.adidas.jp/', 'adidas' ),
+				$r( 'レアルスポーツ', 'https://www.realsports.jp/', 'real' ),
 			),
 			'supporters' => array(
-				array( 'name' => 'トンボ学生服', 'url' => 'http://www.tombow.gr.jp/' ),
-				array( 'name' => 'ファーストビジネス株式会社', 'url' => '' ),
-				array( 'name' => '株式会社松本総合保険', 'url' => 'https://www.m-t-i.jp/' ),
+				$r( 'トンボ学生服', 'http://www.tombow.gr.jp/' ),
+				$r( 'ファーストビジネス株式会社', '' ),
+				$r( '株式会社松本総合保険', 'https://www.m-t-i.jp/' ),
 			),
 		);
 	}

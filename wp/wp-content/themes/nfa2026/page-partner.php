@@ -1,6 +1,6 @@
 <?php
 /**
- * 関わる（協賛）（デザイン partner.html）。
+ * 関わる（協賛）（デザイン partner.html）。scratchpad の conv2.py で生成。
  *
  * @package NFA2026
  */
@@ -34,18 +34,14 @@ get_header();
 <!-- 協賛企業（出典：/office_top/office_member） -->
 <section class="blk" id="partners"><div class="wrap">
 <div class="bh"><div><div class="e">PARTNERS</div><h2>協賛企業一覧</h2></div></div>
-<?php
-$sp   = nfa_sponsor_list();
-$item = fn( $r, $logo = true ) => ( ! empty( $r['url'] ) ? '<a href="' . esc_url( $r['url'] ) . '" rel="noopener" target="_blank">' : '' ) . ( $logo ? '<span class="lg">LOGO</span>' : '' ) . esc_html( $r['name'] ) . ( ! empty( $r['url'] ) ? '</a>' : '' );
-?>
 <h3 class="pt-tier">GOLD PARTNER<span>ゴールドパートナー</span></h3>
-<ul class="pt-logos gold"><?php foreach ( $sp['gold'] as $r ) { echo '<li>' . $item( $r ) . '</li>'; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></ul>
+<ul class="pt-logos gold"><?php echo nfa_partner_logos_html( 'gold' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></ul>
 <h3 class="pt-tier">OFFICIAL PARTNER<span>オフィシャルパートナー</span></h3>
-<ul class="pt-logos"><?php foreach ( $sp['official'] as $r ) { echo '<li>' . $item( $r ) . '</li>'; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></ul>
+<ul class="pt-logos"><?php echo nfa_partner_logos_html( 'official' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></ul>
 <h3 class="pt-tier">SUPPORTERS</h3>
-<ul class="pt-sup"><?php foreach ( $sp['supporters'] as $r ) { echo '<li>' . $item( $r, false ) . '</li>'; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></ul>
+<ul class="pt-sup"><?php echo nfa_partner_sup_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></ul>
 </div></section>
 <!-- お問い合わせ先（出典：/office_top/office_member/office_member_contents） -->
-<section class="cband" id="apply"><div class="wrap"><div class="cband-tx"><p class="cband-e">CONTACT</p><h2>お申し込み・お問い合わせ</h2><p class="cband-info">（一社）長野県サッカー協会　事務局（担当：下条）<br/>TEL <a href="tel:0263878565">0263-87-8565</a>　FAX 0263-87-8587</p><p class="cband-note">お電話でのお問い合わせは、平日の10:00～16:00までの間にてお願いいたします。</p></div><div class="cband-act"><a class="btn btn-g" href="https://www.nagano-fa.or.jp/office_top/office_member/office_member_form" rel="noopener" target="_blank"><span>スポンサー申込</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="btn btn-l" href="<?php echo esc_url( nfa_u( 'contact.html' ) ); ?>"><span>お問い合わせフォーム</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div></div></section>
+<section class="cband" id="apply"><div class="wrap"><div class="cband-tx"><p class="cband-e">CONTACT</p><h2>お申し込み・お問い合わせ</h2><p class="cband-info">（一社）長野県サッカー協会　事務局（担当：下条）<br/>TEL <a href="tel:0263878565">0263-87-8565</a>　FAX 0263-87-8587</p><p class="cband-note">お電話でのお問い合わせは、平日の10:00～16:00までの間にてお願いいたします。</p></div><div class="cband-act"><a class="btn btn-g" href="<?php echo esc_url( nfa_u( 'contact.html' ) ); ?>"><span>スポンサー申込・お問い合わせ</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div></div></section>
 <?php
 get_footer();

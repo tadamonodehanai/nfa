@@ -54,6 +54,23 @@ class NFA_Com_CLI {
 			'privacy' => array( 'プライバシーポリシー', '' ),
 			'teams'   => array( 'チームを探す', '' ),
 			'search'  => array( '情報を探す', '[nfa_ai_search]' ),
+			// 中身はテーマのテンプレート（page-{スラッグ}.php）。デザインの下層ページ
+			'academy'          => array( '長野県レフェリーアカデミー', '' ),
+			'coach-course'     => array( '指導者講習会', '' ),
+			'download'         => array( '書式ダウンロード', '' ),
+			'emperorscup'      => array( '天皇杯', '' ),
+			'facilities'       => array( '主要競技場', '' ),
+			'festival'         => array( 'JFAフェスティバル', '' ),
+			'links'            => array( 'リンク', '' ),
+			'nagano-style'     => array( '長野スタイル', '' ),
+			'referee-schedule' => array( '審判 各種講習会 年間計画', '' ),
+			'registration'     => array( '登録のご案内', '' ),
+			'reports'          => array( '事業計画・事業報告', '' ),
+			'request'          => array( '掲載依頼', '' ),
+			'request-jfa'      => array( 'JFAフェスティバル掲載依頼フォーム', '' ),
+			'sitemap'          => array( 'サイトマップ', '' ),
+			'terms'            => array( '利用規約', '' ),
+			'tracen'           => array( '女子トレセンについて', '' ),
 		);
 		$ids = array();
 		foreach ( $pages as $slug => $p ) {
@@ -66,24 +83,27 @@ class NFA_Com_CLI {
 			}
 		}
 		// AI検索の対象外：フォームをテンプレートに埋め込むお問い合わせ、探索画面そのもの、中身のない TOP・お知らせ一覧
-		foreach ( array( 'contact', 'search', 'home', 'news' ) as $slug ) {
+		foreach ( array( 'contact', 'request-jfa', 'search', 'home', 'news', 'sitemap' ) as $slug ) {
 			update_post_meta( $ids[ $slug ], '_nfa_ais_exclude', true );
 		}
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_on_front', $ids['home'] );
 		update_option( 'page_for_posts', $ids['news'] );
 
-		// お問い合わせ：Contact Form 7 のフォーム（デザインと同じ項目・クラス名）
+		// Contact Form 7 のフォーム（デザインと同じ項目・クラス名。記述はテーマの inc/*.txt）
 		if ( class_exists( 'WPCF7_ContactForm' ) ) {
-			$exists = get_posts( array( 'post_type' => 'wpcf7_contact_form', 'title' => 'お問い合わせ', 'posts_per_page' => 1, 'post_status' => 'any' ) );
-			if ( ! $exists ) {
-				$file = get_theme_file_path( 'inc/contact-form.txt' );
-				$form = WPCF7_ContactForm::get_template( array( 'title' => 'お問い合わせ' ) );
+			foreach ( array( 'お問い合わせ' => 'inc/contact-form.txt', 'JFAフェスティバル掲載依頼' => 'inc/request-jfa-form.txt' ) as $title => $path ) {
+				$exists = get_posts( array( 'post_type' => 'wpcf7_contact_form', 'title' => $title, 'posts_per_page' => 1, 'post_status' => 'any' ) );
+				if ( $exists ) {
+					continue;
+				}
+				$file = get_theme_file_path( $path );
+				$form = WPCF7_ContactForm::get_template( array( 'title' => $title ) );
 				if ( is_readable( $file ) ) {
 					$form->set_properties( array( 'form' => file_get_contents( $file ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 				}
 				$form->save();
-				WP_CLI::log( 'Contact Form 7 のフォーム「お問い合わせ」を作成しました。' );
+				WP_CLI::log( 'Contact Form 7 のフォーム「' . $title . '」を作成しました。' );
 			}
 		}
 		flush_rewrite_rules();
@@ -434,7 +454,8 @@ class NFA_Com_CLI {
 	 */
 	private static function legacy_media_urls( $post ) {
 		// 旧サイトの URL か、ドメインのない URL（"/wp-content/…"）。取り込み済みの新しい URL は拾わない
-		preg_match_all( '#(?:(?:https?:)?//(?:www\.)?nagano-fa\.or\.jp|(?<=["\'(=\s]))/wp-content/uploads/[^\s"\'<>()]+#i', (string) $post->post_content, $m );
+		// 旧サイトの中の別サイト（/referee-seminar/・/main/）のファイルも同じように取り込む
+		preg_match_all( '#(?:(?:https?:)?//(?:www\.)?nagano-fa\.or\.jp(?:/(?:' . self::LEGACY_SUBSITES . '))?|(?<=["\'(=\s]))/wp-content/uploads/[^\s"\'<>()]+#i', (string) $post->post_content, $m );
 		$urls  = $m[0];
 		$thumb = (string) get_post_meta( $post->ID, '_nfa_thumb_url', true );
 		if ( $thumb ) {
@@ -444,11 +465,16 @@ class NFA_Com_CLI {
 		return array_filter( $urls, fn( $u ) => (bool) preg_match( '#/wp-content/uploads/.+\.\w{2,5}$#', $u ) );
 	}
 
+	/** 旧サイトの中の別サイト（WordPress を別に入れていたフォルダ） */
+	const LEGACY_SUBSITES = 'referee-seminar|main';
+
 	/**
 	 * URL → [ uploads 以下のパス, 取り込みのキー（縮小版は元のファイル） ]
+	 * 別サイトのファイルは「referee-seminar/2016/03/x.jpg」のように、別サイトの名前を頭に付ける。
 	 */
 	private static function legacy_media_key( $url ) {
-		$path = rawurldecode( preg_replace( '#^.*?/wp-content/uploads/#', '', $url ) );
+		$sub  = preg_match( '#nagano-fa\.or\.jp/(' . self::LEGACY_SUBSITES . ')/wp-content/uploads/#i', $url, $mm ) ? strtolower( $mm[1] ) . '/' : '';
+		$path = $sub . rawurldecode( preg_replace( '#^.*?/wp-content/uploads/#', '', $url ) );
 		$key  = preg_replace( '/-\d+x\d+(\.\w+)$/', '$1', $path );
 		return array( $path, $key );
 	}
@@ -469,8 +495,11 @@ class NFA_Com_CLI {
 	 * 旧サイトから1ファイルを取り込む（元のファイル → なければ縮小版）。
 	 */
 	private static function sideload_legacy( $key, $path, $parent ) {
-		$base = 'https://www.nagano-fa.or.jp/wp-content/uploads/';
-		$sub  = preg_match( '#^(\d{4}/\d{2})/#', $key, $mm ) ? '/' . $mm[1] : '';
+		// 別サイトのファイル（キーの頭が referee-seminar/ など）は、そのフォルダの uploads から取る
+		$site = preg_match( '#^(' . self::LEGACY_SUBSITES . ')/#', $key, $ms ) ? $ms[1] : '';
+		$base = 'https://www.nagano-fa.or.jp/' . ( $site ? $site . '/' : '' ) . 'wp-content/uploads/';
+		$rel  = fn( $p ) => $site ? substr( $p, strlen( $site ) + 1 ) : $p;
+		$sub  = preg_match( '#^(\d{4}/\d{2})/#', $rel( $key ), $mm ) ? '/' . ( $site ? $site . '/' : '' ) . $mm[1] : '';
 		$dir  = function ( $u ) use ( $sub ) {
 			if ( $sub ) {
 				$u['subdir'] = $sub;
@@ -479,7 +508,7 @@ class NFA_Com_CLI {
 			}
 			return $u;
 		};
-		foreach ( array_unique( array( $key, $path ) ) as $try ) {
+		foreach ( array_unique( array( $rel( $key ), $rel( $path ) ) ) as $try ) {
 			$enc = implode( '/', array_map( 'rawurlencode', explode( '/', $try ) ) );
 			$tmp = download_url( $base . $enc, 60 );
 			if ( is_wp_error( $tmp ) ) {
@@ -807,6 +836,264 @@ class NFA_Com_CLI {
 		return $out;
 	}
 
+	/**
+	 * 読み替えた分類（担当委員会・目的・対象・カテゴリー）を記事に付ける。
+	 */
+	private static function apply_legacy_terms( $id, array $m ) {
+		wp_set_object_terms( $id, $m['committee'], NFA_Com_Committees::TAX );
+		wp_set_object_terms( $id, $m['purpose'], 'nfa_purpose' );
+		$targets = array_values( array_filter( array_map( fn( $c ) => (string) nfa_committee_meta( $c, 'target' ), $m['committee'] ) ) );
+		wp_set_object_terms( $id, $targets, 'nfa_target' );
+		$cats = array_filter( array_map( array( 'NFA_Com_Categories', 'id' ), $m['category'] ?? array( NFA_Com_Categories::INFO ) ) );
+		wp_set_post_categories( $id, array_values( $cats ) );
+	}
+
+	/**
+	 * 取り込み済みのお知らせに、読み替え表（includes/legacy-map.php）をもう一度当てる。
+	 *
+	 * 読み替え表を直したあとに使う。担当委員会・目的・対象・カテゴリーを付け直す（地域・本文はそのまま）。
+	 * 取り込んだあとに管理画面で変えた分類も、読み替え表の値に戻るので注意。
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--dry-run]
+	 * : 付け直さずに、変わる件数だけを表示する
+	 *
+	 * @subcommand remap-legacy
+	 */
+	public function remap_legacy( $args, $assoc ) {
+		global $wpdb;
+		$rows = $wpdb->get_results(
+			"SELECT p.ID, t.meta_value type, c.meta_value cats FROM {$wpdb->posts} p
+			 JOIN {$wpdb->postmeta} t ON t.post_id = p.ID AND t.meta_key = '_nfa_legacy_type' AND t.meta_value IN ('post','news')
+			 LEFT JOIN {$wpdb->postmeta} c ON c.post_id = p.ID AND c.meta_key = '_nfa_legacy_cats'"
+		);
+		$news    = array( 'committee' => array( NFA_Com_Committees::ASSOCIATION ), 'purpose' => array( 'news' ), 'flag' => array(), 'category' => array( NFA_Com_Categories::INFO ) );
+		$changed = array();
+		$dry     = isset( $assoc['dry-run'] );
+		wp_defer_term_counting( true );
+		foreach ( $rows as $r ) {
+			$m      = 'news' === $r->type ? $news : self::map_categories( (string) $r->cats );
+			$before = implode( ',', wp_get_object_terms( (int) $r->ID, NFA_Com_Committees::TAX, array( 'fields' => 'slugs' ) ) );
+			$after  = implode( ',', $m['committee'] );
+			if ( $before !== $after ) {
+				$k             = $before . ' → ' . $after;
+				$changed[ $k ] = ( $changed[ $k ] ?? 0 ) + 1;
+			}
+			if ( ! $dry ) {
+				self::apply_legacy_terms( (int) $r->ID, $m );
+			}
+		}
+		wp_defer_term_counting( false );
+		arsort( $changed );
+		foreach ( $changed as $k => $n ) {
+			WP_CLI::log( sprintf( '%5d  %s', $n, $k ) );
+		}
+		if ( ! $dry && class_exists( 'NFA_AIS_Index' ) ) {
+			NFA_AIS_Index::bump();
+		}
+		WP_CLI::success( sprintf( '%d 件（担当委員会が変わるもの %d 件）%s', count( $rows ), array_sum( $changed ), $dry ? '。--dry-run のため付け直していません。' : 'を付け直しました。' ) );
+	}
+
+	/**
+	 * 事業計画・事業報告を取り込む（デザインの tools/build/reports.json から）。
+	 *
+	 * reports.json は [ [ 掲載年, [ [ 資料名, 旧サイトのパス ], ... ], 注記 ], ... ]。
+	 * ファイルは旧サイトからメディアライブラリに取り込む（取り込み済みなら使い回す）。
+	 *
+	 * ## OPTIONS
+	 *
+	 * <file>
+	 * : reports.json
+	 *
+	 * [--delete]
+	 * : 取り込んだ資料を削除する（メディアは残す）
+	 *
+	 * @subcommand import-reports
+	 */
+	public function import_reports( $args, $assoc ) {
+		global $wpdb;
+		$type = NFA_Com_Report_Type::TYPE;
+		if ( isset( $assoc['delete'] ) ) {
+			$ids = get_posts( array( 'post_type' => $type, 'post_status' => 'any', 'posts_per_page' => -1, 'fields' => 'ids', 'meta_key' => '_nfa_legacy_type', 'meta_value' => 'report' ) ); // phpcs:ignore WordPress.DB.SlowDBQuery
+			foreach ( $ids as $id ) {
+				wp_delete_post( $id, true );
+			}
+			WP_CLI::success( count( $ids ) . ' 件を削除しました。' );
+			return;
+		}
+		$data = json_decode( (string) file_get_contents( $args[0] ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( ! is_array( $data ) ) {
+			WP_CLI::error( 'JSON を読み取れません：' . $args[0] );
+		}
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		$made = 0;
+		$fail = 0;
+		foreach ( $data as $group ) {
+			list( $year, $items, $note ) = array_pad( $group, 3, '' );
+			$year = (int) preg_replace( '/\D.*$/', '', (string) $year );   // 「2013〜2020」のような欄は先頭の年
+			foreach ( array_values( (array) $items ) as $i => $item ) {
+				list( $title, $path ) = $item;
+				$legacy               = 'report:' . ( '' !== (string) $path ? $path : $year . ':' . $title );
+				if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_nfa_legacy_id' AND meta_value = %s LIMIT 1", $legacy ) ) ) {
+					continue;
+				}
+				$att = 0;
+				if ( '' !== (string) $path ) {   // 旧サイトでも「掲載なし」の資料はファイルなしで登録する
+					$url             = 'https://www.nagano-fa.or.jp' . $path;
+					list( $p, $key ) = self::legacy_media_key( $url );
+					$att             = self::legacy_attachment( $key );
+					if ( ! $att ) {
+						$att = self::sideload_legacy( $key, $p, 0 );
+						usleep( 300000 );
+					}
+				}
+				if ( ! $att && '' !== (string) $path ) {
+					$fail++;
+					WP_CLI::warning( '取り込めませんでした：' . $title . ' ' . $url );
+					continue;
+				}
+				$meta = array(
+					'_nfa_legacy_id'   => $legacy,
+					'_nfa_legacy_type' => 'report',
+					'nfa_report_year'  => $year,
+					'_nfa_report_year' => 'field_nfa_report_year',
+					'nfa_report_file'  => $att ? $att : '',
+					'_nfa_report_file' => 'field_nfa_report_file',
+				);
+				if ( $note && 0 === $i ) {
+					$meta['nfa_report_note']  = $note;
+					$meta['_nfa_report_note'] = 'field_nfa_report_note';
+				}
+				$id = wp_insert_post(
+					wp_slash(
+						array(
+							'post_type'   => $type,
+							'post_status' => 'publish',
+							'post_title'  => $title,
+							'menu_order'  => $i,
+							'meta_input'  => $meta,
+						)
+					),
+					true
+				);
+				if ( ! is_wp_error( $id ) ) {
+					$made++;
+				}
+			}
+		}
+		WP_CLI::success( sprintf( '%d 件を取り込みました（取り込めなかったファイル %d）。', $made, $fail ) );
+	}
+
+	/**
+	 * 記事・チーム・大会資料の本文の、旧サイト（www.nagano-fa.or.jp）へのリンクを新サイトの中のリンクに置き換える。
+	 *
+	 * 読み替えは includes/legacy-links.php（ファイル → メディア、記事 → 記事、固定ページ → 新しいページ など）。
+	 * 読み替え先がないリンク（旧サイトにしかないフォームなど）はそのまま。何度実行してもよい。
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--dry-run]
+	 * : 置き換えずに、件数と残るリンクだけを表示する
+	 *
+	 * @subcommand relink
+	 */
+	public function relink( $args, $assoc ) {
+		global $wpdb;
+		$dry  = isset( $assoc['dry-run'] );
+		$rows = $wpdb->get_results( "SELECT ID, post_content FROM {$wpdb->posts} WHERE post_type IN ('post','team','nfa_doc','page') AND post_status IN ('publish','draft','private','future','pending') AND post_content LIKE '%nagano-fa.or.jp%'" );
+		$posts = 0;
+		$links = 0;
+		$left  = array();
+		foreach ( $rows as $r ) {
+			$n   = 0;
+			$new = nfa_legacy_relink_html( $r->post_content, $n );
+			preg_match_all( '#(?:href|src)=["\']((?:https?:)?//(?:www\.)?nagano-fa\.or\.jp[^"\']*)#i', $new, $m );
+			foreach ( $m[1] as $u ) {
+				$k          = preg_replace( '#^(?:https?:)?//(?:www\.)?nagano-fa\.or\.jp/?([^/?\#]*).*$#i', '$1', $u );
+				$left[ $k ] = ( $left[ $k ] ?? 0 ) + 1;
+			}
+			if ( ! $n ) {
+				continue;
+			}
+			$posts++;
+			$links += $n;
+			if ( ! $dry ) {
+				$wpdb->update( $wpdb->posts, array( 'post_content' => $new ), array( 'ID' => $r->ID ) );
+				clean_post_cache( $r->ID );
+			}
+		}
+		arsort( $left );
+		if ( $left ) {
+			WP_CLI::log( '読み替え先がなく残るリンク（パスの1段目ごと）：' );
+			foreach ( $left as $k => $n ) {
+				WP_CLI::log( sprintf( '%5d  /%s', $n, $k ) );
+			}
+		}
+		if ( ! $dry && class_exists( 'NFA_AIS_Index' ) ) {
+			NFA_AIS_Index::bump();
+		}
+		WP_CLI::success( sprintf( '%d 件の %d か所%s', $posts, $links, $dry ? 'を置き換えられます（--dry-run）。' : 'を置き換えました。' ) );
+	}
+
+	/**
+	 * 協賛企業の設定ページ（ACF Pro）に、いまの初期の並び（デザインどおり）を入れる。
+	 * ロゴはテーマの img/sp-{key}.png をメディアライブラリに取り込んで設定する。設定がすでにあれば何もしない。
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--force]
+	 * : 設定があっても初期の並びで上書きする
+	 *
+	 * @subcommand seed-sponsors
+	 */
+	public function seed_sponsors( $args, $assoc ) {
+		if ( ! function_exists( 'update_field' ) || ! function_exists( 'acf_get_options_page' ) ) {
+			WP_CLI::error( 'ACF Pro が有効ではありません。' );
+		}
+		$now = nfa_sponsors();
+		$set = (bool) array_filter( array_map( fn( $k ) => nfa_field( 'nfa_sponsors_' . $k, 'option', array( 'name' ) ), array( 'gold', 'official', 'supporters' ) ) );
+		if ( $set && ! isset( $assoc['force'] ) ) {
+			WP_CLI::success( '協賛企業はすでに設定されています（上書きするときは --force）。' );
+			return;
+		}
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		$logo = function ( $key ) {
+			if ( ! $key ) {
+				return '';
+			}
+			$found = get_posts( array( 'post_type' => 'attachment', 'post_status' => 'inherit', 'posts_per_page' => 1, 'fields' => 'ids', 'meta_key' => '_nfa_sponsor_logo', 'meta_value' => $key ) ); // phpcs:ignore WordPress.DB.SlowDBQuery
+			if ( $found ) {
+				return (int) $found[0];
+			}
+			$file = get_theme_file_path( 'assets/img/sp-' . $key . '.png' );
+			if ( ! is_readable( $file ) ) {
+				return '';
+			}
+			$tmp = wp_tempnam( $file );
+			copy( $file, $tmp );
+			$id = media_handle_sideload( array( 'name' => 'sp-' . $key . '.png', 'tmp_name' => $tmp ), 0 );
+			if ( is_wp_error( $id ) ) {
+				return '';
+			}
+			update_post_meta( $id, '_nfa_sponsor_logo', $key );
+			return (int) $id;
+		};
+		foreach ( NFA_Com_Settings::default_sponsors() as $kind => $rows ) {
+			$value = array();
+			foreach ( $rows as $r ) {
+				$value[] = array( 'name' => $r['name'], 'url' => $r['url'], 'logo' => 'supporters' === $kind ? '' : $logo( $r['key'] ) );
+			}
+			update_field( 'field_nfa_sponsors_' . $kind, $value, 'option' );
+			WP_CLI::log( $kind . '：' . count( $value ) . ' 件' );
+		}
+		WP_CLI::success( '協賛企業の設定ページに初期の並びを入れました。' );
+	}
+
 	private static function read_csv( $file ) {
 		if ( ! is_readable( $file ) ) {
 			WP_CLI::error( '読み込めません：' . $file );
@@ -830,13 +1117,13 @@ class NFA_Com_CLI {
 	public static function map_categories( $cats ) {
 		static $map = null;
 		$map        = $map ?? require NFA_COM_DIR . 'includes/legacy-map.php';
-		$out        = array( 'committee' => array(), 'purpose' => array(), 'flag' => array(), 'unknown' => array() );
+		$out        = array( 'committee' => array(), 'purpose' => array(), 'flag' => array(), 'category' => array(), 'unknown' => array() );
 		foreach ( array_filter( array_map( 'trim', explode( ',', (string) $cats ) ) ) as $c ) {
 			if ( ! isset( $map[ $c ] ) ) {
 				$out['unknown'][] = $c;
 				continue;
 			}
-			foreach ( array( 'committee', 'purpose', 'flag' ) as $k ) {
+			foreach ( array( 'committee', 'purpose', 'flag', 'category' ) as $k ) {
 				if ( ! empty( $map[ $c ][ $k ] ) ) {
 					$out[ $k ][] = $map[ $c ][ $k ];
 				}
@@ -846,7 +1133,10 @@ class NFA_Com_CLI {
 			$out[ $k ] = array_values( array_unique( $v ) );
 		}
 		if ( ! $out['committee'] ) {
-			$out['committee'] = array( 'office' );
+			$out['committee'] = array( NFA_Com_Committees::ASSOCIATION );
+		}
+		if ( ! $out['category'] ) {
+			$out['category'] = array( NFA_Com_Categories::INFO );
 		}
 		if ( ! $out['purpose'] ) {
 			$out['purpose'] = array( 'news' );
@@ -874,7 +1164,7 @@ class NFA_Com_CLI {
 	private static function import_posts( array $rows, $type, $dry ) {
 		$stat = array( 'committee' => array(), 'purpose' => array(), 'flag' => array(), 'unknown' => array(), 'area' => 0, 'link' => 0, 'top' => 0 );
 		foreach ( $rows as $r ) {
-			$m = 'news' === $type ? array( 'committee' => array( 'office' ), 'purpose' => array( 'news' ), 'flag' => array(), 'unknown' => array() ) : self::map_categories( $r['post_category'] ?? '' );
+			$m = 'news' === $type ? array( 'committee' => array( NFA_Com_Committees::ASSOCIATION ), 'purpose' => array( 'news' ), 'flag' => array(), 'category' => array( NFA_Com_Categories::INFO ), 'unknown' => array() ) : self::map_categories( $r['post_category'] ?? '' );
 			foreach ( array( 'committee', 'purpose', 'flag', 'unknown' ) as $k ) {
 				foreach ( $m[ $k ] as $v ) {
 					$stat[ $k ][ $v ] = ( $stat[ $k ][ $v ] ?? 0 ) + 1;
@@ -912,7 +1202,7 @@ class NFA_Com_CLI {
 				$skip++;
 				continue;
 			}
-			$m    = 'news' === $type ? array( 'committee' => array( 'office' ), 'purpose' => array( 'news' ), 'flag' => array() ) : self::map_categories( $r['post_category'] ?? '' );
+			$m    = 'news' === $type ? array( 'committee' => array( NFA_Com_Committees::ASSOCIATION ), 'purpose' => array( 'news' ), 'flag' => array(), 'category' => array( NFA_Com_Categories::INFO ) ) : self::map_categories( $r['post_category'] ?? '' );
 			$meta = array(
 				'_nfa_legacy_id'   => $type . ':' . $old,
 				'_nfa_legacy_type' => $type,
@@ -951,12 +1241,7 @@ class NFA_Com_CLI {
 				WP_CLI::warning( $old . ': ' . $id->get_error_message() );
 				continue;
 			}
-			wp_set_object_terms( $id, $m['committee'], NFA_Com_Committees::TAX );
-			wp_set_object_terms( $id, $m['purpose'], 'nfa_purpose' );
-			$targets = array_values( array_filter( array_map( fn( $c ) => (string) nfa_committee_meta( $c, 'target' ), $m['committee'] ) ) );
-			if ( $targets ) {
-				wp_set_object_terms( $id, $targets, 'nfa_target' );
-			}
+			self::apply_legacy_terms( $id, $m );
 			$area = self::area_of( $postarr['post_title'] );
 			if ( $area ) {
 				$t = get_term_by( 'name', $area, 'nfa_area' );

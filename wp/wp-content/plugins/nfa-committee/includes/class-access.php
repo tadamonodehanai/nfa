@@ -84,7 +84,14 @@ class NFA_Com_Access {
 	 */
 	public static function user_committees( $user_id = 0 ) {
 		$user_id = $user_id ? $user_id : get_current_user_id();
-		return array_values( array_filter( array_map( 'intval', (array) get_user_meta( $user_id, self::USER_META, true ) ) ) );
+		$ids     = array_values( array_filter( array_map( 'intval', (array) get_user_meta( $user_id, self::USER_META, true ) ) ) );
+		// 事務局の担当は「協会」（情報発信元としての協会）の記事も書ける
+		$office = get_term_by( 'slug', 'office', NFA_Com_Committees::TAX );
+		$assoc  = get_term_by( 'slug', NFA_Com_Committees::ASSOCIATION, NFA_Com_Committees::TAX );
+		if ( $office && $assoc && in_array( (int) $office->term_id, $ids, true ) ) {
+			$ids[] = (int) $assoc->term_id;
+		}
+		return array_values( array_unique( $ids ) );
 	}
 
 	private static function managed_type( $type ) {

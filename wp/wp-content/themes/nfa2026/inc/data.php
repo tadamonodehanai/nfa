@@ -39,7 +39,16 @@ function nfa_committees() {
  */
 function nfa_committee_of( $post = null ) {
 	$terms = get_the_terms( get_post( $post ), NFA_COMMITTEE_TAX );
-	return ( $terms && ! is_wp_error( $terms ) ) ? $terms[0] : null;
+	if ( ! $terms || is_wp_error( $terms ) ) {
+		return null;
+	}
+	// 委員会と「協会」の両方が付いた記事は、委員会の方を代表にする
+	foreach ( $terms as $t ) {
+		if ( ! in_array( $t->slug, array( 'association', 'office' ), true ) ) {
+			return $t;
+		}
+	}
+	return $terms[0];
 }
 
 /**
@@ -48,7 +57,7 @@ function nfa_committee_of( $post = null ) {
 function nfa_badge( $post = null ) {
 	$post = get_post( $post );
 	if ( $post && function_exists( 'nfa_flag' ) && nfa_flag( 'important', $post ) ) {
-		return array( '重要', 'var(--tag-result)' );
+		return array( '重要', 'var(--alert)' );
 	}
 	$t = nfa_committee_of( $post );
 	if ( ! $t ) {
@@ -62,14 +71,14 @@ function nfa_badge( $post = null ) {
 /**
  * サムネイル（なければデザインの仮画像）。
  */
-function nfa_thumb( $post = null, $size = 'medium_large' ) {
+function nfa_thumb( $post = null, $size = 'medium_large', $fallback = 'img/thumb-default.jpg' ) {
 	$post = get_post( $post );
 	$url  = get_the_post_thumbnail_url( $post, $size );
 	if ( ! $url && $post ) {
 		// 旧サイトから移したアイキャッチ（メディアに取り込むまでは旧サイトの URL）
 		$url = (string) get_post_meta( $post->ID, '_nfa_thumb_url', true );
 	}
-	return $url ? $url : nfa_asset( 'img/ph-photo.jpg' );
+	return $url ? $url : nfa_asset( $fallback );
 }
 
 /**

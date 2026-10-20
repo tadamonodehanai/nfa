@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       NFA Committee
- * Description:       長野県サッカー協会サイトの委員会ごとの運用。担当委員会による権限（自分の委員会の記事・大会資料だけを書ける）、大会・リーグ資料（nfa_doc）、チーム（team）、「重要」「注意喚起」「TOPに掲載」、委員会ごとの説明文・問い合わせ先、協賛企業の設定を提供します。
- * Version:           0.1.0
+ * Description:       長野県サッカー協会サイトの委員会ごとの運用。担当委員会による権限（自分の委員会の記事・大会資料だけを書ける）、大会・リーグ資料（nfa_doc）、チーム（team）、事業計画・事業報告（nfa_report）、記事の種類（カテゴリー）、「重要」「注意喚起」「TOPに掲載」、委員会ごとの説明文・問い合わせ先、協賛企業の設定を提供します。
+ * Version:           0.2.0
  * Requires at least: 6.5
  * Requires PHP:      8.1
  * Author:            tadamono
@@ -17,14 +17,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NFA_COM_VERSION', '0.1.0' );
+define( 'NFA_COM_VERSION', '0.2.0' );
 define( 'NFA_COM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'NFA_COM_URL', plugin_dir_url( __FILE__ ) );
 
 require_once NFA_COM_DIR . 'includes/helpers.php';
+require_once NFA_COM_DIR . 'includes/legacy-links.php';
 require_once NFA_COM_DIR . 'includes/class-committees.php';
+require_once NFA_COM_DIR . 'includes/class-categories.php';
 require_once NFA_COM_DIR . 'includes/class-doc-type.php';
 require_once NFA_COM_DIR . 'includes/class-team-type.php';
+require_once NFA_COM_DIR . 'includes/class-report-type.php';
 require_once NFA_COM_DIR . 'includes/class-flags.php';
 require_once NFA_COM_DIR . 'includes/class-access.php';
 require_once NFA_COM_DIR . 'includes/class-settings.php';
@@ -35,8 +38,10 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 }
 
 NFA_Com_Committees::init();
+NFA_Com_Categories::init();
 NFA_Com_Doc_Type::init();
 NFA_Com_Team_Type::init();
+NFA_Com_Report_Type::init();
 NFA_Com_Flags::init();
 NFA_Com_Access::init();
 NFA_Com_Settings::init();
@@ -47,6 +52,7 @@ register_activation_hook( __FILE__, 'nfa_com_activate' );
 function nfa_com_activate() {
 	NFA_Com_Doc_Type::register();
 	NFA_Com_Team_Type::register();
+	NFA_Com_Report_Type::register();
 	NFA_Com_Access::install_roles();
 	if ( taxonomy_exists( NFA_Com_Committees::TAX ) ) {
 		NFA_Com_Committees::seed();

@@ -64,7 +64,7 @@ class NFA_AIS_Search {
 							'k'  => 'pdf',
 							'f'  => $row['f'],
 							't'  => $row['t'],
-							'g'  => get_the_title( $post ),
+							'g'  => self::plain_title( $post ),
 							'u'  => $row['u'],
 							'd'  => $row['d'],
 							'l'  => $com[0],
@@ -83,7 +83,7 @@ class NFA_AIS_Search {
 				$items[] = array(
 					'id'  => $id,
 					'k'   => 'news',
-					't'   => get_the_title( $post ),
+					't'   => self::plain_title( $post ),
 					'u'   => $link ? $link : get_permalink( $post ),
 					'd'   => get_the_date( 'Y.m.d', $post ),
 					'l'   => $com[0],
@@ -99,6 +99,13 @@ class NFA_AIS_Search {
 		// 新しい順（日付が空のものは最後）
 		usort( $items, fn( $a, $b ) => strcmp( $b['d'], $a['d'] ) );
 		return $items;
+	}
+
+	/**
+	 * 題名（&#038; などの文字参照を戻した文字。画面側でエスケープする）。
+	 */
+	private static function plain_title( $post ) {
+		return html_entity_decode( get_the_title( $post ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	}
 
 	/**

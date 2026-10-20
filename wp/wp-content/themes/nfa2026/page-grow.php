@@ -1,6 +1,6 @@
 <?php
 /**
- * 育成・強化（デザイン grow.html）。
+ * 育成・強化（デザイン grow.html）。scratchpad の conv2.py で生成。
  *
  * @package NFA2026
  */
@@ -16,10 +16,10 @@ get_header();
 <section class="blk" id="who"><div class="wrap">
 <div class="bh"><div><div class="e">BY <i>ROLE</i></div><h2>立場別のご案内</h2></div></div>
 <div class="cards c4 sg-who sg-who-r">
-<a class="cd" href="#tc"><div class="th"><img alt="トレーニングする選手" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">PLAYER</div><h3>選手</h3><p>長野スタイル（育成コンセプト）と、各年代のトレセン・強化練習会の活動報告です。</p><span class="go">トレセン・強化</span></div></a>
-<a class="cd" href="<?php echo esc_url( nfa_u( 'technical.html' ) ); ?>"><div class="th"><img alt="選手に指導するコーチ" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">COACH</div><h3>指導者</h3><p>レベルに応じた指導者講習会を開催しています（技術委員会）。</p><span class="go">指導者について</span></div></a>
-<a class="cd" href="<?php echo esc_url( nfa_u( 'referee.html' ) ); ?>"><div class="th"><img alt="試合を担当する審判員" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">REFEREE</div><h3>審判</h3><p>4級・3級の取得講習会、更新講習会、審判セミナーのご案内です（審判委員会）。</p><span class="go">審判について</span></div></a>
-<a class="cd" href="#register"><div class="th"><img alt="登録手続きのイメージ" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">REGISTRATION</div><h3>登録</h3><p>サッカー・フットサル登録、指導者登録、審判登録はKICKOFF（JFA）で行います。</p><span class="go">登録について</span></div></a>
+<a class="cd" href="#tc"><div class="th"><img alt="ボールを運ぶ選手の足元" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/st-grow-player.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">PLAYER</div><h3>選手</h3><p>長野スタイル（育成コンセプト）と、各年代のトレセン・強化練習会の活動報告です。</p><span class="go">トレセン・強化</span></div></a>
+<a class="cd" href="<?php echo esc_url( nfa_u( 'technical.html' ) ); ?>"><div class="th"><img alt="作戦ボードで指示を出すコーチの手元" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/st-grow-coach.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">COACH</div><h3>指導者</h3><p>レベルに応じた指導者講習会を開催しています（技術委員会）。</p><span class="go">指導者について</span></div></a>
+<a class="cd" href="<?php echo esc_url( nfa_u( 'referee.html' ) ); ?>"><div class="th"><img alt="イエローカードと笛を持つ審判員" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/st-grow-referee.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">REFEREE</div><h3>審判</h3><p>4級・3級の取得講習会、更新講習会、審判セミナーのご案内です（審判委員会）。</p><span class="go">審判について</span></div></a>
+<a class="cd" href="#register"><div class="th"><img alt="ピッチ脇に置かれたスコアシート" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/st-grow-register.jpg' ) ); ?>"/></div><div class="bd"><div class="lab">REGISTRATION</div><h3>登録</h3><p>サッカー・フットサル登録、指導者登録、審判登録はKICKOFF（JFA）で行います。</p><span class="go">登録について</span></div></a>
 </div>
 </div></section>
 <!-- NAGANO STYLE -->
@@ -29,21 +29,21 @@ get_header();
 <div class="prose">
 <p>長野県の育成コンセプト『長野スタイル』を提案します。各年代で獲得すべきもの、プレーモデルとしてまとめました。</p>
 <p>2028年国民スポーツ大会優勝に向け指導者のベクトルを合わせ、長野県サッカーを向上させていきましょう。</p>
-<p><a class="btn btn-n" href="https://www.nagano-fa.or.jp/news_top/technical_news/28084" rel="noopener" target="_blank">長野スタイルの詳細<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></p>
+<p><a class="btn btn-n" href="<?php echo esc_url( nfa_u( 'nagano-style.html' ) ); ?>">長野スタイルの詳細<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></p>
 </div>
-<div class="sg-ph"><img alt="年代別トレーニングの様子" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/></div>
+<div class="sg-ph"><img alt="コーンを使ったトレーニング" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/st-grow-age.jpg' ) ); ?>"/></div>
 </div>
 </div></section>
 <!-- TRESEN -->
 <section class="blk" id="tc"><div class="wrap">
-<div class="bh"><div><div class="e">TRAINING <i>CENTER</i></div><h2>トレセン・強化の活動報告</h2></div><a class="more" href="https://www.nagano-fa.or.jp/category/news_top/technical_news" rel="noopener" target="_blank">技術委員会のお知らせ</a></div>
+<div class="bh"><div><div class="e">TRAINING <i>CENTER</i></div><h2>トレセン・強化の活動報告</h2></div><a class="more" href="<?php echo esc_url( nfa_u( 'list.html?c=technical_news' ) ); ?>">技術委員会のお知らせ</a></div>
 <ul class="nl">
-<li data-c="info"><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39935" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.09.30</span></span><h3>U12女子北信越TC開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="info"><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39751" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.09.16</span></span><h3>U12北信越TC 中期 開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="info"><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39738" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.09.16</span></span><h3>長野県女子トレセン開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="info"><a href="https://www.nagano-fa.or.jp/news_top/office_news/selection_news/39675" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">国体</span></span><span><span class="mt"><span class="dt">2026.09.09</span></span><h3>U11トレセンキャンプ 開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="info"><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39223" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.07.15</span></span><h3>U14・U16強化練習会 開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="info"><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39102" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.07.06</span></span><h3>トレセンマッチ（U10）が開催されました。</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="info"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/technical_news/39935' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.09.30</span></span><h3>U12女子北信越TC開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="info"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/technical_news/39751' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.09.16</span></span><h3>U12北信越TC 中期 開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="info"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/technical_news/39738' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.09.16</span></span><h3>長野県女子トレセン開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="info"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/office_news/selection_news/39675' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">国体</span></span><span><span class="mt"><span class="dt">2026.09.09</span></span><h3>U11トレセンキャンプ 開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="info"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/technical_news/39223' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.07.15</span></span><h3>U14・U16強化練習会 開催</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="info"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/technical_news/39102' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">技術</span></span><span><span class="mt"><span class="dt">2026.07.06</span></span><h3>トレセンマッチ（U10）が開催されました。</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
 </ul>
 </div></section>
 <!-- COACH -->
@@ -88,9 +88,9 @@ get_header();
 <p class="sg-note">1級の中から実績により毎年JリーグやFリーグ担当審判員が、さらに国際試合を担当することができる国際審判員が推薦されます。</p>
 <h3 class="h3j">資格の取得と更新</h3>
 <div class="prose sg-prose">
-<p>新規審判資格を取得するには、「新規講習会」を受講していただきます。長野県内でのサッカーおよびフットサル4級取得講習会、3級昇級講習会は、審判委員会の<a href="https://www.nagano-fa.or.jp/category/news_top/referee_news" rel="noopener" target="_blank">お知らせ</a>にて随時ご案内しています。</p>
+<p>新規審判資格を取得するには、「新規講習会」を受講していただきます。長野県内でのサッカーおよびフットサル4級取得講習会、3級昇級講習会は、審判委員会の<a href="<?php echo esc_url( nfa_u( 'list.html?c=referee_news' ) ); ?>">お知らせ</a>にて随時ご案内しています。</p>
 <p>4級審判員の更新講習会は、JFAラーニングをご利用ください。ユース限定の4級取得講習会を1月から2月の期間に開催しています。</p>
-<p>審判セミナーは、「審判技術の向上を図る」「審判員・指導者等の交流を図る」ことを目的に、毎月1回、長野県フットボールセンター、北信地区で開催しています。<a href="https://www.nagano-fa.or.jp/referee_top/referee-seminer" rel="noopener" target="_blank">審判セミナーについて</a></p>
+<p>審判セミナーは、「審判技術の向上を図る」「審判員・指導者等の交流を図る」ことを目的に、毎月1回、長野県フットボールセンター、北信地区で開催しています。<a href="<?php echo esc_url( nfa_u( 'academy.html' ) ); ?>">審判セミナーについて</a></p>
 </div>
 </div></section>
 <!-- REGISTRATION -->
@@ -102,13 +102,13 @@ get_header();
 <h3>登録はWeb登録システム「KICKOFF」で行います</h3>
 <p>JFA主催大会や北信越地域／長野県の各種大会へ出場するためには、JFAへのチーム登録および選手登録が必要になります。JFA IDをお持ちでない方は、新規で取得してからKICKOFFシステムにログインしてください。既にJFA IDをお持ちの方は、新たに取得しないようご注意ください。</p>
 </div>
-<div class="ctas"><a class="btn btn-g" href="https://jfaid.jfa.jp/uniid-server/login" rel="noopener" target="_blank">KICKOFF（JFA ID ログイン）<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="btn btn-o" href="https://www.jfa.jp/registration/" rel="noopener" target="_blank">JFA 登録のご案内<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
+<div class="ctas"><a class="btn btn-g" href="https://jfaid.jfa.jp/uniid-server/login" rel="noopener" target="_blank">KICKOFF（JFA ID ログイン）<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="btn btn-o" href="https://www.jfa.jp/registration/" rel="noopener" target="_blank">JFA 登録のご案内<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
 </div>
 <h3 class="h3j">登録の種類</h3>
 <div class="cards sg-reg">
-<a class="cd" href="https://www.nagano-fa.or.jp/office_top/entry" rel="noopener" target="_blank"><div class="bd"><div class="lab">TEAM / PLAYER</div><h3>サッカー・フットサル登録</h3><p>チーム登録・選手登録。1チームにつき最大3名（登録責任者と代理2名）がKICKOFFで各種手続きを行えます。不測の事態に備え、登録担当者を複数名登録してください。</p><span class="go">詳しく見る</span></div></a>
-<a class="cd" href="https://www.nagano-fa.or.jp/office_top/entry/coach_entry" rel="noopener" target="_blank"><div class="bd"><div class="lab">COACH</div><h3>指導者登録</h3><p>所定のカリキュラムを受講し、認定試験に合格した指導者は、JFAに指導者登録することによってJFA認定ライセンス（資格）指導者となります。</p><span class="go">詳しく見る</span></div></a>
-<a class="cd" href="https://www.nagano-fa.or.jp/office_top/entry/referee_entry" rel="noopener" target="_blank"><div class="bd"><div class="lab">REFEREE</div><h3>審判登録</h3><p>審判員および審判インストラクターに講習会を受けていただくとともに、それぞれのライセンス（資格）への登録を進めています。</p><span class="go">詳しく見る</span></div></a>
+<a class="cd" href="<?php echo esc_url( nfa_u( 'registration.html' ) ); ?>"><div class="bd"><div class="lab">TEAM / PLAYER</div><h3>サッカー・フットサル登録</h3><p>チーム登録・選手登録。1チームにつき最大3名（登録責任者と代理2名）がKICKOFFで各種手続きを行えます。不測の事態に備え、登録担当者を複数名登録してください。</p><span class="go">詳しく見る</span></div></a>
+<a class="cd" href="<?php echo esc_url( nfa_u( 'registration.html#coach' ) ); ?>"><div class="bd"><div class="lab">COACH</div><h3>指導者登録</h3><p>所定のカリキュラムを受講し、認定試験に合格した指導者は、JFAに指導者登録することによってJFA認定ライセンス（資格）指導者となります。</p><span class="go">詳しく見る</span></div></a>
+<a class="cd" href="<?php echo esc_url( nfa_u( 'registration.html#referee' ) ); ?>"><div class="bd"><div class="lab">REFEREE</div><h3>審判登録</h3><p>審判員および審判インストラクターに講習会を受けていただくとともに、それぞれのライセンス（資格）への登録を進めています。</p><span class="go">詳しく見る</span></div></a>
 </div>
 <ul class="sg-ul">
 <li><span class="nw">2018年度</span>から選手証・監督証は完全電子化されています。サッカー／フットサルのいずれも選手証・監督証は発送されません。</li>
@@ -148,9 +148,9 @@ get_header();
 </div>
 <h3 class="h3j">マニュアル・FAQ</h3>
 <ul class="dl">
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2016/02/kickoff-kyoutu_m2015.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span>利用者共通マニュアル<small>2.8MB</small></a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2016/02/nfa_jfaid_image_manual.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span>JFA ID 本人写真登録操作イメージ【長野県版マニュアル】</a></li>
-<li><a href="https://www.nagano-fa.or.jp/wp-content/uploads/2016/02/referee_m2015.pdf" rel="noopener" target="_blank"><span class="fbtn-i">PDF</span>審判マニュアル<small>2.18MB</small></a></li>
+<li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2016/02/kickoff-kyoutu_m2015.pdf' ); ?>><span class="fbtn-i">PDF</span>利用者共通マニュアル<small>2.8MB</small></a></li>
+<li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2016/02/nfa_jfaid_image_manual.pdf' ); ?>><span class="fbtn-i">PDF</span>JFA ID 本人写真登録操作イメージ【長野県版マニュアル】</a></li>
+<li><a <?php nfa_href( 'https://www.nagano-fa.or.jp/wp-content/uploads/2016/02/referee_m2015.pdf' ); ?>><span class="fbtn-i">PDF</span>審判マニュアル<small>2.18MB</small></a></li>
 <li><a href="https://www.jfa.jp/documents/#l2" rel="noopener" target="_blank"><span class="fbtn-i w">WEB</span>各種申請 ダウンロード（JFA）</a></li>
 <li><a href="https://www.jfa.or.jp/info/inquiry/kickoff/" rel="noopener" target="_blank"><span class="fbtn-i w">WEB</span>JFA FAQ TOP</a></li>
 <li><a href="https://www.jfa.or.jp/info/inquiry/kickoff/jfaid/" rel="noopener" target="_blank"><span class="fbtn-i w">WEB</span>JFA ID FAQ</a></li>
@@ -161,20 +161,20 @@ get_header();
 </ul>
 <div class="contact sg-ct">
 <div><div class="e">CONTACT</div><h3>KICKOFFに関するお問い合わせ</h3><p>KICKOFF・JFA IDに関するお問い合わせの営業時間等は、JFAサイトにてご確認ください。</p></div>
-<div class="ctas"><a class="btn btn-l" href="https://www.jfa.jp/registration/" rel="noopener" target="_blank"><span>JFAサイト（登録）</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
+<div class="ctas"><a class="btn btn-l" href="https://www.jfa.jp/registration/" rel="noopener" target="_blank"><span>JFAサイト（登録）</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
 </div>
 </div></section>
 <!-- NEWS -->
 <section class="blk" id="news"><div class="wrap">
 <div class="bh"><div><div class="e">NEWS</div><h2>講習会のお知らせ</h2></div><a class="more" href="<?php echo esc_url( nfa_u( 'list.html' ) ); ?>">一覧を見る</a></div>
 <ul class="nl">
-<li data-c="event"><a href="https://www.nagano-fa.or.jp/news_top/referee_news/40073" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-event)">審判</span></span><span><span class="mt"><span class="dt">2026.10.13</span></span><h3><span class="nw">2027年度</span>登録 サッカー3級審判インストラクター養成講習会について</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="event"><a href="https://www.nagano-fa.or.jp/news_top/referee_news/39969" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-event)">審判</span></span><span><span class="mt"><span class="dt">2026.10.05</span></span><h3><span class="nw">2027年度</span>登録サッカー・フットサル審判資格（3級・4級）更新講習会【JFAラーニング】について</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="event"><a href="https://www.nagano-fa.or.jp/news_top/referee_news/39823" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-event)">審判</span></span><span><span class="mt"><span class="dt">2026.09.24</span></span><h3><span class="nw">2027年度</span>登録サッカー3級審判員昇級講習会</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="event"><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39546" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">指導者</span></span><span><span class="mt"><span class="dt">2026.09.03</span></span><h3><span class="nw">2026年度</span> ゴールキーパーレベル1ライセンスコーチ養成講習会 長野FAコース 開催について</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
-<li data-c="event"><a href="https://www.nagano-fa.or.jp/news_top/technical_news/39440" rel="noopener" target="_blank"><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/ph-photo.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">指導者</span></span><span><span class="mt"><span class="dt">2026.08.25</span></span><h3><span class="nw">2026年度</span>(公財)日本サッカー協会公認Cライセンスコーチ養成講習会開催要項</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="event"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/referee_news/40073' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-event)">審判</span></span><span><span class="mt"><span class="dt">2026.10.13</span></span><h3><span class="nw">2027年度</span>登録 サッカー3級審判インストラクター養成講習会について</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="event"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/referee_news/39969' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-event)">審判</span></span><span><span class="mt"><span class="dt">2026.10.05</span></span><h3><span class="nw">2027年度</span>登録サッカー・フットサル審判資格（3級・4級）更新講習会【JFAラーニング】について</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="event"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/referee_news/39823' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-event)">審判</span></span><span><span class="mt"><span class="dt">2026.09.24</span></span><h3><span class="nw">2027年度</span>登録サッカー3級審判員昇級講習会</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="event"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/technical_news/39546' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">指導者</span></span><span><span class="mt"><span class="dt">2026.09.03</span></span><h3><span class="nw">2026年度</span> ゴールキーパーレベル1ライセンスコーチ養成講習会 長野FAコース 開催について</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
+<li data-c="event"><a <?php nfa_href( 'https://www.nagano-fa.or.jp/news_top/technical_news/39440' ); ?>><span class="th"><img alt="" loading="lazy" src="<?php echo esc_url( nfa_asset( 'img/thumb-default.jpg' ) ); ?>"/><span class="badge" style="background:var(--tag-info)">指導者</span></span><span><span class="mt"><span class="dt">2026.08.25</span></span><h3><span class="nw">2026年度</span>(公財)日本サッカー協会公認Cライセンスコーチ養成講習会開催要項</h3></span><span aria-hidden="true" class="ar"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></li>
 </ul>
 </div></section>
-<section class="cband"><div class="wrap"><div class="cband-tx"><p class="cband-e">COURSE</p><h2>講習会のご案内</h2><p>審判講習会の正式なご案内は、原則開催日の1か月前までにホームページに掲載します。また、JFA KICKOFFよりメール配信を行います。</p></div><div class="cband-act"><a class="btn btn-g" href="<?php echo esc_url( nfa_u( 'technical.html' ) ); ?>"><span>指導者のページ</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="btn btn-l" href="<?php echo esc_url( nfa_u( 'referee.html' ) ); ?>"><span>審判のページ</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div></div></section>
+<section class="cband"><div class="wrap"><div class="cband-tx"><p class="cband-e">COURSE</p><h2>講習会のご案内</h2><p>審判講習会の正式なご案内は、原則開催日の1か月前までにホームページに掲載します。また、JFA KICKOFFよりメール配信を行います。</p></div><div class="cband-act"><a class="btn btn-g" href="<?php echo esc_url( nfa_u( 'technical.html' ) ); ?>"><span>指導者のページ</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="btn btn-l" href="<?php echo esc_url( nfa_u( 'referee.html' ) ); ?>"><span>審判のページ</span><span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div></div></section>
 <?php
 get_footer();

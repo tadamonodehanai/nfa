@@ -1,6 +1,6 @@
 <?php
 /**
- * 404（デザイン 404.html）。
+ * 404（デザイン 404.html）。scratchpad の conv2.py で生成。
  *
  * @package NFA2026
  */
@@ -14,7 +14,7 @@ get_header();
 <div class="e">PAGE NOT FOUND</div>
 <h1>ページが見つかりません</h1>
 <p>お探しのページは、移動または削除された可能性があります。<br/>サイトのリニューアルにより、以前のアドレスから新しいアドレスに変わったページがあります。</p>
-<form action="<?php echo esc_url( nfa_u( 'search.html' ) ); ?>" class="nf-sbox" role="search">
+<form action="<?php echo esc_url( nfa_u( 'search.html' ) ); ?>" class="nf-sbox" data-demo="" role="search">
 <label class="vh" for="nfq">サイト内を探す</label>
 <input class="inp" id="nfq" placeholder="探している情報を入力" type="search"/>
 <button class="btn btn-g" type="submit">探す</button>

@@ -148,6 +148,30 @@
     $$('video[data-src]').forEach(function(v){ io.observe(v); });
   }
 
+  /* チームを探す：条件のタグと地図の地区を連動 */
+  $$('.sg-find').forEach(function(box){
+    var pills = $$('.sg-pills .pill', box), map = $$('.mp-r', box);
+    function syncMap(){ map.forEach(function(g){ var p = pills.filter(function(x){ return x.textContent.trim() === g.dataset.r; })[0]; g.setAttribute('aria-pressed', p ? p.getAttribute('aria-pressed') : 'false'); }); }
+    pills.forEach(function(p){ p.addEventListener('click', function(){ p.setAttribute('aria-pressed', p.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); syncMap(); }); });
+    map.forEach(function(g){
+      function go(){ var p = pills.filter(function(x){ return x.textContent.trim() === g.dataset.r; })[0]; if (p) p.click(); }
+      g.addEventListener('click', go);
+      g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+    });
+  });
+
+  /* 主要競技場：地図の地区と絞り込みタブを連動 */
+  $$('.fc-top').forEach(function(box){
+    var tabs = $$('.fc-filt [data-f]', box), map = $$('.mp-r', box);
+    function sync(){ var cur = tabs.filter(function(t){ return t.getAttribute('aria-selected') === 'true'; })[0]; map.forEach(function(g){ g.setAttribute('aria-pressed', cur && cur.dataset.r === g.dataset.r ? 'true' : 'false'); }); }
+    tabs.forEach(function(t){ t.addEventListener('click', function(){ setTimeout(sync, 0); }); });
+    map.forEach(function(g){
+      function go(){ var on = g.getAttribute('aria-pressed') === 'true'; var t = on ? tabs[0] : tabs.filter(function(x){ return x.dataset.r === g.dataset.r; })[0]; if (t) t.click(); }
+      g.addEventListener('click', go);
+      g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+    });
+  });
+
   if (!hasST || reduce) return;
 
   /* ---------- ビジョン：全面の映像がスクロールで縮む ---------- */
@@ -162,7 +186,12 @@
         .to({}, {duration:.45});
     };
     mm.add('(min-width:961px)', function(){ vmTl('inset(12% 5% 12% 46%)', 20.5, 0); });
-    mm.add('(max-width:960px)', function(){ vmTl('inset(52% 4% 5% 4%)', 0, 23.5); });
+    mm.add('(max-width:960px)', function(){
+      /* 縮んだ映像が文章に重ならない位置を、文章の高さから決める */
+      var st = $('.vm-sticky'), c = $('#vmCopy');
+      var t = Math.min(76, Math.max(52, Math.ceil((c.offsetTop + c.offsetHeight + 24) / st.clientHeight * 100)));
+      vmTl('inset(' + t + '% 4% 5% 4%)', 0, (t - 5) / 2);
+    });
   }
 
   /* ---------- 下層ヒーロー：画像がスクロールで縮む（参考サイトの縮小ギミック） ---------- */

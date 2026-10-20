@@ -5,6 +5,7 @@
   "plugins": [
     "./wp/wp-content/plugins/nfa-ai-search",
     "./wp/wp-content/plugins/nfa-committee",
+    "./wp/wp-content/plugins/advanced-custom-fields-pro",
     "https://downloads.wordpress.org/plugin/contact-form-7.zip"
   ],
   "themes": [

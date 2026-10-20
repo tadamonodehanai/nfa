@@ -1,6 +1,8 @@
 <?php
 /**
- * 担当委員会（nfa_committee）の12個と、委員会ごとの入力欄（タームメタ）。
+ * 担当委員会（nfa_committee）の13個と、委員会ごとの入力欄（タームメタ）。
+ * 「協会」（association）は委員会ではなく親組織だが、お知らせの発信元（区分）として同じ分類に置く。
+ * 協会のページは「協会について」（固定ページ about）。事務局の担当は協会の記事も書ける。
  *
  * 分類そのものは NFA AI Search が登録する。スラッグはデザイン NFA_site_design のページ名に合わせている
  * （cat-4.html → cat-4）。委員会ページの URL は仮に /committee/{スラッグ}/。
@@ -21,6 +23,9 @@ defined( 'ABSPATH' ) || exit;
 class NFA_Com_Committees {
 
 	const TAX = 'nfa_committee';
+
+	/** 情報発信元としての「協会」 */
+	const ASSOCIATION = 'association';
 
 	const FIELDS = array(
 		'ja'      => '和名',
@@ -75,8 +80,19 @@ class NFA_Com_Committees {
 			'referee'    => array( 'name' => '審判', 'order' => 9, 'target' => 'referee', 'tel' => '0263-50-8330（審判委員会）' ) + $cat( '審判', '', 'REFEREE', 'info', 'https://www.nagano-fa.or.jp/referee_top', '', '審判', 'var(--tag-match)', '審判（審判委員会）の講習会・資格のご案内と、お知らせを掲載しています。' ),
 			'technical'  => array( 'name' => '技術', 'order' => 10, 'target' => 'technical' ) + $cat( '指導者', '', 'COACH', 'info', 'https://www.nagano-fa.or.jp/technical', '', '技術', 'var(--tag-reg)', '指導者（技術委員会）の講習会・資格のご案内と、お知らせを掲載しています。' ),
 			'medical'    => array( 'name' => '医学', 'order' => 11, 'target' => '' ) + $cat( '医学', '', 'MEDICAL', 'info', 'https://www.nagano-fa.or.jp/category/news_top/medical_news', '', '医学', 'var(--alert)', '医学（医学委員会）からのお知らせを掲載しています。' ),
-			'office'     => array( 'name' => '事務局', 'order' => 12, 'target' => '' ) + $cat( '協会', '', 'NFA', 'info', 'https://www.nagano-fa.or.jp/category/news_top/office_news', '', '協会', 'var(--tag-info)', '長野県サッカー協会（事務局）からのお知らせを掲載しています。' ),
+			'association' => array( 'name' => '協会', 'order' => 12, 'target' => '' ) + $cat( '協会', '', 'ABOUT', 'info', 'https://www.nagano-fa.or.jp/category/news_top/office_news', '', '協会', 'var(--tag-info)', '長野県サッカー協会からのお知らせを掲載しています。' ),
+			'office'     => array( 'name' => '事務局', 'order' => 13, 'target' => '' ) + $cat( '事務局', '', 'OFFICE', 'info', '', '', '事務局', 'var(--tag-info)', '長野県サッカー協会 事務局からのお知らせを掲載しています。' ),
 		);
+	}
+
+	/**
+	 * 過去の日程・試合結果：/committee/{スラッグ}/archive/（テーマは get_query_var( 'nfa_archive' ) で見分ける）。
+	 */
+	public static function archive_route() {
+		$base = (string) apply_filters( 'nfa_committee_rewrite_slug', 'committee' );
+		$tax  = get_taxonomy( self::TAX );
+		$var  = $tax && $tax->query_var ? $tax->query_var : self::TAX;
+		add_rewrite_rule( '^' . preg_quote( $base, '#' ) . '/([^/]+)/archive/?$', 'index.php?' . $var . '=$matches[1]&nfa_archive=1', 'top' );
 	}
 
 	public static function definition( $slug ) {
@@ -85,6 +101,8 @@ class NFA_Com_Committees {
 
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'maybe_seed' ), 20 );
+		add_action( 'init', array( __CLASS__, 'archive_route' ), 20 );   // 分類の登録（NFA AI Search）のあと
+		add_filter( 'query_vars', fn( $v ) => array_merge( $v, array( 'nfa_archive' ) ) );
 		add_action( self::TAX . '_edit_form_fields', array( __CLASS__, 'edit_fields' ) );
 		add_action( 'edited_' . self::TAX, array( __CLASS__, 'save_fields' ) );
 	}

@@ -70,6 +70,9 @@ add_filter(
 		if ( is_tax( 'nfa_committee' ) ) {
 			$ja             = (string) nfa_term_meta( get_queried_object(), 'ja' );
 			$parts['title'] = $ja ? $ja : $parts['title'];
+			if ( get_query_var( 'nfa_archive' ) ) {
+				$parts['title'] = '過去の日程・試合結果（' . $parts['title'] . '）';
+			}
 		}
 		$parts['site'] = '長野県サッカー協会（NFA）';
 		unset( $parts['tagline'] );
@@ -85,15 +88,56 @@ add_action(
 		} elseif ( is_singular() && has_excerpt() ) {
 			$desc = wp_strip_all_tags( get_the_excerpt() );
 		}
-		echo '<meta name="description" content="' . esc_attr( wp_html_excerpt( $desc, 120, '…' ) ) . '">' . "\n";
+		$desc  = wp_html_excerpt( $desc, 120, '…' );
+		$title = wp_get_document_title();
+		$image = is_singular() && has_post_thumbnail() ? get_the_post_thumbnail_url( null, 'large' ) : nfa_asset( 'img/ogp.jpg' );
+		echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
+		echo '<link rel="icon" href="' . esc_url( nfa_asset( 'img/favicon.svg' ) ) . '" type="image/svg+xml">' . "\n";
+		echo '<link rel="icon" href="' . esc_url( nfa_asset( 'img/favicon-32.png' ) ) . '" sizes="32x32">' . "\n";
+		echo '<link rel="apple-touch-icon" href="' . esc_url( nfa_asset( 'img/apple-touch-icon.png' ) ) . '">' . "\n";
+		echo '<meta property="og:type" content="' . ( is_front_page() ? 'website' : 'article' ) . '">' . "\n";
+		echo '<meta property="og:site_name" content="長野県サッカー協会（NFA）">' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( $title ) . '">' . "\n";
+		echo '<meta property="og:description" content="' . esc_attr( $desc ) . '">' . "\n";
+		echo '<meta property="og:image" content="' . esc_url( $image ) . '">' . "\n";
+		echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
 	},
 	1
 );
 
-/* ---------- お知らせ一覧：委員会で絞り込み（?c=） ---------- */
+// サイトアイコン（カスタマイザー）を設定していないときは、WordPress のアイコンを出さない（テーマのファビコンを使う）
+add_filter( 'get_site_icon_url', fn( $url ) => $url );
+
+/* ---------- 担当委員会「協会」のページは「協会について」 ---------- */
+add_filter(
+	'term_link',
+	function ( $url, $term ) {
+		return ( 'nfa_committee' === $term->taxonomy && 'association' === $term->slug ) ? nfa_page_url( 'about' ) : $url;
+	},
+	10,
+	2
+);
+
+/* ---------- 過去の日程・試合結果（/committee/{スラッグ}/archive/） ---------- */
+add_filter(
+	'template_include',
+	function ( $template ) {
+		if ( is_tax( 'nfa_committee' ) && get_query_var( 'nfa_archive' ) ) {
+			$t = locate_template( 'taxonomy-nfa_committee-archive.php' );
+			return $t ? $t : $template;
+		}
+		return $template;
+	}
+);
+
+/* ---------- お知らせ一覧：区分（担当委員会 ?c=）とカテゴリー（?type=）の掛け合わせ ---------- */
 function nfa_news_filter() {
 	$f = isset( $_GET['c'] ) ? sanitize_key( wp_unslash( $_GET['c'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	return ( 'cat' === $f || ( $f && term_exists( $f, 'nfa_committee' ) ) ) ? $f : '';
+}
+function nfa_news_type() {
+	$t = isset( $_GET['type'] ) ? sanitize_title( wp_unslash( $_GET['type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	return ( $t && term_exists( $t, 'category' ) ) ? $t : '';
 }
 add_action(
 	'pre_get_posts',
@@ -103,11 +147,19 @@ add_action(
 		}
 		if ( $q->is_home() ) {
 			$q->set( 'posts_per_page', 30 );
-			$f = nfa_news_filter();
+			$f  = nfa_news_filter();
+			$t  = nfa_news_type();
+			$tq = array();
 			if ( 'cat' === $f ) {
-				$q->set( 'tax_query', array( array( 'taxonomy' => 'nfa_committee', 'field' => 'slug', 'terms' => array( 'cat-4', 'cat-3', 'cat-2', 'cat-1', 'cat-w', 'cat-f', 'cat-s' ) ) ) );
+				$tq[] = array( 'taxonomy' => 'nfa_committee', 'field' => 'slug', 'terms' => array( 'cat-4', 'cat-3', 'cat-2', 'cat-1', 'cat-w', 'cat-f', 'cat-s' ) );
 			} elseif ( $f ) {
-				$q->set( 'tax_query', array( array( 'taxonomy' => 'nfa_committee', 'field' => 'slug', 'terms' => $f ) ) );
+				$tq[] = array( 'taxonomy' => 'nfa_committee', 'field' => 'slug', 'terms' => $f );
+			}
+			if ( $t ) {
+				$tq[] = array( 'taxonomy' => 'category', 'field' => 'slug', 'terms' => $t, 'include_children' => true );
+			}
+			if ( $tq ) {
+				$q->set( 'tax_query', array_merge( array( 'relation' => 'AND' ), $tq ) );
 			}
 		}
 		if ( $q->is_tax( 'nfa_committee' ) ) {
@@ -118,4 +170,4 @@ add_action(
 );
 
 /* ---------- AI検索：テーマの画像を「写真なし」の記事に使う ---------- */
-add_filter( 'nfa_ais_placeholder_image', fn() => nfa_asset( 'img/ph-photo.jpg' ) );
+add_filter( 'nfa_ais_placeholder_image', fn() => nfa_asset( 'img/thumb-default.jpg' ) );

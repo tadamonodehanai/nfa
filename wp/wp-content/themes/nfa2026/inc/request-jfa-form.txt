@@ -1,0 +1,38 @@
+<h2 class="rj-h"><span>01</span>依頼者の情報</h2>
+<label><span class="ct-lb">掲載依頼者名<span class="req">必須</span></span>[text* your-name autocomplete:name class:inp]</label>
+<label><span class="ct-lb">電話番号<span class="req">必須</span></span>[tel* tel autocomplete:tel class:inp placeholder "0123-04-5678"]<span class="ct-sm">市外局番から入力してください（携帯電話も可）</span></label>
+<label><span class="ct-lb">メールアドレス<span class="req">必須</span></span>[email* your-email autocomplete:email class:inp]</label>
+<label><span class="ct-lb">所属<span class="req">必須</span></span>[select* shozoku class:inp first_as_label "選択してください" "事務局" "技術" "審判" "施設" "医学" "国体" "規律" "1種社会人" "1種学生" "2種" "3種" "4種" "女子" "フットサル" "シニア" "グラスルーツ"]</label>
+<h2 class="rj-h"><span>02</span>フェスティバルの情報</h2>
+<div class="rj-ttl">
+<span class="ct-lb">タイトル<span class="req">必須</span></span>
+<div class="rj-ttl-r">
+[select* title-kind class:inp first_as_label "選択してください" "キッズサッカー" "レディース/ガールズサッカー" "ファミリーフットサル"]
+<span class="rj-fix">フェスティバル20××長野in</span>
+[text* title-venue class:inp placeholder "会場名を入力してください"]
+</div>
+</div>
+<label><span class="ct-lb">主催<span class="req">必須</span></span>[text* shusai class:inp "一般社団法人長野県サッカー協会"]</label>
+<label><span class="ct-lb">共催<span class="req">必須</span></span>[text* kyosai class:inp placeholder "開催自治体（都道府県・市区町村）等"]</label>
+<label><span class="ct-lb">主管<span class="req">必須</span></span>[text* shukan class:inp placeholder "地区／市区郡町村サッカー協会、または各種の連盟の都道府県組織等"]</label>
+<label><span class="ct-lb">後援<span class="req">必須</span></span>[text* koen class:inp "公益財団法人日本サッカー協会"]</label>
+<label><span class="ct-lb">協力</span>[text kyoryoku class:inp placeholder "チーム名等"]</label>
+<label><span class="ct-lb">開催日程<span class="req">必須</span></span>[text* nittei class:inp placeholder "例：2026年9月22日（火・祝）9:00〜12:00"]</label>
+<label><span class="ct-lb">会場<span class="req">必須</span></span>[text* kaijo class:inp]</label>
+<label><span class="ct-lb">参加者<span class="req">必須</span></span>[text* sankasha class:inp placeholder "対象となる参加者"]</label>
+<label><span class="ct-lb">掲載内容（募集内容など）</span>[textarea naiyo x10 class:inp]</label>
+<h2 class="rj-h"><span>03</span>資料の添付</h2>
+<fieldset class="ct-files">
+<legend class="ct-lb">添付資料</legend>
+<div class="ct-fr"><b>資料1</b><label><span class="ct-sm">名称</span>[text shiryo-01 class:inp]</label>[file file-01 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx|ppt|pptx|ai|psd|txt class:inp class:ct-file]</div>
+<div class="ct-fr"><b>資料2</b><label><span class="ct-sm">名称</span>[text shiryo-02 class:inp]</label>[file file-02 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx|ppt|pptx|ai|psd|txt class:inp class:ct-file]</div>
+<div class="ct-fr"><b>資料3</b><label><span class="ct-sm">名称</span>[text shiryo-03 class:inp]</label>[file file-03 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx|ppt|pptx|ai|psd|txt class:inp class:ct-file]</div>
+<div class="ct-fr"><b>資料4</b><label><span class="ct-sm">名称</span>[text shiryo-04 class:inp]</label>[file file-04 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx|ppt|pptx|ai|psd|txt class:inp class:ct-file]</div>
+<div class="ct-fr"><b>資料5</b><label><span class="ct-sm">名称</span>[text shiryo-05 class:inp]</label>[file file-05 limit:20mb filetypes:gif|png|jpg|jpeg|pdf|xls|xlsx|doc|docx|ppt|pptx|ai|psd|txt class:inp class:ct-file]</div>
+<p class="ct-hint"><b>添付資料・注意事項</b><br>Windows系ファイルを受信できます（ワード、エクセル、パワーポイント、PDF、イラストレーター、フォトショップ、写真：jpeg・jpg・gif・png、テキスト）。添付ファイルは合計20MBまで送信できます。</p>
+</fieldset>
+<div class="ct-agree">
+<p>掲載する文章・写真・資料について、著作権・肖像権・個人情報の取り扱いに問題がないことを確認してください。</p>
+<label class="ct-chk">[acceptance kakunin]著作権、肖像権、個人情報を確認しました[/acceptance]</label>
+</div>
+<div>[submit class:btn class:btn-g class:ct-submit "掲載依頼を送信する"]</div>

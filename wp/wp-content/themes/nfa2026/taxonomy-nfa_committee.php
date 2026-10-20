@@ -6,7 +6,9 @@
  *   full       … 最新の更新・大会・リーグ・お知らせ・過去の結果（cat-1〜4）
  *   tournament … 最新の更新・大会・お知らせ・過去の結果（女子・フットサル・シニア）
  *   info       … 最新のお知らせ・説明（template-parts/committee/{スラッグ}.php があれば）・お知らせ（キッズ・審判・指導者・医学）
+ * 関連ページの欄は template-parts/committee/{スラッグ}-guide.php があれば出す（キッズ・審判・指導者・女子）。
  * 大会・リーグ・最新の更新は「大会・リーグ資料（nfa_doc）」から、お知らせは投稿から自動で並ぶ。
+ * 大会・リーグは最新の年度だけ。前の年度は「過去の日程・試合結果」（/committee/{スラッグ}/archive/）。
  *
  * @package NFA2026
  */
@@ -22,16 +24,16 @@ $ja     = $ja ? $ja : $term->name;
 $tg     = (string) nfa_term_meta( $term, 'tg' );
 $en     = (string) nfa_term_meta( $term, 'en' );
 $lead   = (string) nfa_term_meta( $term, 'lead' );
-$legacy = (string) nfa_term_meta( $term, 'legacy' );
 $upd    = nfa_last_updated( $slug );
 $extra  = locate_template( 'template-parts/committee/' . $slug . '.php' );
+$guide  = locate_template( 'template-parts/committee/' . $slug . '-guide.php' );
 $news   = nfa_news( array( 'committee' => $slug, 'n' => 8 ) );
 
-// 大会・リーグは1年度ずつ出す（既定は最新の年度。?season=2024 で過去の年度。year は WordPress の予約語なので使わない）
-$years = nfa_doc_years( $slug );
-$year  = isset( $_GET['season'] ) ? (int) $_GET['season'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$year  = in_array( $year, $years, true ) ? $year : ( $years[0] ?? 0 );
-$past  = $year && $year !== ( $years[0] ?? 0 );
+// 大会・リーグは最新の年度だけ。前の年度は「過去の日程・試合結果」のページへ
+$years   = nfa_doc_years( $slug );
+$year    = $years[0] ?? 0;
+$past    = array_slice( $years, 1 );
+$arc_url = function_exists( 'nfa_committee_archive_url' ) ? nfa_committee_archive_url( $slug ) : '';
 
 // ページ内メニュー
 $lnav = array( 'sched' => 'info' === $layout ? '最新のお知らせ' : '最新の更新' );
@@ -40,15 +42,25 @@ if ( 'info' !== $layout ) {
 	if ( 'full' === $layout ) {
 		$lnav['league'] = 'リーグ';
 	}
-	$lnav['news']    = 'お知らせ';
-	$lnav['archive'] = '過去の結果';
+	if ( $guide ) {
+		$lnav['guide'] = '関連ページ';
+	}
+	$lnav['news'] = 'お知らせ';
+	if ( $past ) {
+		$lnav['archive'] = '過去の結果';
+	}
 } else {
-	$extra_titles = array( 'grassroots' => array( 'about' => 'グラスルーツについて' ), 'referee' => array( 'about' => '審判員について', 'course' => '講習会・研修' ), 'technical' => array( 'about' => '指導者講習会について', 'license' => 'ライセンス' ) );
-	$lnav         = array_merge( $lnav, $extra_titles[ $slug ] ?? array(), array( 'news' => 'お知らせ' ) );
+	$extra_titles = array(
+		'grassroots' => array( 'about' => 'グラスルーツについて' ),
+		'referee'    => array( 'about' => '審判員について', 'course' => '講習会・研修' ),
+		'technical'  => array( 'about' => '指導者講習会について', 'license' => 'ライセンス' ),
+		'medical'    => array( 'topics' => 'トピック別の情報' ),
+	);
+	$lnav = array_merge( $lnav, $extra_titles[ $slug ] ?? array(), $guide ? array( 'guide' => '関連ページ' ) : array(), array( 'news' => 'お知らせ' ) );
 }
 ?>
 <nav aria-label="パンくず" class="bc wrap"><a href="<?php echo esc_url( nfa_u( 'index.html' ) ); ?>">TOP</a><span aria-hidden="true">›</span><a href="<?php echo esc_url( nfa_u( 'index.html#category' ) ); ?>">カテゴリ・日程</a><span aria-hidden="true">›</span><span aria-current="page"><?php echo esc_html( $ja ); ?></span></nav>
-<section class="pg-hero"><div class="wrap"><div class="pg-ttl"><p class="pg-pre">CATEGORY</p><p aria-hidden="true" class="pg-en"><span class="ln"><span><?php echo esc_html( $en ); ?></span></span></p><h1 class="pg-ja"><?php echo esc_html( $ja ); ?><?php if ( $tg ) : ?><span class="tg"><?php echo esc_html( $tg ); ?></span><?php endif; ?></h1></div><div class="pg-sub"><p><?php echo esc_html( $lead ); ?></p><div class="meta"><?php if ( $upd ) : ?><span>最終更新 <b><?php echo esc_html( $upd ); ?></b></span><?php endif; ?><?php if ( $legacy ) : ?><span><a href="<?php echo esc_url( $legacy ); ?>" rel="noopener" target="_blank">既存サイトの該当ページ ↗</a></span><?php endif; ?></div></div></div></section>
+<section class="pg-hero"><div class="wrap"><div class="pg-ttl"><p class="pg-pre">CATEGORY</p><p aria-hidden="true" class="pg-en"><span class="ln"><span><?php echo esc_html( $en ); ?></span></span></p><h1 class="pg-ja"><?php echo esc_html( $ja ); ?><?php if ( $tg ) : ?><span class="tg"><?php echo esc_html( $tg ); ?></span><?php endif; ?></h1></div><div class="pg-sub"><p><?php echo esc_html( $lead ); ?></p><div class="meta"><?php if ( $upd ) : ?><span>最終更新 <b><?php echo esc_html( $upd ); ?></b></span><?php endif; ?><?php if ( $past && $arc_url ) : ?><span><a href="<?php echo esc_url( $arc_url ); ?>">過去の日程・試合結果 →</a></span><?php endif; ?></div></div></div></section>
 <nav aria-label="ページ内メニュー" class="lnav"><div class="lnav-in"><span class="lnav-lb">CONTENTS</span><ul><?php $no = 0; foreach ( $lnav as $id => $t ) : $no++; ?><li><a href="#<?php echo esc_attr( $id ); ?>"><span class="no"><?php echo esc_html( sprintf( '%02d', $no ) ); ?></span><span class="t"><?php echo esc_html( $t ); ?></span></a></li><?php endforeach; ?></ul></div></nav>
 
 <?php // 01 最新の更新（資料）／最新のお知らせ ?>
@@ -76,7 +88,7 @@ if ( 'info' === $layout ) {
 <?php if ( 'info' !== $layout ) : ?>
 <?php $tournaments = nfa_docs( array( 'committee' => $slug, 'kind' => 'full' === $layout ? 'tournament' : '', 'year' => $year ) ); ?>
 <section class="blk" id="tournament"><div class="wrap">
-<div class="bh"><div><div class="e">TOURNAMENT<?php echo $year ? ' ' . esc_html( $year ) : ''; ?></div><h2><?php echo $year ? esc_html( $year . '年度の' ) : ''; ?>大会</h2></div><?php if ( $past ) : ?><a class="more" href="<?php echo esc_url( get_term_link( $term ) ); ?>#tournament">最新の年度へ</a><?php endif; ?></div>
+<div class="bh"><div><div class="e">TOURNAMENT</div><h2>大会</h2></div></div>
 <?php if ( $tournaments ) : ?>
 <div class="trn-grid"><?php foreach ( $tournaments as $doc ) { echo nfa_trn( $doc ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 <?php else : ?>
@@ -87,7 +99,7 @@ if ( 'info' === $layout ) {
 	<?php if ( 'full' === $layout ) : ?>
 		<?php $leagues = nfa_docs( array( 'committee' => $slug, 'kind' => 'league', 'year' => $year ) ); ?>
 <section class="blk pale" id="league"><div class="wrap">
-<div class="bh"><div><div class="e">LEAGUE<?php echo $year ? ' ' . esc_html( $year ) : ''; ?></div><h2><?php echo $year ? esc_html( $year . '年度の' ) : ''; ?>リーグ</h2></div></div><p class="lead2">日程表・星取表はPDFで掲載しています。「準備中」はまだ掲載されていない資料です。</p>
+<div class="bh"><div><div class="e">LEAGUE</div><h2>リーグ</h2></div></div><p class="lead2">日程表・星取表はPDFで掲載しています。「準備中」はまだ掲載されていない資料です。</p>
 		<?php if ( $leagues ) : ?>
 <div class="acc"><?php foreach ( $leagues as $i => $doc ) { echo nfa_league_acc( $doc, $i ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 		<?php endif; ?>
@@ -110,7 +122,7 @@ if ( 'info' === $layout ) {
 		);
 		?>
 <section class="blk pale" id="course"><div class="wrap">
-<div class="bh"><div><div class="e">COURSE</div><h2>講習会・研修のお知らせ</h2></div><a class="more" href="https://www.nagano-fa.or.jp/referee_top/year" rel="noopener" target="_blank">年間計画（既存サイト）</a></div><p class="lead2">各種講習会の正式な案内は、原則開催日の1か月前までに掲載します。</p><ul class="nl no-th"><?php
+<div class="bh"><div><div class="e">COURSE</div><h2>講習会・研修のお知らせ</h2></div><a class="more" href="<?php echo esc_url( nfa_u( 'referee-schedule.html' ) ); ?>">年間計画</a></div><p class="lead2">各種講習会の正式な案内は、原則開催日の1か月前までに掲載します。</p><ul class="nl no-th"><?php
 		foreach ( $courses as $p ) {
 			list( $label, $color ) = nfa_badge( $p );
 			printf(
@@ -125,6 +137,7 @@ if ( 'info' === $layout ) {
 		?></ul></div></section>
 	<?php endif; ?>
 <?php endif; ?>
+<?php if ( $guide ) { include $guide; } // 関連ページ ?>
 
 <section class="blk" id="news"><div class="wrap">
 <div class="bh"><div><div class="e">NEWS</div><h2><?php echo esc_html( $ja ); ?>のお知らせ</h2></div><a class="more" href="<?php echo esc_url( nfa_news_url( $slug ) ); ?>">一覧を見る</a></div>
@@ -135,25 +148,9 @@ if ( 'info' === $layout ) {
 <?php endif; ?>
 </div></section>
 
-<?php
-// 過去の日程・試合結果：取り込んだ年度（資料がある年度）。なければ委員会の入力欄「過去の結果」のリンク
-$archive = array_filter( array_map( 'trim', explode( "\n", (string) nfa_term_meta( $term, 'archive' ) ) ) );
-if ( 'info' !== $layout && ( count( $years ) > 1 || $archive ) ) :
-	?>
+<?php if ( 'info' !== $layout && $past ) : // 過去の日程・試合結果：前の年度（ページ内の年度の位置へ） ?>
 <section class="blk" id="archive"><div class="wrap">
-<div class="bh"><div><div class="e">ARCHIVE</div><h2>過去の日程・試合結果</h2></div></div><div class="yrs"><?php
-	if ( count( $years ) > 1 ) {
-		foreach ( $years as $i => $y ) {
-			$url = 0 === $i ? get_term_link( $term ) : add_query_arg( 'season', $y, get_term_link( $term ) );
-			printf( '<a href="%s#tournament"%s>%s年度</a>', esc_url( $url ), $y === $year ? ' aria-current="page"' : '', esc_html( $y ) );
-		}
-	} else {
-		foreach ( $archive as $line ) {
-			list( $label, $url ) = array_pad( explode( '|', $line, 2 ), 2, '' );
-			printf( '<a href="%s" rel="noopener" target="_blank">%s</a>', esc_url( $url ), esc_html( $label ) );
-		}
-	}
-	?></div></div></section>
+<div class="bh"><div><div class="e">ARCHIVE</div><h2>過去の日程・試合結果</h2></div></div><div class="yrs"><?php foreach ( $past as $y ) : ?><a href="<?php echo esc_url( $arc_url . '#y' . $y ); ?>"><?php echo esc_html( $y ); ?>年度</a><?php endforeach; ?></div></div></section>
 <?php endif; ?>
 
 <section class="catsec"><div class="wrap">

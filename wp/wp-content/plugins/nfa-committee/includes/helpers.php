@@ -149,8 +149,13 @@ function nfa_flag( $flag, $post = null ) {
 function nfa_sponsors() {
 	$out = array();
 	foreach ( array( 'gold', 'official', 'supporters' ) as $kind ) {
-		$rows         = nfa_field( 'nfa_sponsors_' . $kind, 'option', array( 'name', 'url' ) );
+		$rows         = nfa_field( 'nfa_sponsors_' . $kind, 'option', array( 'name', 'url', 'logo' ) );
 		$out[ $kind ] = array_values( array_filter( (array) $rows, fn( $r ) => ! empty( $r['name'] ) ) );
+		foreach ( $out[ $kind ] as $i => $r ) {
+			$out[ $kind ][ $i ]['logo'] = ! empty( $r['logo'] ) ? (string) wp_get_attachment_image_url( (int) $r['logo'], 'full' ) : '';
+			// デザインのロゴ（seed-sponsors で取り込んだもの）は、ロゴごとの見た目の調整（data-sp）を残す
+			$out[ $kind ][ $i ]['key']  = ! empty( $r['logo'] ) ? (string) get_post_meta( (int) $r['logo'], '_nfa_sponsor_logo', true ) : '';
+		}
 	}
 	if ( ! $out['gold'] && ! $out['official'] && ! $out['supporters'] ) {
 		return NFA_Com_Settings::default_sponsors();
