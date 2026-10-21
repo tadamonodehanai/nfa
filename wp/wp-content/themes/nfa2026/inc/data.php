@@ -113,7 +113,7 @@ function nfa_event_label( $post = null ) {
  * @return WP_Post[]
  */
 function nfa_news( array $args = array() ) {
-	$args = wp_parse_args( $args, array( 'committee' => '', 'n' => 5, 'flag' => '', 'exclude' => array(), 'fresh' => false ) );
+	$args = wp_parse_args( $args, array( 'committee' => '', 'type' => '', 'n' => 5, 'flag' => '', 'exclude' => array(), 'fresh' => false ) );
 	$q    = array(
 		'post_type'           => 'post',
 		'post_status'         => 'publish',
@@ -124,6 +124,11 @@ function nfa_news( array $args = array() ) {
 	);
 	if ( $args['committee'] ) {
 		$q['tax_query'] = array( array( 'taxonomy' => NFA_COMMITTEE_TAX, 'field' => 'slug', 'terms' => (array) $args['committee'] ) ); // phpcs:ignore WordPress.DB.SlowDBQuery
+	}
+	if ( $args['type'] ) {
+		// 投稿のカテゴリー（news-info・action_report など。子カテゴリーも含む）
+		$q['tax_query']   = $q['tax_query'] ?? array();
+		$q['tax_query'][] = array( 'taxonomy' => 'category', 'field' => 'slug', 'terms' => (array) $args['type'], 'include_children' => true );
 	}
 	$today = wp_date( 'Ymd' );
 	$meta  = array();
@@ -175,6 +180,11 @@ function nfa_docs( array $args = array() ) {
 	);
 	if ( $args['committee'] ) {
 		$q['tax_query'] = array( array( 'taxonomy' => NFA_COMMITTEE_TAX, 'field' => 'slug', 'terms' => (array) $args['committee'] ) ); // phpcs:ignore WordPress.DB.SlowDBQuery
+	}
+	if ( $args['type'] ) {
+		// 投稿のカテゴリー（news-info・action_report など。子カテゴリーも含む）
+		$q['tax_query']   = $q['tax_query'] ?? array();
+		$q['tax_query'][] = array( 'taxonomy' => 'category', 'field' => 'slug', 'terms' => (array) $args['type'], 'include_children' => true );
 	}
 	$meta = array();
 	if ( $args['kind'] ) {
@@ -263,6 +273,29 @@ function nfa_last_updated( $committee ) {
 	}
 	rsort( $dates );
 	return $dates[0] ?? '';
+}
+
+/**
+ * TOP の NEWS のタブ。タブを増やす・減らす・名前や中身を変えるときは、ここ（またはフィルター nfa_news_tabs）を直す。
+ *
+ *   キー（英数字）=> [
+ *     'label'     => タブの名前,
+ *     'committee' => 担当委員会のスラッグの配列（空ならすべて）,
+ *     'type'      => 投稿のカテゴリーのスラッグの配列（空ならすべて。例：array( 'action_report' )）,
+ *     'n'         => 出す件数,
+ *   ]
+ * 最初のタブが、開いたときに表示されるタブ。タブごとに最新の記事を読み込むので、どのタブも空になりにくい。
+ */
+function nfa_news_tabs() {
+	$tabs = array(
+		'latest' => array( 'label' => 'すべて', 'committee' => array(), 'n' => 16 ),
+		'info'   => array( 'label' => '協会', 'committee' => array( 'association', 'office' ), 'n' => 8 ),
+		'match'  => array( 'label' => '大会・カテゴリ', 'committee' => array( 'cat-4', 'cat-3', 'cat-2', 'cat-1', 'cat-w', 'cat-f', 'cat-s' ), 'n' => 8 ),
+		'tech'   => array( 'label' => '技術・医学', 'committee' => array( 'technical', 'medical' ), 'n' => 8 ),
+		'ref'    => array( 'label' => '審判', 'committee' => array( 'referee' ), 'n' => 8 ),
+		'kids'   => array( 'label' => 'グラスルーツ', 'committee' => array( 'grassroots' ), 'n' => 8 ),
+	);
+	return apply_filters( 'nfa_news_tabs', $tabs );
 }
 
 /**

@@ -214,20 +214,17 @@ function nfa_legacy_category_url( $legacy_cat ) {
 	$map        = $map ?? require NFA_COM_DIR . 'includes/legacy-map.php';
 	$base       = nfa_legacy_target_url( 'news' );
 	$m          = $map[ $legacy_cat ] ?? null;
+	$build = function ( $c, $t ) use ( $base ) {
+		// テーマの nfa_news_url()（パスの形）があればそれを使う
+		return function_exists( 'nfa_news_url' ) ? nfa_news_url( (string) $c, (string) $t ) : add_query_arg( array_filter( array( 'c' => $c, 'type' => $t ) ), $base );
+	};
 	if ( 'important' === $legacy_cat ) {
-		return add_query_arg( 'type', NFA_Com_Categories::IMPORTANT, $base );
+		return $build( '', NFA_Com_Categories::IMPORTANT );
 	}
 	if ( ! $m ) {
 		return $base;
 	}
-	$args = array();
-	if ( ! empty( $m['committee'] ) ) {
-		$args['c'] = $m['committee'];
-	}
-	if ( ! empty( $m['category'] ) ) {
-		$args['type'] = $m['category'];
-	}
-	return $args ? add_query_arg( $args, $base ) : $base;
+	return $build( $m['committee'] ?? '', $m['category'] ?? '' );
 }
 
 /**

@@ -166,3 +166,16 @@ npx @wordpress/env start
 ## 本番への配置
 
 `wp/wp-content/plugins/nfa-ai-search/` をそのまま本番の `wp-content/plugins/` に置き、管理画面で有効化します。ビルドは不要です。
+
+## アクセス解析（Google アナリティクス 4）
+
+設定の「アクセス解析」をオンにすると（初期値オン）、探索画面から GA4 にイベントを送ります。GA4 のタグ（gtag.js／Google タグマネージャー）は別に埋め込んでください。`window.gtag` があれば `gtag('event', …)`、gtag.js が読み込まれていれば `gtag()` と同じ形で `dataLayer` へ、どちらもなければ（GTM だけのとき） `dataLayer.push({ event: …, … })` で送ります。
+
+| イベント | いつ | パラメータ |
+| --- | --- | --- |
+| `search` | 文を入力して検索したとき | `search_term`（入力文。伏せ字済み・100文字まで） |
+| `ai_search` | 検索のたび（タグで絞り込んだときも） | `search_term` `via`（text／tag） `selected`（選んだタグの言葉） `turn` `target` `purpose` `area` `keyword` `results` `zero_result` `relaxed` `unread` `parser`（rules／claude） |
+| `ai_search_click` | 回答の中の資料・記事を開いたとき | `search_term` `kind`（document／news／guide） `link_url` `link_text` `position` |
+
+- 入力文のメールアドレス・電話番号は伏せ字にしてから送ります（検索ログと同じ）。アドレス欄の `?q=` も伏せ字にして書き換えます。
+- ページで受け取りたいときは、`[data-nfa-ais]` の要素に出る CustomEvent `nfa:analytics`（`detail: { name, params }`）を使えます。

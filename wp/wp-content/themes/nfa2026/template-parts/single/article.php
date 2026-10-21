@@ -34,7 +34,7 @@ $thumb_id = (int) get_post_thumbnail_id( $post );
 $photos   = 'report' === $variant ? array_filter( get_attached_media( 'image', $post ), fn( $a ) => $a->ID !== $thumb_id ) : array();
 $files    = array_filter( get_attached_media( '', $post ), fn( $a ) => 0 !== strpos( $a->post_mime_type, 'image/' ) );
 ?>
-<nav aria-label="パンくず" class="bc wrap"><a href="<?php echo esc_url( nfa_u( 'index.html' ) ); ?>">TOP</a><span aria-hidden="true">›</span><a href="<?php echo esc_url( nfa_news_url() ); ?>">お知らせ</a><span aria-hidden="true">›</span><?php if ( 'important' === $variant ) : ?><a href="<?php echo esc_url( add_query_arg( 'type', 'news-important', nfa_news_url() ) ); ?>">重要</a><span aria-hidden="true">›</span><?php elseif ( $com ) : ?><a href="<?php echo esc_url( $list ); ?>"><?php echo esc_html( $c_badge ); ?></a><span aria-hidden="true">›</span><?php endif; ?><span aria-current="page"><?php the_title(); ?></span></nav>
+<nav aria-label="パンくず" class="bc wrap"><a href="<?php echo esc_url( nfa_u( 'index.html' ) ); ?>">TOP</a><span aria-hidden="true">›</span><a href="<?php echo esc_url( nfa_news_url() ); ?>">お知らせ</a><span aria-hidden="true">›</span><?php if ( 'important' === $variant ) : ?><a href="<?php echo esc_url( nfa_news_url( '', 'news-important' ) ); ?>">重要</a><span aria-hidden="true">›</span><?php elseif ( $com ) : ?><a href="<?php echo esc_url( $list ); ?>"><?php echo esc_html( $c_badge ); ?></a><span aria-hidden="true">›</span><?php endif; ?><span aria-current="page"><?php the_title(); ?></span></nav>
 <section class="blk dt-blk dt-<?php echo esc_attr( $variant ); ?>"><div class="wrap">
 <div class="art">
 <article class="dt-main">
@@ -57,7 +57,7 @@ $files    = array_filter( get_attached_media( '', $post ), fn( $a ) => 0 !== str
 <?php if ( function_exists( 'nfa_ai_search_source_notice' ) ) { nfa_ai_search_source_notice(); } ?>
 <div class="dt-share"><span>SHARE</span><div class="share"><a aria-label="Xで共有" href="https://x.com/intent/post?url=<?php echo esc_attr( $share ); ?>&amp;text=<?php echo esc_attr( $title_e ); ?>" rel="noopener" target="_blank">X</a><a aria-label="Facebookで共有" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo esc_attr( $share ); ?>" rel="noopener" target="_blank">f</a><a aria-label="LINEで送る" href="https://social-plugins.line.me/lineit/share?url=<?php echo esc_attr( $share ); ?>" rel="noopener" target="_blank">LINE</a></div></div>
 <?php if ( $prev ) : ?><nav aria-label="前後の記事" class="pn"><a href="<?php echo esc_url( get_permalink( $prev ) ); ?>"><small>PREV</small><?php echo esc_html( get_the_title( $prev ) ); ?></a><span></span></nav><?php endif; ?>
-<div class="dt-back"><a class="btn btn-o" href="<?php echo esc_url( 'important' === $variant ? add_query_arg( 'type', 'news-important', nfa_news_url() ) : $list ); ?>"><?php echo esc_html( ( 'important' === $variant ? '重要' : ( $com ? $c_badge : '' ) ) . 'のお知らせ一覧へ' ); ?><?php echo $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a></div>
+<div class="dt-back"><a class="btn btn-o" href="<?php echo esc_url( 'important' === $variant ? nfa_news_url( '', 'news-important' ) : $list ); ?>"><?php echo esc_html( ( 'important' === $variant ? '重要' : ( $com ? $c_badge : '' ) ) . 'のお知らせ一覧へ' ); ?><?php echo $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a></div>
 </article>
 <aside aria-label="関連情報" class="side">
 <?php if ( $com ) : ?>

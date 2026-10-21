@@ -23,6 +23,9 @@ class NFA_AIS_Frontend {
 		// ブロックテーマはテンプレート（＝ショートコード）を wp_head より前に描画するので、init で登録しておく。
 		add_action( 'init', array( __CLASS__, 'register_assets' ) );
 		add_action( 'save_post_page', array( __CLASS__, 'remember_search_page' ), 10, 2 );
+		// 探索画面の ?q= をアクセス解析より先に URL から外す（テーマがタグの前で nfa_before_analytics を呼ぶ。なければ wp_head の最初）
+		add_action( 'nfa_before_analytics', array( __CLASS__, 'strip_query_script' ) );
+		add_action( 'wp_head', array( __CLASS__, 'strip_query_script' ), 0 );
 	}
 
 	public static function register_assets() {
@@ -38,6 +41,25 @@ class NFA_AIS_Frontend {
 		if ( 'publish' === $post->post_status && has_shortcode( $post->post_content, 'nfa_ai_search' ) ) {
 			update_option( self::PAGE_OPTION, $post_id, false );
 		}
+	}
+
+	/**
+	 * 探索画面を ?q=入力文 で開いたとき、入力文を URL から外して履歴の情報（history.state）に移す。
+	 * アクセス解析のタグ（GA など）がページの URL（page_location）を読む前に動かすので、入力文が URL として記録されない。
+	 * 画面（nfa-ai-search.js）は history.state から入力文を受け取って会話を始める。
+	 */
+	public static function strip_query_script() {
+		static $done = false;
+		if ( $done || ! is_page() ) {
+			return;
+		}
+		$id = (int) get_option( self::PAGE_OPTION );
+		$p  = get_queried_object();
+		if ( ! $p || ( $id ? (int) $p->ID !== $id : ! has_shortcode( (string) $p->post_content, 'nfa_ai_search' ) ) ) {
+			return;
+		}
+		$done = true;
+		echo "<script>(function(){try{var u=new URL(location.href),q=u.searchParams.get('q');if(q===null)return;u.searchParams.delete('q');history.replaceState({nfaAisQ:q},'',u.pathname+u.search+u.hash);}catch(e){}})();</script>\n";
 	}
 
 	public static function search_page_url() {
@@ -97,6 +119,7 @@ class NFA_AIS_Frontend {
 				'register' => $grow . '#register',
 			),
 			'placeholder' => apply_filters( 'nfa_ais_placeholder_image', NFA_AIS_URL . 'assets/ph-photo.jpg' ),
+			'analytics'   => (bool) NFA_AIS_Settings::value( 'analytics' ),
 		);
 
 		ob_start();

@@ -18,7 +18,7 @@ get_header();
 <section class="blk"><div class="wrap">
 <?php if ( have_posts() ) : ?>
 <ul class="nl"><?php while ( have_posts() ) : the_post(); echo nfa_news_li( get_post() ); endwhile; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></ul>
-<?php the_posts_pagination(); ?>
+<?php echo nfa_pager(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 <?php else : ?>
 <p class="lead2">該当する情報はありません。</p>
 <?php endif; ?>

@@ -148,8 +148,7 @@ foreach ( $pick as $p ) :
 <div class="wrap">
 <div class="sh"><div class="e">NEWS</div><span class="j">お知らせ</span></div>
 <?php $alert = nfa_important_post(); if ( $alert ) : ?><a class="alert" href="<?php echo esc_url( nfa_post_url( $alert ) ); ?>"><b>重要なお知らせ</b><span><?php echo esc_html( get_the_title( $alert ) ); ?></span></a><?php endif; ?>
-<div aria-label="ニュースの種類" class="tabs" data-filter="ngrid" role="tablist"><button aria-selected="true" data-f="all" role="tab">すべて</button><button aria-selected="false" data-f="info" role="tab">協会</button><button aria-selected="false" data-f="match" role="tab">大会・カテゴリ</button><button aria-selected="false" data-f="tech" role="tab">技術・医学</button><button aria-selected="false" data-f="ref" role="tab">審判</button><button aria-selected="false" data-f="kids" role="tab">グラスルーツ</button></div>
-<div class="ngrid" id="ngrid"><?php foreach ( nfa_news( array( 'n' => 16, 'fresh' => true ) ) as $p ) { echo nfa_nc( $p ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+<?php echo nfa_news_tabs_html(); // タブと中身は nfa_news_tabs()（inc/data.php） phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 <div class="center"><a class="btn btn-o" href="<?php echo esc_url( nfa_u( 'list.html' ) ); ?>">お知らせ・大会情報をすべて見る<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
 </div>
 </section>
@@ -162,7 +161,7 @@ foreach ( $pick as $p ) :
 $reports = get_posts( array( 'post_type' => 'post', 'posts_per_page' => 3, 'category_name' => 'action_report', 'ignore_sticky_posts' => true ) );
 foreach ( $reports as $p ) :
 	?><a class="cc" href="<?php echo esc_url( nfa_post_url( $p ) ); ?>"><div class="th"><img alt="" src="<?php echo esc_url( nfa_thumb( $p ) ); ?>"/></div><div class="bd"><div class="cat"><?php echo esc_html( nfa_badge( $p )[0] ); ?></div><h3><?php echo esc_html( get_the_title( $p ) ); ?></h3><div class="dt"><?php echo esc_html( get_the_date( 'Y.m.d', $p ) ); ?></div></div></a><?php endforeach; ?></div>
-<div class="center"><a class="btn btn-o" href="<?php echo esc_url( add_query_arg( 'type', 'action_report', nfa_news_url() ) ); ?>">お知らせ・活動報告をすべて見る<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
+<div class="center"><a class="btn btn-o" href="<?php echo esc_url( nfa_news_url( '', 'action_report' ) ); ?>">お知らせ・活動報告をすべて見る<span aria-hidden="true" class="arr"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
 </div>
 </section>
 <!-- F: PARTNERSHIP -->

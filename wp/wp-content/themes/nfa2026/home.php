@@ -3,8 +3,9 @@
  * お知らせ一覧（デザイン list.html）。表示設定の「投稿ページ」に割り当てた固定ページで表示される。
  *
  * 絞り込みは2段で、掛け合わせられる（どちらも URL のクエリ。サーバー側で絞り込んでページ送りする）。
- *   区分     ?c=    担当委員会のスラッグ（association＝協会、technical、cat-3 …）
- *   カテゴリー ?type= 投稿のカテゴリー（news-info＝お知らせ・募集、news-important、action_report＝活動報告）
+ *   区分       …/committee/{担当委員会のスラッグ}/（association＝協会、technical、cat-3 …）
+ *   カテゴリー /news/news-info/ ・ /news/news-important/ ・ /action_report/（投稿のカテゴリー）
+ *   URL の形は inc/urls.php の nfa_news_url()。古い ?c= ?type= はパスの形へ転送する（functions.php）。
  *
  * @package NFA2026
  */
@@ -30,10 +31,7 @@ $areas = array(
 $types = array( '' => 'すべて' ) + ( class_exists( 'NFA_Com_Categories' ) ? NFA_Com_Categories::filters() : array() );
 $cur_c = nfa_news_filter();
 $cur_t = nfa_news_type();
-$link  = function ( $c, $t ) {
-	$args = array_filter( array( 'c' => $c, 'type' => $t ) );
-	return add_query_arg( $args, nfa_news_url() );
-};
+$link  = fn( $c, $t ) => nfa_news_url( $c, $t );   // パスの形（/news/news-info/committee/referee/）
 global $wp_query;
 $total = (int) wp_count_posts( 'post' )->publish;
 ?>
@@ -53,12 +51,7 @@ $total = (int) wp_count_posts( 'post' )->publish;
 <p class="lead2">この条件に当てはまるお知らせはありません。</p>
 <?php endif; ?>
 </div>
-<?php
-$pages = paginate_links( array( 'type' => 'array', 'prev_text' => '前へ', 'next_text' => '次へ', 'mid_size' => 1 ) );
-if ( $pages ) :
-	?>
-<nav class="center pager" aria-label="ページ送り"><?php echo implode( ' ', $pages ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></nav>
-<?php endif; ?>
+<?php echo nfa_pager(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div></section>
 <?php
 get_footer();

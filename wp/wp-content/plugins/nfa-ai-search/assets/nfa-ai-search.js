@@ -42,6 +42,53 @@
     });
   }
 
+  /* ---------- アクセス解析（Google アナリティクス 4） ----------
+     タグの埋め込み方（gtag.js か Google タグマネージャーか）に関係なく送れるよう、
+     window.gtag があれば gtag('event', …)、gtag.js が読み込まれていれば gtag() と同じ形で dataLayer へ、
+     どちらもなければ（GTM だけのとき）dataLayer.push({ event: …, … }) で送る。
+     GTM で受けるときは「カスタムイベント」トリガー（イベント名 search / ai_search / ai_search_click）と、
+     データレイヤー変数（search_term など）で GA4 イベントタグに渡す。
+     あわせて、ページ側で使えるよう app に CustomEvent 'nfa:analytics'（detail: {name, params}）を出す。
+     入力文はサーバーの検索ログと同じく、メールアドレス・電話番号を伏せ字にしてから送る。 */
+  function maskPersonal(s) {
+    return String(s || '')
+      .replace(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g, '［メール］')
+      .replace(/(?:[0-9０-９][\-－ー\s]?){9,12}[0-9０-９]/g, '［電話番号］');
+  }
+  function gaText(s) { s = maskPersonal(s).trim(); return s.length > 100 ? s.slice(0, 100) : s; }   // GA4 のパラメータは100文字まで
+  // gtag.js（GA4 のタグ）がページにあるか。最適化系のプラグインがタグの <script> を包むと window.gtag が見えないことがあるので、読み込みの <script src> でも見る
+  function hasGtagJs() { return !!document.querySelector('script[src*="googletagmanager.com/gtag/js"]'); }
+  function track(name, params) {
+    if (!CFG.analytics) return;
+    try {
+      window.dataLayer = window.dataLayer || [];
+      if (typeof window.gtag === 'function') window.gtag('event', name, params);
+      else if (hasGtagJs()) { (function () { window.dataLayer.push(arguments); })('event', name, params); }   // gtag() と同じ形（gtag.js が受け取る）
+      else { var o = { event: name }; for (var k in params) o[k] = params[k]; window.dataLayer.push(o); }   // Google タグマネージャー（カスタムイベント）
+      app.dispatchEvent(new CustomEvent('nfa:analytics', { detail: { name: name, params: params } }));
+    } catch (e) { /* 解析が失敗しても検索は止めない */ }
+  }
+  var lastTerm = '';   // いちばん最近に入力された文（タグで絞り込んだあとも、クリックに付けて送る）
+  function trackTurn(res, via, raw, tag) {
+    var c = res.c || {}, n = res.total || 0;
+    if (via === 'text' && raw) { lastTerm = gaText(raw); track('search', { search_term: lastTerm }); }
+    track('ai_search', {
+      search_term: lastTerm,
+      via: via === 'text' ? 'text' : 'tag',
+      selected: tag || '',                                    // タグで選んだときの、その言葉（「#審判」など）
+      turn: turns.length,                                     // 会話の何回目か
+      target: (c.t || []).map(function (v) { return label('t', v); }).join('・'),
+      purpose: (c.p || []).map(function (v) { return label('p', v); }).join('・'),
+      area: (c.r || []).map(function (v) { return label('r', v); }).join('・'),
+      keyword: c.kw || '',
+      results: n,
+      zero_result: n === 0 ? 'yes' : 'no',
+      relaxed: res.relaxed ? label(res.relaxed, (res.c[res.relaxed] || [])[0]) : '',
+      unread: res.unread ? 'yes' : 'no',                       // 読み取れなかった
+      parser: res.parser || ''                                // rules（辞書）| claude
+    });
+  }
+
   /* ---------- 回答文を組み立てる（search.js の compose と同じ。段階3で Claude の回答文に置き換える） ---------- */
   function who(st) { return st.t.length ? st.t.map(function (v) { return SHORT[v] || label('t', v); }).join('・') : ''; }
   function groups(docs) {
@@ -256,6 +303,7 @@
       N = res.counts; TOTAL = res.total;
       var r = reply(prev, res, raw);
       turns.push({ you: you, msg: r.msg, docs: r.docs, rows: r.rows, lead: r.lead, res: res });
+      trackTurn(res, via, raw, via === 'text' ? '' : you);
     }).catch(function (e) {
       turns.push({ you: you, msg: '<p>' + esc(e.status === 429 ? e.message : 'うまくつながりませんでした。少し時間をおいて、もう一度お試しください。') + '</p>', docs: [], rows: [] });
     }).then(function () {
@@ -266,7 +314,8 @@
   function say(text, fresh) {
     text = (text || '').trim(); if (!text) return;
     if (fresh) { C = { t: [], p: [], r: [], join: false, kw: '' }; turns = []; }
-    try { history.replaceState(null, '', location.pathname + '?q=' + encodeURIComponent(turns.length ? turns[0].you : text)); } catch (e) {}
+    // 入力文はアドレス欄（GA の page_location にも入る）には出さず、履歴の情報に残す（「戻る」で会話を始め直せるように）
+    try { history.replaceState({ nfaAisQ: turns.length ? turns[0].you : text }, '', location.pathname + location.hash); } catch (e) {}
     ask(text, 'text', snap(), text, text);
   }
   function pick(ax, v, mode) {
@@ -280,7 +329,7 @@
   function welcome() {   // 入口（チャット投稿フォーム）に戻す
     C = { t: [], p: [], r: [], join: false, kw: '' };
     turns = [];
-    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
     draw(false);
   }
   /* 条件パネルの件数だけを先に読み込む（会話には何も足さない） */
@@ -305,6 +354,19 @@
     var s1 = e.target.closest('[data-say]'); if (s1) { say(s1.getAttribute('data-say'), !turns.length); return; }
     var t = e.target.closest('.sr-pick[data-ax], .sr-tag[data-ax]'); if (t) { pick(t.getAttribute('data-ax'), t.getAttribute('data-v'), t.getAttribute('data-mode') || 'add'); return; }
     var a = e.target.closest('[data-all]'); if (a) expandAll();
+    // 回答の中の資料・記事を開いた
+    var link = e.target.closest('.sr-nfa a[href]');
+    if (link) {
+      var bub = link.closest('.sr-bub'), all = bub ? $$('.sr-card a[href], .sr-lists a[href]', bub) : [], pos = all.indexOf(link);
+      var inList = !!link.closest('.sr-card, .sr-lists');
+      track('ai_search_click', {
+        search_term: lastTerm,
+        kind: !inList ? 'guide' : (link.closest('.sr-dl') || /\.(pdf|xlsx?|docx?)(\?|$)/i.test(link.href) ? 'document' : 'news'),
+        link_url: link.href.slice(0, 100),
+        link_text: (link.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 100),
+        position: pos > -1 ? pos + 1 : 0                      // 回答の中の何番目か（1＝いちばん近い資料・記事のカード）
+      });
+    }
   });
   function expandAll() {
     var t = turns[turns.length - 1], pdfs = t.docs.filter(function (d) { return d.k === 'pdf'; }), news = t.docs.filter(function (d) { return d.k === 'news'; });
@@ -314,8 +376,10 @@
     thread.lastElementChild.querySelector('.sr-lists').innerHTML = h;
   }
 
-  // 起動：?q= があればその質問から会話を始める。なければ入口を出し、条件パネルの件数だけ読み込む
-  var q0 = new URLSearchParams(location.search).get('q');
+  // 起動：入力文（?q=）があればその質問から会話を始める。なければ入口を出し、条件パネルの件数だけ読み込む
+  // 入力文：head で URL から外して履歴の情報に移したもの（class-frontend.php）。なければ ?q=
+  var q0 = (history.state && history.state.nfaAisQ) || new URLSearchParams(location.search).get('q');
+  if (new URLSearchParams(location.search).has('q')) { try { history.replaceState({ nfaAisQ: q0 }, '', location.pathname + location.hash); } catch (e) {} }
   welcome();
   if (q0) { say(q0.slice(0, 200), false); setTimeout(toThread, 400); } else { loadCounts(); }
 })();

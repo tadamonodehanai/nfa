@@ -29,6 +29,30 @@ add_action(
 	}
 );
 
+/* ---------- アクセス解析のタグ（template-parts/analytics.php）を読み込むか ----------
+ * 本番だけ。開発環境（wp-env の localhost・WP_ENVIRONMENT_TYPE が local／development／staging）では読み込まない。
+ * 管理画面にログイン中の人も読み込まない（制作・更新の作業を数えないため）。変えるときはフィルター nfa_analytics_off_reason（'' を返すと読み込む）。
+ */
+function nfa_analytics_enabled() {
+	return '' === nfa_analytics_off_reason();
+}
+
+/**
+ * アクセス解析のタグを出さない理由（出すときは ''）。出さないときは、ページのソースにこの理由をコメントで残す。
+ */
+function nfa_analytics_off_reason() {
+	if ( 'production' !== wp_get_environment_type() ) {
+		$reason = '本番の環境ではないため（WP_ENVIRONMENT_TYPE＝' . wp_get_environment_type() . '）';
+	} elseif ( in_array( wp_parse_url( home_url(), PHP_URL_HOST ), array( 'localhost', '127.0.0.1' ), true ) ) {
+		$reason = '開発環境（localhost）のため';
+	} elseif ( is_user_logged_in() ) {
+		$reason = 'ログイン中のため（ログアウトするか、プライベートウィンドウで確認してください）';
+	} else {
+		$reason = '';
+	}
+	return (string) apply_filters( 'nfa_analytics_off_reason', $reason );
+}
+
 /* ---------- CSS・JS ---------- */
 add_action(
 	'wp_enqueue_scripts',
@@ -67,6 +91,21 @@ add_filter(
 	function ( $parts ) {
 		if ( is_front_page() ) {
 			return array( 'title' => '長野県サッカー協会（NFA）' );
+		}
+		if ( is_home() ) {
+			// 絞り込んだ一覧は「お知らせ（審判・活動報告）」のように（GA のページタイトルでも見分けられるよう）
+			$names = array();
+			$c     = nfa_news_filter();
+			$t     = nfa_news_type();
+			if ( $c && ( $term = get_term_by( 'slug', $c, 'nfa_committee' ) ) ) {
+				$names[] = (string) nfa_term_meta( $term, 'badge' ) ?: $term->name;
+			}
+			if ( $t && ( $term = get_term_by( 'slug', $t, 'category' ) ) ) {
+				$names[] = $term->name;
+			}
+			if ( $names ) {
+				$parts['title'] .= '（' . implode( '・', $names ) . '）';
+			}
 		}
 		if ( is_tax( 'nfa_committee' ) ) {
 			$ja             = (string) nfa_term_meta( get_queried_object(), 'ja' );
@@ -109,6 +148,40 @@ add_action(
 // サイトアイコン（カスタマイザー）を設定していないときは、WordPress のアイコンを出さない（テーマのファビコンを使う）
 add_filter( 'get_site_icon_url', fn( $url ) => $url );
 
+/* ---------- フォームの送信完了ページ（フォームの固定ページの子ページ complete） ----------
+ * 送信が済んだら（Contact Form 7 の wpcf7mailsent）、そのページの子ページ「complete」へ移る。
+ * 完了ページがなければ、Contact Form 7 の「送信しました」の表示のまま。
+ */
+add_action(
+	'wp_footer',
+	function () {
+		if ( ! is_page() ) {
+			return;
+		}
+		$page = get_queried_object();
+		$done = get_page_by_path( get_page_uri( $page ) . '/complete' );
+		if ( ! $done || 'publish' !== $done->post_status ) {
+			return;
+		}
+		printf(
+			"<script>document.addEventListener('wpcf7mailsent',function(){location.href=%s;});</script>\n",
+			wp_json_encode( get_permalink( $done ) )
+		);
+	},
+	50
+);
+// 完了ページは検索エンジンに載せない
+add_filter(
+	'wp_robots',
+	function ( $robots ) {
+		if ( is_page() && 'complete' === get_queried_object()->post_name ) {
+			$robots['noindex'] = true;
+			$robots['follow']  = true;
+		}
+		return $robots;
+	}
+);
+
 /* ---------- Contact Form 7：フォームの記述（inc/*-form.txt）に段落を自動で付けない（デザインの並びが崩れるため） ---------- */
 add_filter( 'wpcf7_autop_or_not', '__return_false' );
 
@@ -120,6 +193,28 @@ add_filter(
 	},
 	10,
 	2
+);
+
+/* ---------- お知らせ一覧のパスの形へ転送 ----------
+ * ・カテゴリーのページ（/category/news/news-info/）→ /news/news-info/
+ * ・古い形（/news/?c=referee&type=action_report）→ /action_report/committee/referee/
+ */
+add_action(
+	'template_redirect',
+	function () {
+		if ( is_feed() ) {
+			return;
+		}
+		$query = is_home() && ( isset( $_GET['c'] ) || isset( $_GET['type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! is_category() && ! $query ) {
+			return;
+		}
+		$type = is_category() ? get_queried_object()->slug : nfa_news_type();
+		$url  = nfa_news_url( nfa_news_filter(), $type );
+		$page = (int) get_query_var( 'paged' );
+		wp_safe_redirect( $page > 1 ? trailingslashit( $url ) . 'page/' . $page . '/' : $url, 301 );
+		exit;
+	}
 );
 
 /* ---------- 過去の日程・試合結果（/committee/{スラッグ}/archive/） ---------- */
@@ -135,14 +230,58 @@ add_filter(
 );
 
 /* ---------- お知らせ一覧：区分（担当委員会 ?c=）とカテゴリー（?type=）の掛け合わせ ---------- */
+// 区分・カテゴリーは URL のパス（/news/news-info/committee/referee/）から。古い ?c= ?type= も読む（パスの形へ転送する）
 function nfa_news_filter() {
-	$f = isset( $_GET['c'] ) ? sanitize_key( wp_unslash( $_GET['c'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$f = (string) get_query_var( 'nfa_c' );
+	$f = $f ? $f : ( isset( $_GET['c'] ) ? wp_unslash( $_GET['c'] ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$f = sanitize_key( $f );
 	return ( 'cat' === $f || ( $f && term_exists( $f, 'nfa_committee' ) ) ) ? $f : '';
 }
 function nfa_news_type() {
-	$t = isset( $_GET['type'] ) ? sanitize_title( wp_unslash( $_GET['type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$t = (string) get_query_var( 'nfa_type' );
+	$t = $t ? $t : ( isset( $_GET['type'] ) ? wp_unslash( $_GET['type'] ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$t = sanitize_title( $t );
 	return ( $t && term_exists( $t, 'category' ) ) ? $t : '';
 }
+
+/**
+ * お知らせ一覧の絞り込みのパス（inc/urls.php の nfa_news_url() の形）を読む書き換えルール。
+ * カテゴリーごとにルールを作るので、カテゴリーを追加・変更したらルールを作り直す。
+ */
+function nfa_news_rewrite() {
+	$posts_page = (int) get_option( 'page_for_posts' );
+	if ( ! $posts_page ) {
+		return;
+	}
+	$base = get_post_field( 'post_name', $posts_page );
+	$to   = 'index.php?page_id=' . $posts_page;
+	$tail = '(?:/committee/([^/]+))?(?:/page/([0-9]+))?/?$';
+	add_rewrite_rule( '^' . preg_quote( $base, '#' ) . '/committee/([^/]+)(?:/page/([0-9]+))?/?$', $to . '&nfa_c=$matches[1]&paged=$matches[2]', 'top' );
+	foreach ( get_terms( array( 'taxonomy' => 'category', 'hide_empty' => false ) ) as $t ) {
+		$path = nfa_category_path( $t->slug );
+		if ( '' === $path || 'uncategorized' === $t->slug ) {
+			continue;
+		}
+		add_rewrite_rule( '^' . preg_quote( $path, '#' ) . $tail, $to . '&nfa_type=' . $t->slug . '&nfa_c=$matches[1]&paged=$matches[2]', 'top' );
+	}
+}
+add_action( 'init', 'nfa_news_rewrite' );
+add_filter( 'query_vars', fn( $v ) => array_merge( $v, array( 'nfa_c', 'nfa_type' ) ) );
+foreach ( array( 'created_category', 'edited_category', 'delete_category' ) as $hook ) {
+	add_action( $hook, fn() => update_option( 'nfa_news_rewrite_dirty', 1 ) );
+}
+add_action(
+	'init',
+	function () {
+		if ( get_option( 'nfa_news_rewrite_dirty' ) ) {
+			delete_option( 'nfa_news_rewrite_dirty' );
+			flush_rewrite_rules( false );
+		}
+	},
+	99
+);
+// 絞り込みのパスで開いたときに、WordPress が /news/ へ戻す転送をしない
+add_filter( 'redirect_canonical', fn( $url ) => ( get_query_var( 'nfa_c' ) || get_query_var( 'nfa_type' ) ) ? false : $url );
 add_action(
 	'pre_get_posts',
 	function ( $q ) {

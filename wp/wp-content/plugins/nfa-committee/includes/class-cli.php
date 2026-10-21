@@ -116,6 +116,12 @@ class NFA_Com_CLI {
 					wp_update_post( array( 'ID' => $page->ID, 'post_content' => sprintf( '[contact-form-7 id="%d" title="%s" html_class="%s"]', $form_id, $title, $class ) ) );
 					WP_CLI::log( '固定ページ「' . $page->post_title . '」の本文にフォーム「' . $title . '」を入れました。' );
 				}
+				// 送信完了ページ（子ページ complete。送信が済むとテーマがここへ移す）
+				if ( $page && ! get_page_by_path( $slug . '/complete' ) ) {
+					$done = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_parent' => $page->ID, 'post_name' => 'complete', 'post_title' => $page->post_title . ' 送信完了' ) );
+					update_post_meta( $done, '_nfa_ais_exclude', true );
+					WP_CLI::log( '送信完了ページを作成：/' . $slug . '/complete/' );
+				}
 			}
 		}
 		flush_rewrite_rules();

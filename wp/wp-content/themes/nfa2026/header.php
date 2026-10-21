@@ -7,6 +7,8 @@
 ?><!doctype html>
 <html <?php language_attributes(); ?> data-video-base="<?php echo esc_url( nfa_asset( 'video/' ) ); ?>" data-search-url="<?php echo esc_url( nfa_u( 'search.html' ) ); ?>">
 <head>
+<?php do_action( 'nfa_before_analytics' ); // アクセス解析のタグより先に動かすもの（AI検索：URL の入力文を外す） ?>
+<?php get_template_part( 'template-parts/analytics' ); // アクセス解析のタグ（貼る場所は template-parts/analytics.php） ?>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <?php wp_head(); ?>

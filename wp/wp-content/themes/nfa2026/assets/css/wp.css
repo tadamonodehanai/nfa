@@ -20,3 +20,10 @@
 .form .ct-chk .wpcf7-acceptance,
 .form .ct-chk .wpcf7-list-item,
 .form .ct-chk .wpcf7-list-item > label{display:contents}
+
+/* 絞り込み（main.js の [data-filter]）で隠したもの：.nc などは display が指定されていて hidden だけでは消えないので */
+[data-c][hidden]{display:none !important}
+
+/* フォームの送信完了ページ（page-complete.php）：404 と同じ大きな見出しの組み方を使い、文字数に合わせて小さく */
+.nf-complete .nf-code{font-size:clamp(56px,12vw,150px)}
+.nf-complete .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}

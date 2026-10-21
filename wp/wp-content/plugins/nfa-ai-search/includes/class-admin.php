@@ -94,6 +94,13 @@ class NFA_AIS_Admin {
 					<td><input id="nfa-cap" type="number" min="0" name="<?php echo esc_attr( $name ); ?>[daily_ai_cap]" value="<?php echo esc_attr( $s['daily_ai_cap'] ); ?>"> 回 <p class="description">超えた日は、AIを使わない解釈に自動で切り替えます。</p></td>
 				</tr>
 				<tr>
+					<th scope="row">アクセス解析</th>
+					<td>
+						<label><input type="checkbox" name="<?php echo esc_attr( $name ); ?>[analytics]" value="1" <?php checked( $s['analytics'] ); ?>> 検索の内容を Google アナリティクス 4 にイベントとして送る</label>
+						<p class="description">イベント：<code>search</code>（search_term＝入力文）・<code>ai_search</code>（読み取った条件・件数）・<code>ai_search_click</code>（開いた資料・記事）。入力文のメールアドレス・電話番号は伏せ字にして送ります。<br>GA4 のタグ（gtag.js または Google タグマネージャー）はテーマなどで別に埋め込んでください。タグがないページでは何も送りません。</p>
+					</td>
+				</tr>
+				<tr>
 					<th scope="row"><label for="nfa-rate">回数制限（1分・IPごと）</label></th>
 					<td><input id="nfa-rate" type="number" min="1" name="<?php echo esc_attr( $name ); ?>[rate_per_min]" value="<?php echo esc_attr( $s['rate_per_min'] ); ?>"> 回</td>
 				</tr>

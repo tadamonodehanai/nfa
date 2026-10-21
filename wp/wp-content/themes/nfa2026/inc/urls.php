@@ -41,12 +41,48 @@ function nfa_committee_url( $slug ) {
 }
 
 /**
- * お知らせ一覧の URL（委員会で絞り込むときは $committee にスラッグ）。
+ * お知らせ一覧の URL。絞り込みもパスで表す（GA などでページとして数えられるように）。
+ *
+ *   すべて                 /news/
+ *   カテゴリー             /news/news-info/ ・ /action_report/（記事の URL /%category%/%post_id%/ と同じ並び）
+ *   区分（担当委員会）     /news/committee/referee/
+ *   カテゴリー × 区分     /news/news-info/committee/referee/
+ *   ページ送りは後ろに /page/2/（paginate_links が付ける）
+ * パスの読み取りは functions.php の nfa_news_rewrite()。
+ *
+ * @param string $committee 担当委員会のスラッグ（'' ならすべて）
+ * @param string $type      投稿のカテゴリーのスラッグ（'' ならすべて）
  */
-function nfa_news_url( $committee = '' ) {
-	$id  = (int) get_option( 'page_for_posts' );
-	$url = $id ? get_permalink( $id ) : home_url( '/news/' );
-	return $committee ? add_query_arg( 'c', $committee, $url ) : $url;
+function nfa_news_url( $committee = '', $type = '' ) {
+	$path = $type ? nfa_category_path( $type ) : '';
+	if ( $path ) {
+		$url = home_url( '/' . $path . '/' );
+	} else {
+		$id  = (int) get_option( 'page_for_posts' );
+		$url = $id ? get_permalink( $id ) : home_url( '/news/' );
+	}
+	return $committee ? trailingslashit( $url ) . 'committee/' . rawurlencode( $committee ) . '/' : $url;
+}
+
+/**
+ * カテゴリーのパス（親のスラッグ／自分のスラッグ。例：news/news-info）。お知らせ一覧の「すべて」にあたる
+ * 親カテゴリー（投稿ページと同じスラッグ。news）は '' を返す。
+ */
+function nfa_category_path( $slug ) {
+	$term = get_term_by( 'slug', $slug, 'category' );
+	if ( ! $term ) {
+		return '';
+	}
+	$slugs = array( $term->slug );
+	foreach ( get_ancestors( $term->term_id, 'category', 'taxonomy' ) as $aid ) {
+		$a = get_term( $aid, 'category' );
+		if ( $a && ! is_wp_error( $a ) ) {
+			array_unshift( $slugs, $a->slug );
+		}
+	}
+	$path  = implode( '/', $slugs );
+	$posts = get_post( (int) get_option( 'page_for_posts' ) );
+	return ( $posts && $path === $posts->post_name ) ? '' : $path;
 }
 
 /**
@@ -75,8 +111,8 @@ function nfa_u( $target ) {
 		$team = $team ? $team : get_page_by_path( $name, OBJECT, 'team' );
 		$url  = $team ? get_permalink( $team ) : nfa_page_url( 'teams' );
 	} elseif ( 'list' === $name ) {
-		$url   = nfa_news_url();
-		$query = nfa_list_query( $query );
+		$url   = nfa_list_url( $query );
+		$query = '';
 	} elseif ( 'search' === $name ) {
 		$url = function_exists( 'nfa_ai_search_url' ) && nfa_ai_search_url() ? nfa_ai_search_url() : nfa_page_url( 'search' );
 	} elseif ( 0 === strpos( $name, 'detail' ) || '404' === $name ) {
@@ -91,13 +127,10 @@ function nfa_u( $target ) {
 }
 
 /**
- * デザインのお知らせ一覧の絞り込み（?c=office_news など旧カテゴリー）→ 担当委員会 ?c= ・カテゴリー ?type=。
+ * デザインのお知らせ一覧の絞り込み（list.html?c=office_news など旧カテゴリー）→ お知らせ一覧の URL（パスの形）。
  */
-function nfa_list_query( $query ) {
+function nfa_list_url( $query ) {
 	parse_str( (string) $query, $q );
-	if ( empty( $q['c'] ) ) {
-		return $query;
-	}
 	$map = array(
 		'office_news'    => 'association',
 		'technical_news' => 'technical',
@@ -112,13 +145,11 @@ function nfa_list_query( $query ) {
 		'cat_f_news'     => 'cat-f',
 		'cat_s_news'     => 'cat-s',
 	);
-	if ( 'important' === $q['c'] ) {
-		unset( $q['c'] );
-		$q['type'] = 'news-important';
-	} elseif ( isset( $map[ $q['c'] ] ) ) {
-		$q['c'] = $map[ $q['c'] ];
+	$c = (string) ( $q['c'] ?? '' );
+	if ( 'important' === $c ) {
+		return nfa_news_url( '', 'news-important' );
 	}
-	return http_build_query( $q );
+	return nfa_news_url( $map[ $c ] ?? '' );
 }
 
 /**

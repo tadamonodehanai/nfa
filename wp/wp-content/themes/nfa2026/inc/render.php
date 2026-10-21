@@ -21,7 +21,7 @@ function nfa_btn_arrow() {
 function nfa_news_group( $post ) {
 	$t = nfa_committee_of( $post );
 	$s = $t ? $t->slug : 'office';
-	$map = array( 'office' => 'info', 'referee' => 'ref', 'technical' => 'tech', 'medical' => 'tech', 'grassroots' => 'kids' );
+	$map = array( 'association' => 'info', 'office' => 'info', 'referee' => 'ref', 'technical' => 'tech', 'medical' => 'tech', 'grassroots' => 'kids' );
 	return $map[ $s ] ?? 'match';
 }
 
@@ -74,18 +74,55 @@ function nfa_news_li_noth( $post ) {
 /**
  * TOPのNEWSカード（a.nc）。
  */
-function nfa_nc( $post ) {
+function nfa_nc( $post, $group = null, $hidden = false ) {
 	list( $label, $color ) = nfa_badge( $post );
 	return sprintf(
-		'<a class="nc" data-c="%1$s" href="%2$s"><div class="th"><img alt="" src="%3$s"/><span class="badge" style="background:%4$s">%5$s</span></div><div class="dt">%6$s</div><h3>%7$s</h3></a>',
-		esc_attr( nfa_news_group( $post ) ),
+		'<a class="nc" data-c="%1$s" href="%2$s"%8$s><div class="th"><img alt="" src="%3$s"/><span class="badge" style="background:%4$s">%5$s</span></div><div class="dt">%6$s</div><h3>%7$s</h3></a>',
+		esc_attr( null === $group ? nfa_news_group( $post ) : $group ),
 		esc_url( nfa_post_url( $post ) ),
 		esc_url( nfa_thumb( $post ) ),
 		esc_attr( $color ),
 		esc_html( $label ),
 		esc_html( get_the_date( 'Y.m.d', $post ) ),
-		esc_html( get_the_title( $post ) )
+		esc_html( get_the_title( $post ) ),
+		$hidden ? ' hidden' : ''
 	);
+}
+
+/**
+ * TOP の NEWS：タブ（div.tabs）とカード（div.ngrid）。タブの中身は nfa_news_tabs()（inc/data.php）。
+ * タブごとに最新の記事を読み込み、カードの data-c に「その記事が入るタブのキー」を並べる。
+ * 切り替えはデザインの main.js（[data-filter] と data-f／data-c）がそのまま行う。最初のタブ以外のカードは hidden で始める。
+ */
+function nfa_news_tabs_html() {
+	$tabs  = nfa_news_tabs();
+	$first = (string) array_key_first( $tabs );
+	$cards = array();   // 投稿ID => [ 投稿, タブのキー[] ]
+	foreach ( $tabs as $key => $t ) {
+		$posts = nfa_news(
+			array(
+				'committee' => $t['committee'] ?? array(),
+				'type'      => $t['type'] ?? array(),
+				'n'         => (int) ( $t['n'] ?? 8 ),
+				'fresh'     => true,
+			)
+		);
+		foreach ( $posts as $p ) {
+			$cards[ $p->ID ][0]   = $p;
+			$cards[ $p->ID ][1][] = $key;
+		}
+	}
+	uasort( $cards, fn( $a, $b ) => strcmp( $b[0]->post_date, $a[0]->post_date ) );   // 新しい順
+
+	$out = '<div aria-label="ニュースの種類" class="tabs" data-filter="ngrid" role="tablist">';
+	foreach ( $tabs as $key => $t ) {
+		$out .= sprintf( '<button aria-selected="%s" data-f="%s" role="tab">%s</button>', $key === $first ? 'true' : 'false', esc_attr( $key ), esc_html( $t['label'] ) );
+	}
+	$out .= '</div><div class="ngrid" id="ngrid">';
+	foreach ( $cards as $c ) {
+		$out .= nfa_nc( $c[0], implode( ' ', $c[1] ), ! in_array( $first, $c[1], true ) );
+	}
+	return $out . '</div>';
 }
 
 /**
@@ -263,6 +300,14 @@ function nfa_partner_sup_html() {
 		$out .= '<li>' . ( ! empty( $r['url'] ) ? '<a href="' . esc_url( $r['url'] ) . '" rel="noopener" target="_blank">' . esc_html( $r['name'] ) . '</a>' : esc_html( $r['name'] ) ) . '</li>';
 	}
 	return $out;
+}
+
+/**
+ * ページ送り（デザインの nav.pager）。一覧（お知らせ・カテゴリー・アーカイブ）で共通。
+ */
+function nfa_pager() {
+	$pages = paginate_links( array( 'type' => 'array', 'prev_text' => '前へ', 'next_text' => '次へ', 'mid_size' => 1 ) );
+	return $pages ? '<nav class="center pager" aria-label="ページ送り">' . implode( ' ', $pages ) . '</nav>' : '';
 }
 
 /* ---------- ファイル・旧サイトへのリンク ---------- */

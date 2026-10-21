@@ -27,6 +27,8 @@ class NFA_AIS_Settings {
 			'rate_per_min'   => 30,
 			// 検索ログの保存日数
 			'log_days'       => 90,
+			// アクセス解析（Google アナリティクス 4）にイベントを送るか（タグは別に埋め込む）
+			'analytics'      => true,
 		);
 	}
 
@@ -66,6 +68,7 @@ class NFA_AIS_Settings {
 		$out['daily_ai_cap'] = max( 0, absint( $input['daily_ai_cap'] ?? $d['daily_ai_cap'] ) );
 		$out['rate_per_min'] = max( 1, absint( $input['rate_per_min'] ?? $d['rate_per_min'] ) );
 		$out['log_days']     = min( 365, max( 1, absint( $input['log_days'] ?? $d['log_days'] ) ) );
+		$out['analytics']    = ! empty( $input['analytics'] );
 		return $out;
 	}
 
