@@ -36,6 +36,7 @@ add_action(
 		$ver = fn( $f ) => NFA_THEME_VERSION . '.' . filemtime( get_theme_file_path( $f ) );
 		wp_enqueue_style( 'nfa-fonts', 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap', array(), null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 		wp_enqueue_style( 'nfa-style', get_theme_file_uri( 'assets/css/style.css' ), array( 'nfa-fonts' ), $ver( 'assets/css/style.css' ) );
+		wp_enqueue_style( 'nfa-wp', get_theme_file_uri( 'assets/css/wp.css' ), array( 'nfa-style' ), $ver( 'assets/css/wp.css' ) );   // WordPress 版だけの調整
 		wp_enqueue_script( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', array(), '3.12.5', true );
 		wp_enqueue_script( 'gsap-scrolltrigger', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js', array( 'gsap' ), '3.12.5', true );
 		wp_enqueue_script( 'lenis', 'https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js', array(), '1.1.13', true );
@@ -107,6 +108,9 @@ add_action(
 
 // サイトアイコン（カスタマイザー）を設定していないときは、WordPress のアイコンを出さない（テーマのファビコンを使う）
 add_filter( 'get_site_icon_url', fn( $url ) => $url );
+
+/* ---------- Contact Form 7：フォームの記述（inc/*-form.txt）に段落を自動で付けない（デザインの並びが崩れるため） ---------- */
+add_filter( 'wpcf7_autop_or_not', '__return_false' );
 
 /* ---------- 担当委員会「協会」のページは「協会について」 ---------- */
 add_filter(

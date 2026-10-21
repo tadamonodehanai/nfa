@@ -1,0 +1,22 @@
+/* =========================================================
+   WordPress 版だけの調整（デザインの style.css は変えずに、ここで足す）
+   ========================================================= */
+
+/* 協賛帯：サポーターにリンクがあるとき（協賛ページの .pt-sup a と同じ見た目） */
+.supp a{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+
+/* TOP の ACTIVITY REPORT：題名の長さで列の幅が変わらないよう、3列を均等に */
+@media (min-width:961px){
+  .cgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+/* Contact Form 7：入力欄を包む span を、デザインの input と同じく行いっぱいに */
+.form .wpcf7-form-control-wrap{display:block;min-width:0}
+.form .wpcf7-form-control-wrap .inp{width:100%}
+.form .wpcf7-acceptance .wpcf7-list-item{margin:0}
+.form .wpcf7-spinner{vertical-align:middle}
+/* 同意のチェック：Contact Form 7 の入れ子（span・label）を外して、デザインの「□ 文言」の1行に */
+.form .ct-chk .wpcf7-form-control-wrap,
+.form .ct-chk .wpcf7-acceptance,
+.form .ct-chk .wpcf7-list-item,
+.form .ct-chk .wpcf7-list-item > label{display:contents}

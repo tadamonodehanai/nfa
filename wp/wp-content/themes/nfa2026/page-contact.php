@@ -16,7 +16,7 @@ get_header();
 <div class="bh"><div><div class="e">CONTACT FORM</div><h2>お問い合わせフォーム</h2></div></div>
 <div class="art ct-art">
 <div class="ct-main">
-<?php echo nfa_cf7( 'お問い合わせ', 'form' ); // Contact Form 7（記述は inc/contact-form.txt） phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+<?php echo nfa_page_form( 'お問い合わせ', 'form' ); // フォーム＝固定ページの本文の Contact Form 7 ショートコード（空なら「お問い合わせ」。記述は inc/contact-form.txt） phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div>
 <aside aria-label="お問い合わせの前に" class="side ct-side">
 <div>

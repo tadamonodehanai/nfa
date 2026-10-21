@@ -16,7 +16,7 @@ get_header();
 <div class="rj-note">
 <p>一度送信した掲載依頼を修正する場合も、このフォームから再度送信してください。その際は、以前の掲載依頼の修正であることがわかるよう、<b>掲載内容の冒頭にその旨を記載</b>してください。</p>
 </div>
-<?php echo nfa_cf7( 'JFAフェスティバル掲載依頼', 'form rj-form' ); // Contact Form 7（記述は inc/request-jfa-form.txt） phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+<?php echo nfa_page_form( 'JFAフェスティバル掲載依頼', 'form rj-form' ); // フォーム＝固定ページの本文の Contact Form 7 ショートコード（空なら「JFAフェスティバル掲載依頼」。記述は inc/request-jfa-form.txt） phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div>
 <aside aria-label="送信の前に" class="side ct-side">
 <div>

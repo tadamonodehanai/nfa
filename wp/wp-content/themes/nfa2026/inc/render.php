@@ -217,7 +217,9 @@ function nfa_sponsors_html() {
 	}
 	$out .= '</div><div class="supp"><b>SUPPORTERS</b>';
 	foreach ( $s['supporters'] as $r ) {
-		$out .= '<span>' . esc_html( $r['name'] ) . '</span>';
+		// URL が登録されていればリンクにする
+		$name = esc_html( $r['name'] );
+		$out .= '<span>' . ( ! empty( $r['url'] ) ? '<a href="' . esc_url( $r['url'] ) . '" target="_blank" rel="noopener">' . $name . '</a>' : $name ) . '</span>';
 	}
 	return $out . '</div>';
 }
@@ -318,6 +320,20 @@ function nfa_cf7( $title, $class = 'form' ) {
 	return current_user_can( 'manage_options' )
 		? '<p class="lead2">Contact Form 7 のフォーム「' . esc_html( $title ) . '」が見つかりません。<code>wp nfa-committee setup-pages</code> で作成できます。</p>'
 		: '<p class="lead2">ただいまフォームを準備しています。</p>';
+}
+
+/**
+ * 固定ページのフォーム欄：固定ページの本文（Contact Form 7 のショートコード）を出す。
+ * 本文が空のときだけ、題名 $title のフォームを出す（移行中に消えないように）。
+ * 年度などでフォームを替えるときは、本文のショートコードを入れ替える。
+ * ショートコードには、デザインのスタイルが当たるよう html_class を付ける（例：html_class="form rj-form"）。
+ */
+function nfa_page_form( $title, $class = 'form' ) {
+	$content = (string) get_post_field( 'post_content', get_queried_object_id() );
+	if ( '' === trim( wp_strip_all_tags( $content ) ) ) {
+		return nfa_cf7( $title, $class );
+	}
+	return apply_filters( 'the_content', $content ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 }
 
 /* ---------- 事業計画・事業報告 ---------- */

@@ -13,6 +13,6 @@
 </fieldset>
 <div class="ct-agree">
 <p>※当フォームをご利用の際には、<a href="/privacy/">「個人情報保護方針」</a>に同意いただく必要があります。</p>
-<label class="ct-chk">[acceptance acceptance-privacy]「個人情報保護方針」の内容に同意する[/acceptance]</label>
+<div class="ct-chk">[acceptance acceptance-privacy]「個人情報保護方針」の内容に同意する[/acceptance]</div>
 </div>
 <div>[submit class:btn class:btn-g class:ct-submit "送信する"]</div>

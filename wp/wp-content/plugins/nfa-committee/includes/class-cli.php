@@ -90,20 +90,32 @@ class NFA_Com_CLI {
 		update_option( 'page_on_front', $ids['home'] );
 		update_option( 'page_for_posts', $ids['news'] );
 
-		// Contact Form 7 のフォーム（デザインと同じ項目・クラス名。記述はテーマの inc/*.txt）
+		// Contact Form 7 のフォーム（デザインと同じ項目・クラス名。記述はテーマの inc/*.txt）と、
+		// それを置く固定ページの本文（ショートコード。年度などでフォームを替えるときは本文を入れ替える）
 		if ( class_exists( 'WPCF7_ContactForm' ) ) {
-			foreach ( array( 'お問い合わせ' => 'inc/contact-form.txt', 'JFAフェスティバル掲載依頼' => 'inc/request-jfa-form.txt' ) as $title => $path ) {
+			$forms = array(
+				'お問い合わせ'               => array( 'inc/contact-form.txt', 'contact', 'form' ),
+				'JFAフェスティバル掲載依頼' => array( 'inc/request-jfa-form.txt', 'request-jfa', 'form rj-form' ),
+			);
+			foreach ( $forms as $title => $f ) {
+				list( $path, $slug, $class ) = $f;
 				$exists = get_posts( array( 'post_type' => 'wpcf7_contact_form', 'title' => $title, 'posts_per_page' => 1, 'post_status' => 'any' ) );
 				if ( $exists ) {
-					continue;
+					$form_id = (int) $exists[0]->ID;
+				} else {
+					$file = get_theme_file_path( $path );
+					$form = WPCF7_ContactForm::get_template( array( 'title' => $title ) );
+					if ( is_readable( $file ) ) {
+						$form->set_properties( array( 'form' => file_get_contents( $file ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+					}
+					$form_id = (int) $form->save();
+					WP_CLI::log( 'Contact Form 7 のフォーム「' . $title . '」を作成しました。' );
 				}
-				$file = get_theme_file_path( $path );
-				$form = WPCF7_ContactForm::get_template( array( 'title' => $title ) );
-				if ( is_readable( $file ) ) {
-					$form->set_properties( array( 'form' => file_get_contents( $file ) ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+				$page = get_post( $ids[ $slug ] ?? 0 );
+				if ( $page && $form_id && '' === trim( $page->post_content ) ) {
+					wp_update_post( array( 'ID' => $page->ID, 'post_content' => sprintf( '[contact-form-7 id="%d" title="%s" html_class="%s"]', $form_id, $title, $class ) ) );
+					WP_CLI::log( '固定ページ「' . $page->post_title . '」の本文にフォーム「' . $title . '」を入れました。' );
 				}
-				$form->save();
-				WP_CLI::log( 'Contact Form 7 のフォーム「' . $title . '」を作成しました。' );
 			}
 		}
 		flush_rewrite_rules();

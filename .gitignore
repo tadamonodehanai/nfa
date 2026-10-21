@@ -5,3 +5,7 @@ lic/
 
 # 有料プラグイン（ライセンスのためリポジトリに入れない。各環境で別に入れる）
 wp/wp-content/plugins/advanced-custom-fields-pro/
+
+# サーバー側の設定（環境ごとに違う。DBのパスワードなどを含むのでリポジトリに入れない）
+/index.php
+/wp/wp-config.php

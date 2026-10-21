@@ -33,6 +33,6 @@
 </fieldset>
 <div class="ct-agree">
 <p>掲載する文章・写真・資料について、著作権・肖像権・個人情報の取り扱いに問題がないことを確認してください。</p>
-<label class="ct-chk">[acceptance kakunin]著作権、肖像権、個人情報を確認しました[/acceptance]</label>
+<div class="ct-chk">[acceptance kakunin]著作権、肖像権、個人情報を確認しました[/acceptance]</div>
 </div>
 <div>[submit class:btn class:btn-g class:ct-submit "掲載依頼を送信する"]</div>

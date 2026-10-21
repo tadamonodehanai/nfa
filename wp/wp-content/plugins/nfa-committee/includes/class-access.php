@@ -7,7 +7,9 @@
  *   委員会担当（nfa_committee_editor）… 自分の委員会のお知らせ・大会資料の作成・編集・公開、自分が上げたメディア
  *
  * 委員会担当には、ユーザーごとに「担当委員会」（複数可）を割り当てる。
- * 投稿の担当委員会は保存時に自動で付け、担当外の委員会には変えさせない。
+ * 委員会担当の投稿は、担当委員会を保存時に自動で付け、担当外の委員会には変えさせない。
+ * 委員会担当以外（事務局など）が担当委員会を選ばずに保存した記事・大会資料は「協会」にする。
+ * （2026-10 時点では委員会ごとのアカウントは発行しない運用。権限の仕組みは将来のために残している）
  * 他の委員会の記事は、一覧に出さず、URLを直接開いても編集できない（map_meta_cap で判定）。
  *
  * @package NFA_Committee
@@ -26,7 +28,8 @@ class NFA_Com_Access {
 		add_filter( 'user_has_cap', array( __CLASS__, 'review_mode' ), 10, 4 );
 		add_action( 'pre_get_posts', array( __CLASS__, 'filter_admin_lists' ) );
 		add_filter( 'ajax_query_attachments_args', array( __CLASS__, 'own_media_only' ) );
-		add_action( 'save_post', array( __CLASS__, 'assign_on_save' ), 20, 2 );
+		// ブロックエディターは分類を保存のあとに付けるので、それが済んだ wp_after_insert_post で見る
+		add_action( 'wp_after_insert_post', array( __CLASS__, 'assign_on_save' ), 20, 2 );
 		add_filter( 'rest_' . NFA_Com_Committees::TAX . '_query', array( __CLASS__, 'limit_term_choices' ), 10, 2 );
 		add_filter( 'get_terms_args', array( __CLASS__, 'limit_term_choices_admin' ), 10, 2 );
 		add_action( 'admin_menu', array( __CLASS__, 'hide_menus' ), 999 );
@@ -182,7 +185,7 @@ class NFA_Com_Access {
 	 * 対象が未選択なら、委員会の初期値（例：4種 → 小学生）を入れる。
 	 */
 	public static function assign_on_save( $post_id, $post ) {
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || ! self::managed_type( $post->post_type ) ) {
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || ! self::managed_type( $post->post_type ) || 'auto-draft' === $post->post_status ) {
 			return;
 		}
 		$terms = self::post_committees( $post_id );
@@ -193,9 +196,12 @@ class NFA_Com_Access {
 			if ( $keep !== $terms ) {
 				wp_set_object_terms( $post_id, $keep, NFA_Com_Committees::TAX );
 			}
-			$terms = $keep;
+			return;
 		}
-		NFA_Com_Committees::apply_default_target( $post_id, $terms );
+		// 担当委員会を選び忘れた記事は「協会」にする（委員会ページ・一覧の区分から漏れないように）
+		if ( ! $terms ) {
+			wp_set_object_terms( $post_id, NFA_Com_Committees::ASSOCIATION, NFA_Com_Committees::TAX );
+		}
 	}
 
 	/**

@@ -13,7 +13,7 @@
  *   layout  ページの構成：full（大会＋リーグ）| tournament（大会のみ）| info（説明文中心）
  *   lead    ページ見出しの説明文         tel    問い合わせ帯の電話番号
  *   legacy  既存サイトの該当ページ       archive 既存サイトの過去年度（年度|URL を改行区切り）
- *   target  「対象」の初期値（AI検索の対象のスラッグ。委員会担当が対象を選ばなかったときに入る）
+ *   target  「対象」の値（AI検索の対象のスラッグ）。旧サイトの記事を取り込むときだけ使う（投稿のときに自動では付けない）
  *
  * @package NFA_Committee
  */
@@ -148,30 +148,6 @@ class NFA_Com_Committees {
 			}
 		);
 		return $terms;
-	}
-
-	/**
-	 * 対象が未選択なら、委員会の初期値を入れる（例：4種 → 小学生（4種））。
-	 */
-	public static function apply_default_target( $post_id, array $committee_ids ) {
-		if ( ! taxonomy_exists( 'nfa_target' ) || ! $committee_ids ) {
-			return;
-		}
-		$has = wp_get_object_terms( $post_id, 'nfa_target', array( 'fields' => 'ids' ) );
-		if ( $has && ! is_wp_error( $has ) ) {
-			return;
-		}
-		$targets = array();
-		foreach ( $committee_ids as $cid ) {
-			$slug = (string) nfa_committee_meta( $cid, 'target' );
-			$t    = $slug ? get_term_by( 'slug', $slug, 'nfa_target' ) : null;
-			if ( $t ) {
-				$targets[] = (int) $t->term_id;
-			}
-		}
-		if ( $targets ) {
-			wp_set_object_terms( $post_id, $targets, 'nfa_target' );
-		}
 	}
 
 	/* ---------- 委員会の編集画面 ---------- */
